@@ -21,24 +21,26 @@
  */
 
 
-package com.razor;
-
-import lombok.extern.slf4j.Slf4j;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+package com.razor.mvc;
 
 /**
- * Razor entrance
+ * Razor global constants
  *
  * @author Touchumind
  * @since 0.0.1
- * @date 2017/8/21
+ * @date 2017/8/22
  */
-@Slf4j
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Razor {
+public interface Constants {
+    // Version
+    String VERSION = "0.0.1-SNAPSHOT";
 
-    public static Razor self() {
-        return new Razor();
-    }
+    // Server constants
+    String DEFAULT_SERVER_HOST = "0.0.0.0";
+    int DEFAULT_SERVER_PORT = 8088;
+
+    // Http constants
+    String DEFAULT_CHARSET = "UTF-8";
+    String CONTENT_TYPE_HTML = "text/html; charset=" + DEFAULT_CHARSET;
+    String CONTENT_TYPE_JSON = "application/json; charset=" + DEFAULT_CHARSET;
+    String CONTENT_TYPE_TEXT = "text/plain; charset=" + DEFAULT_CHARSET;
 }
