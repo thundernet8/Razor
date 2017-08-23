@@ -21,52 +21,42 @@
  */
 
 
-package com.razor;
+package com.razor.server;
 
-import lombok.extern.slf4j.Slf4j;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import com.razor.env.Env;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.CharsetUtil;
 
 /**
- * Razor entrance
+ * Default ChannelInboundHandler
  *
  * @author Touchumind
  * @since 0.0.1
- * @date 2017/8/21
  */
-@Slf4j
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Razor {
-    private Env env;
+public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
-    public Env getEnv() {
-        return env;
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        // super.channelRead(ctx, msg);
+        ByteBuf in = (ByteBuf) msg;
+        System.out.println("Server received: " + in.toString(CharsetUtil.UTF_8));
+        ctx.write(in);
     }
 
-    // Application class
-    private Class<?> appClass;
-
-    public Class<?> getAppClass() {
-        return appClass;
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        // super.channelReadComplete(ctx);
+        ctx.writeAndFlush(Unpooled.EMPTY_BUFFER)
+                .addListener(ChannelFutureListener.CLOSE);
     }
 
-    public static Razor self() {
-        return new Razor();
-    }
-
-    public Razor listen(@NonNull String host, @NonNull int port) {
-        // TODO
-        return this;
-    }
-
-    public void run(@NonNull Class<?> appClass, String[] args) {
-        // TODO
-        this.appClass = appClass;
-    }
-
-    public void stop() {
-        // TODO
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        // super.exceptionCaught(ctx, cause);
+        cause.printStackTrace();
+        ctx.close();
     }
 }

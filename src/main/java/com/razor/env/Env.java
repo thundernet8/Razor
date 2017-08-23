@@ -30,13 +30,13 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import static com.razor.mvc.Constants.*;
 
 /**
  * Razor environment handler
  *
  * @author Touchumind
  * @since 0.0.1
- * @date 2017/8/22
  */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

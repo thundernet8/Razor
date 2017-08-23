@@ -43,4 +43,8 @@ public interface Constants {
     String CONTENT_TYPE_HTML = "text/html; charset=" + DEFAULT_CHARSET;
     String CONTENT_TYPE_JSON = "application/json; charset=" + DEFAULT_CHARSET;
     String CONTENT_TYPE_TEXT = "text/plain; charset=" + DEFAULT_CHARSET;
+
+    // Env keys
+    String ENV_KEY_SERVER_HOST = "server.host";
+    String ENV_KEY_SERVER_PORT = "server.port";
 }
