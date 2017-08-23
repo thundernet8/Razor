@@ -37,8 +37,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gson.version>2.8.1</gson.version>
         <netty.version>4.1.14.Final</netty.version>
-        <slf4j.version>1.7.12</slf4j.version>
-        <log4j.version>1.2.17</log4j.version>
+        <slf4j.version>1.7.25</slf4j.version>
         <junit.version>4.12</junit.version>
         <javax.servlet.version>4.0.0</javax.servlet.version>
         <lombok.version>1.16.18</lombok.version>
@@ -70,7 +69,7 @@
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <artifactId>slf4j-simple</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
         <dependency>
@@ -104,7 +103,20 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
-            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-nop</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-jdk14</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- https://mvnrepository.com/artifact/io.netty/netty-all -->
         <dependency>
@@ -113,5 +125,4 @@
             <version>${netty.version}</version>
         </dependency>
     </dependencies>
-    
 </project>

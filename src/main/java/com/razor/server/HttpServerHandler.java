@@ -23,12 +23,17 @@
 
 package com.razor.server;
 
+import com.razor.Razor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
+import io.netty.channel.ChannelHandler.Sharable;
+
+import static io.netty.buffer.Unpooled.copiedBuffer;
 
 /**
  * Default ChannelInboundHandler
@@ -36,14 +41,42 @@ import io.netty.util.CharsetUtil;
  * @author Touchumind
  * @since 0.0.1
  */
+@Sharable
 public class HttpServerHandler extends ChannelInboundHandlerAdapter {
+
+    private Razor razor;
+
+    public HttpServerHandler(Razor razor) {
+        this.razor = razor;
+    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         // super.channelRead(ctx, msg);
-        ByteBuf in = (ByteBuf) msg;
-        System.out.println("Server received: " + in.toString(CharsetUtil.UTF_8));
-        ctx.write(in);
+        if (msg instanceof FullHttpRequest)
+        {
+            final FullHttpRequest request = (FullHttpRequest) msg;
+            final String responseMessage = "Hello from Netty!";
+            FullHttpResponse response = new DefaultFullHttpResponse(
+                    HttpVersion.HTTP_1_1,
+                    HttpResponseStatus.OK,
+                    copiedBuffer(responseMessage.getBytes())
+            );
+
+            if (HttpHeaders.isKeepAlive(request))
+            {
+                response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+            }
+            response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/plain");
+            response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, responseMessage.length());
+            response.headers().set("X-Power-By", "Razor");
+
+            ctx.write(response);
+        }
+        else
+        {
+            super.channelRead(ctx, msg);
+        }
     }
 
     @Override
@@ -56,6 +89,13 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         // super.exceptionCaught(ctx, cause);
+
+        ctx.writeAndFlush(new DefaultFullHttpResponse(
+                HttpVersion.HTTP_1_1,
+                HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                copiedBuffer(cause.getMessage().getBytes())
+        ));
+
         cause.printStackTrace();
         ctx.close();
     }

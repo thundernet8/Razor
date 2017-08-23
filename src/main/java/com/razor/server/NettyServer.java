@@ -26,9 +26,8 @@ package com.razor.server;
 import com.razor.Razor;
 import com.razor.env.Env;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 import io.netty.channel.Channel;
@@ -48,7 +47,13 @@ public class NettyServer {
     private Env env;
 
     private Channel channel;
-    private NioEventLoopGroup group;
+    private final NioEventLoopGroup masterGroup;
+    private final NioEventLoopGroup slaveGroup;
+
+    public NettyServer() {
+        masterGroup = new NioEventLoopGroup();
+        slaveGroup = new NioEventLoopGroup();
+    }
 
     public void start(Razor razor, String[] args) throws Exception {
         this.razor = razor;
@@ -58,21 +63,32 @@ public class NettyServer {
     }
 
     private void startServer() throws Exception {
-        this.group = new NioEventLoopGroup();
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            @Override
+            public void run() { shutdown(); }
+        });
+
         try {
-            ServerBootstrap b = new ServerBootstrap();
-            b.group(group).channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new HttpServerHandler());
-                        }
-                    });
-            this.channel = b.bind(env.get(ENV_KEY_SERVER_HOST, DEFAULT_SERVER_HOST), env.getInt(ENV_KEY_SERVER_PORT, DEFAULT_SERVER_PORT)).sync().channel();
-            System.out.println(HttpServerHandler.class.getName() + " started and listen on " + channel.localAddress());
+            ServerBootstrap bootstrap = new ServerBootstrap();
+            bootstrap.group(masterGroup, slaveGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new HttpServerInitializer(razor))
+                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true);
+            this.channel = bootstrap.bind(env.get(ENV_KEY_SERVER_HOST, DEFAULT_SERVER_HOST), env.getInt(ENV_KEY_SERVER_PORT, DEFAULT_SERVER_PORT)).sync().channel();
+            log.info("{} started and listen on {}", HttpServerHandler.class.getName(), channel.localAddress());
+        } catch (final InterruptedException e){
+            log.error("Netty server startup failed, error: {}", e.getMessage());
+        }
+    }
+
+    public void shutdown() {
+        slaveGroup.shutdownGracefully();
+        masterGroup.shutdownGracefully();
+        try {
             channel.closeFuture().sync();
-        } finally {
-            group.shutdownGracefully().sync();
+        } catch (InterruptedException e) {
+            log.error("Netty server shutdown failed, error: {}", e.getMessage());
         }
     }
 }

@@ -23,11 +23,15 @@
 
 package com.razor;
 
+import com.razor.server.NettyServer;
 import lombok.extern.slf4j.Slf4j;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import com.razor.env.Env;
+
+import static com.razor.mvc.Constants.*;
 
 /**
  * Razor entrance
@@ -37,36 +41,49 @@ import com.razor.env.Env;
  * @date 2017/8/21
  */
 @Slf4j
+@Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Razor {
-    private Env env;
-
-    public Env getEnv() {
-        return env;
-    }
+    private Env env = Env.defaults();
 
     // Application class
     private Class<?> appClass;
 
-    public Class<?> getAppClass() {
-        return appClass;
-    }
+    private NettyServer nettyServer;
 
     public static Razor self() {
         return new Razor();
     }
 
     public Razor listen(@NonNull String host, @NonNull int port) {
-        // TODO
+        env.set(ENV_KEY_SERVER_HOST, host);
+        env.set(ENV_KEY_SERVER_PORT, port);
         return this;
     }
 
     public void run(@NonNull Class<?> appClass, String[] args) {
-        // TODO
-        this.appClass = appClass;
+        run(appClass, DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT, args);
+    }
+
+    public void run(@NonNull Class<?> appClass, @NonNull String host, @NonNull int port, String[] args) {
+        try {
+            env.set(ENV_KEY_SERVER_HOST, host);
+            assert port >= 80 : "Port should be a positive value and greater or equal to 80";
+            env.set(ENV_KEY_SERVER_PORT, port);
+            this.appClass = appClass;
+            new Thread(() -> {
+                try {
+                    nettyServer.start(Razor.this, args);
+                } catch (Exception e) {
+                    log.error("Run razor in new thread failed, error: {}", e.getMessage());
+                }
+            }).start();
+        } catch (Exception e) {
+            log.error("Run razor failed, error: {}", e.getMessage());
+        }
     }
 
     public void stop() {
-        // TODO
+        nettyServer.shutdown();
     }
 }
