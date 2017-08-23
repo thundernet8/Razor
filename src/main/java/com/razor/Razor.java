@@ -26,6 +26,9 @@ package com.razor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Getter;
+import com.razor.env.Env;
 
 /**
  * Razor entrance
@@ -35,10 +38,29 @@ import lombok.NoArgsConstructor;
  * @date 2017/8/21
  */
 @Slf4j
+@Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Razor {
+    private Env env;
+
+    // Application class
+    private Class<?> appClass;
 
     public static Razor self() {
         return new Razor();
+    }
+
+    public Razor listen(@NonNull String host, @NonNull int port) {
+        // TODO
+        return this;
+    }
+
+    public void run(@NonNull Class<?> appClass, String[] args) {
+        // TODO
+        this.appClass = appClass;
+    }
+
+    public void stop() {
+        // TODO
     }
 }

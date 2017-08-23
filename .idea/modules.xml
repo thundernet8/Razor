@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/razor-mvc.iml" filepath="$PROJECT_DIR$/razor-mvc.iml" />
-      <module fileurl="file://$PROJECT_DIR$/razor-mvc.iml" filepath="$PROJECT_DIR$/razor-mvc.iml" />
     </modules>
   </component>
 </project>
