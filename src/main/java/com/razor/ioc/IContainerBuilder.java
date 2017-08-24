@@ -31,9 +31,11 @@ package com.razor.ioc;
  */
 public interface IContainerBuilder {
 
-    <O, T> void registerTypeAs(O implementer, T implementationType);
+    <T> IRegistrationBuilder registerType(T implementerOrImplementationType);
 
-    <O, T> void registerTypeNamed(O implementer, T implementationType, String name);
+    <T> IRegistrationBuilder registerInstance(T implementationType);
 
-    <O, T, E extends Enum<E>> void registerTypeKeyed(O implementer, T implementationType, E key);
+    IRegistrationBuilder registerControllers();
+
+    IContainer build();
 }

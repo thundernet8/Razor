@@ -23,11 +23,44 @@
 
 package com.razor.ioc;
 
+import org.apache.commons.lang3.StringUtils;
+import lombok.Getter;
+
 /**
- *
+ * Bean descriptor
  *
  * @author Touchumind
  * @since 0.0.1
  */
+@Getter
 public class ServiceBean {
+
+    private Class<?> type;
+
+    private String name;
+
+    private Object key;
+
+    private Object bean;
+
+    boolean hasName() {
+        return !StringUtils.isEmpty(name);
+    }
+
+    boolean hasKey() {
+        return key != null;
+    }
+
+    private ServiceBean(RegistrationData rd) {
+        type = rd.getType();
+        name = rd.getName();
+        key = rd.getKey();
+        bean = rd.getInstance();
+
+        // TODO
+    }
+
+    static ServiceBean fromRegistrationData(RegistrationData rd) {
+        return new ServiceBean(rd);
+    }
 }

@@ -23,11 +23,38 @@
 
 package com.razor.ioc;
 
+import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Data common to all registrations made in the container, both direct (IComponentRegistration) and and dynamic (IRegistrationSource.)
  *
  * @author Touchumind
  * @since 0.0.1
  */
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RegistrationData {
+
+    /**
+     * Determinate the lifecycle of ServiceBean which will bind to this registration.
+     */
+    private boolean isSington = false;
+
+    private Class<?> type;
+
+    private Object implementer;
+
+    private String name = "";
+
+    private Object key = null;
+
+    private Object instance = null;
+
+    public static RegistrationData defaults() {
+        return new RegistrationData();
+    }
 }

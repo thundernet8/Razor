@@ -23,11 +23,46 @@
 
 package com.razor.ioc;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 /**
- * Service beans container interface
+ * Beans container builder
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public interface IDependencyResolver {
+public class ContainerBuilder implements IContainerBuilder {
+
+    private final Map<String, RegistrationData> rds = new HashMap<>();
+
+    private final List<RegistrationBuilder> rbs = new ArrayList<>();
+
+    @Override
+    public <T> IRegistrationBuilder registerType(T implementationType) {
+        RegistrationBuilder rb = RegistrationBuilder.forType(implementationType);
+        rbs.add(rb);
+        return rb;
+    }
+
+    @Override
+    public <T> IRegistrationBuilder registerInstance(T instance) {
+        RegistrationBuilder rb = RegistrationBuilder.forInstance(instance);
+        rbs.add(rb);
+        return rb;
+    }
+
+    @Override
+    public IRegistrationBuilder registerControllers() {
+        // TODO
+        return null;
+    }
+
+    @Override
+    public IContainer build() {
+        return new Ioc(rbs.stream().map(t -> ServiceBean.fromRegistrationData(t.getRegistrationData())).collect(Collectors.toList()));
+    }
 }
