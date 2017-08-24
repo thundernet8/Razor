@@ -32,6 +32,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.util.ReferenceCountUtil;
 
 import static io.netty.buffer.Unpooled.copiedBuffer;
 
@@ -72,6 +73,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
             response.headers().set("X-Power-By", "Razor");
 
             ctx.write(response);
+            ReferenceCountUtil.release(msg);
         }
         else
         {

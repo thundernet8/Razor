@@ -23,6 +23,7 @@
 
 package com.razor;
 
+import com.razor.ioc.IDependencyResolver;
 import com.razor.server.NettyServer;
 import lombok.extern.slf4j.Slf4j;
 import lombok.AccessLevel;
@@ -45,11 +46,10 @@ import static com.razor.mvc.Constants.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Razor {
     private Env env = Env.defaults();
-
     // Application class
     private Class<?> appClass;
 
-    private NettyServer nettyServer;
+    private NettyServer nettyServer = new NettyServer();
 
     public static Razor self() {
         return new Razor();
@@ -61,11 +61,11 @@ public class Razor {
         return this;
     }
 
-    public void run(@NonNull Class<?> appClass, String[] args) {
-        run(appClass, DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT, args);
+    public void start(@NonNull Class<?> appClass, String[] args) {
+        start(appClass, DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT, args);
     }
 
-    public void run(@NonNull Class<?> appClass, @NonNull String host, @NonNull int port, String[] args) {
+    public void start(@NonNull Class<?> appClass, @NonNull String host, @NonNull int port, String[] args) {
         try {
             env.set(ENV_KEY_SERVER_HOST, host);
             assert port >= 80 : "Port should be a positive value and greater or equal to 80";
@@ -73,7 +73,7 @@ public class Razor {
             this.appClass = appClass;
             new Thread(() -> {
                 try {
-                    nettyServer.start(Razor.this, args);
+                    nettyServer.run(Razor.this, args);
                 } catch (Exception e) {
                     log.error("Run razor in new thread failed, error: {}", e.getMessage());
                 }
@@ -82,6 +82,7 @@ public class Razor {
             log.error("Run razor failed, error: {}", e.getMessage());
         }
     }
+
 
     public void stop() {
         nettyServer.shutdown();

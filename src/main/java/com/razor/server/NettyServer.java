@@ -55,7 +55,7 @@ public class NettyServer {
         slaveGroup = new NioEventLoopGroup();
     }
 
-    public void start(Razor razor, String[] args) throws Exception {
+    public void run(Razor razor, String[] args) throws Exception {
         this.razor = razor;
         this.env = razor.getEnv();
 
