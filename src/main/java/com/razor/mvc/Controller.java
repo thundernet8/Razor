@@ -20,35 +20,15 @@
  * SOFTWARE.
  */
 
-import com.razor.ioc.*;
 
-import java.lang.reflect.Constructor;
+package com.razor.mvc;
 
-interface IClz {
+/**
+ * Razor abstract controller
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public abstract class Controller {
 
-}
-
-public class Test implements IClz {
-    public String para = "para";
-
-    public static void main(String[] args) {
-        ContainerBuilder builder = new ContainerBuilder();
-        builder.registerType(Test.class).named("name");
-        Ioc container = (Ioc)builder.build();
-        Test t = container.resolveNamed(Test.class, "name");
-        Test t2 = (Test)t;
-        Constructor[] tt = Test.class.getConstructors();
-        Constructor ttt = null;
-        try {
-            ttt = Test.class.getConstructor(new Class[]{String.class});
-        } catch (Exception e) {
-
-        }
-        String a = "";
-
-    }
-
-    public Test(String x) {
-        para = x;
-    }
 }

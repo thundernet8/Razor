@@ -23,11 +23,12 @@
 
 package com.razor.ioc;
 
+import com.razor.ioc.walker.ClassesWalker;
 import com.razor.ioc.walker.ConstructorWalker;
-
-import java.lang.reflect.Array;
+import com.razor.ioc.walker.FieldsWalker;
+import lombok.extern.slf4j.Slf4j;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -36,6 +37,7 @@ import java.util.*;
  * @author Touchumind
  * @since 0.0.1
  */
+@Slf4j
 public class Ioc implements IContainer {
 
     @SuppressWarnings("unchecked")
@@ -45,7 +47,7 @@ public class Ioc implements IContainer {
 
     private final Map<String, Map<Object, ServiceBean>> keyedBeanPool = new HashMap<>();
 
-    public Ioc(List<ServiceBean> beans) {
+    Ioc(List<ServiceBean> beans) {
         // TODO getInterfaces() and register
         for (ServiceBean bean : beans) {
             String typeName = bean.getRegType().getName();
@@ -58,7 +60,7 @@ public class Ioc implements IContainer {
                 keyedBeanPool.put(typeName, innerMap);
             }
             if (bean.hasName()) {
-                namedBeanPool.put(typeName + "-" + bean.getName(), bean);
+                namedBeanPool.put(typeName.concat("-").concat(bean.getName()), bean);
             }
             beanPool.put(typeName, bean);
         }
@@ -66,22 +68,37 @@ public class Ioc implements IContainer {
 
     @Override
     public <T> T resolve(Class<T> t) {
-        return resolveBean(beanPool.get(t.getName()));
+        try {
+            return resolveBean(beanPool.get(t.getName()));
+        } catch (DependencyResolveException e) {
+            log.error("Resolve {} encounter exception: {}", t.getName(), e.getMessage());
+            return null;
+        }
     }
 
     @Override
     public <T> T resolveNamed(Class<T> t, String name) {
-        return resolveBean(namedBeanPool.get(t.getName() + "-" + name));
+        try {
+            return resolveBean(namedBeanPool.get(t.getName().concat("-").concat(name)));
+        } catch (DependencyResolveException e) {
+            log.error("Resolve {} named {} encounter exception: {}", t.getName(), name, e.getMessage());
+            return null;
+        }
     }
 
     @Override
     public <T, E extends Enum<E>> T resolveKeyed(Class<T> t, E enumKey) {
-        Map<Object, ServiceBean> svbMap = keyedBeanPool.get(t.getName());
-        return resolveBean(svbMap.get(enumKey));
+        try {
+            Map<Object, ServiceBean> svbMap = keyedBeanPool.get(t.getName());
+            return resolveBean(svbMap.get(enumKey));
+        } catch (DependencyResolveException e) {
+            log.error("Resolve {} keyed {} encounter exception: {}", t.getName(), enumKey.toString(), e.getMessage());
+            return null;
+        }
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T resolveBean(ServiceBean svb) {
+    private <T> T resolveBean(ServiceBean svb) throws DependencyResolveException {
         if (svb == null) {
             return null;
         }
@@ -92,16 +109,43 @@ public class Ioc implements IContainer {
 
         try {
             Class<?> clazz = svb.getImplType();
-            Constructor constructor = ConstructorWalker.findInjectContructor(clazz);
-            Class[] parameterTypes = constructor.getParameterTypes();
-            if (parameterTypes.length == 0) {
-                return (T)constructor.newInstance();
+
+            if (clazz.isInterface()) {
+                Class<?>[] implementers = ClassesWalker.cachedImplementers(clazz);
+                for (int i=0; i<implementers.length; i++) {
+                    Object ret = resolve(implementers[i]);
+                    if (ret != null) {
+                        return (T)ret;
+                    }
+                }
+
+                throw new DependencyResolveException("Cannot resolve interface " + clazz.getName());
             }
-            Object[] args = Arrays.stream(parameterTypes).map(this::resolve).toArray();
-            Object ins = constructor.newInstance(args);
-            return (T)ins;
+
+            // resolve constructor and args
+            Constructor constructor = ConstructorWalker.cachedInjectConstructor(clazz);
+            Class[] parameterTypes = constructor.getParameterTypes();
+            T ins = null;
+            if (parameterTypes.length == 0) {
+                ins = (T)constructor.newInstance();
+            } else {
+                Object[] args = Arrays.stream(parameterTypes).map(this::resolve).toArray();
+                ins = (T)constructor.newInstance(args);
+
+                // resolve fields
+                Field[] fields = FieldsWalker.cachedInjectFields(clazz);
+
+                // TODO add fields to instance
+            }
+
+            if (svb.isSington()) {
+                svb.setBean(ins);
+            }
+
+            return ins;
         } catch (Exception e) {
-            return null;
+            e.printStackTrace();
+            throw new DependencyResolveException(e.getMessage(), e.getCause());
         }
 
     }

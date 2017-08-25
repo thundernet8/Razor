@@ -1,3 +1,9 @@
+package com.razor.test;
+
+import org.reflections.Reflections;
+
+import java.util.Set;
+
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -20,24 +26,14 @@
  * SOFTWARE.
  */
 
+public class Test implements ITest {
 
-package com.razor.ioc;
+    public static void main(String[] args) {
 
-import java.util.Set;
+        class TT{}
 
-/**
- * Dependency injection services container
- *
- * @author Touchumind
- * @since 0.0.1
- */
-public interface IContainerBuilder {
+        Set<Class<? extends ITest>> classes = new Reflections("com.razor.test.controllers").getSubTypesOf(ITest.class);
 
-    <T> IRegistrationBuilder registerType(Class<T> implementerOrImplementationType);
-
-    <T> IRegistrationBuilder registerInstance(T instance);
-
-    <T> void autoRegister(Class<T> abstractController);
-
-    IContainer build();
+        System.out.println("done");
+    }
 }

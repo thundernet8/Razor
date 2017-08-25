@@ -21,23 +21,13 @@
  */
 
 
-package com.razor.ioc;
+package com.razor.test;
 
-import java.util.Set;
+import com.razor.ioc.annotation.Inject;
 
-/**
- * Dependency injection services container
- *
- * @author Touchumind
- * @since 0.0.1
- */
-public interface IContainerBuilder {
+@Inject
+public class InjectTest {
+    String des = "test inject annotation, should auto registered";
 
-    <T> IRegistrationBuilder registerType(Class<T> implementerOrImplementationType);
-
-    <T> IRegistrationBuilder registerInstance(T instance);
-
-    <T> void autoRegister(Class<T> abstractController);
-
-    IContainer build();
+    public InjectTest() {}
 }

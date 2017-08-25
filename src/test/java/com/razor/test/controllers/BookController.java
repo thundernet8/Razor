@@ -21,23 +21,13 @@
  */
 
 
-package com.razor.ioc;
+package com.razor.test.controllers;
 
-import java.util.Set;
 
-/**
- * Dependency injection services container
- *
- * @author Touchumind
- * @since 0.0.1
- */
-public interface IContainerBuilder {
+import com.razor.mvc.Controller;
+import com.razor.test.ITest;
 
-    <T> IRegistrationBuilder registerType(Class<T> implementerOrImplementationType);
+public class BookController extends Controller implements ITest {
 
-    <T> IRegistrationBuilder registerInstance(T instance);
-
-    <T> void autoRegister(Class<T> abstractController);
-
-    IContainer build();
+    public String defaultName = "book";
 }

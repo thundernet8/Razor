@@ -69,7 +69,7 @@ public class Env {
     }
 
     public Optional<Object> getObject(@NonNull String key) {
-        return Optional.ofNullable(props.getProperty(key));
+        return Optional.ofNullable(props.get(key));
     }
 
     public Optional<Integer> getInt(@NonNull String key) {
@@ -113,4 +113,6 @@ public class Env {
     }
 
     // TODO load envs from file or others
+
+    // TODO controllers package suffix
 }

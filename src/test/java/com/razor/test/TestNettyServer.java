@@ -21,23 +21,18 @@
  */
 
 
-package com.razor.ioc;
+package com.razor.test;
 
-import java.util.Set;
+import com.razor.Razor;
+import com.razor.server.NettyServer;
 
-/**
- * Dependency injection services container
- *
- * @author Touchumind
- * @since 0.0.1
- */
-public interface IContainerBuilder {
-
-    <T> IRegistrationBuilder registerType(Class<T> implementerOrImplementationType);
-
-    <T> IRegistrationBuilder registerInstance(T instance);
-
-    <T> void autoRegister(Class<T> abstractController);
-
-    IContainer build();
+public class TestNettyServer {
+    public static void main(String[] args) {
+        NettyServer nettyServer = new NettyServer();
+        try {
+            nettyServer.run(Razor.self(), args);
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+    }
 }

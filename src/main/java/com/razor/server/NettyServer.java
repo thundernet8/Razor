@@ -63,10 +63,7 @@ public class NettyServer {
     }
 
     private void startServer() throws Exception {
-        Runtime.getRuntime().addShutdownHook(new Thread(){
-            @Override
-            public void run() { shutdown(); }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
 
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();

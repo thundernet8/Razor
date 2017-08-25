@@ -23,8 +23,12 @@
 
 package com.razor.ioc.walker;
 
+import com.razor.ioc.DependencyResolveException;
 import com.razor.ioc.annotation.ForInject;
 import java.lang.reflect.Constructor;
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -36,29 +40,54 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ConstructorWalker {
 
-    public static Constructor findInjectContructor(Class<?> clazz) {
+    private static final Map<Class<?>, Constructor> constructorMap = new HashMap<>();
+
+    public static Constructor findInjectConstructor(Class<?> clazz) throws DependencyResolveException {
         Constructor[] constructors = clazz.getConstructors();
-        Constructor injectConstructor = null;
-        Constructor annotationConstructor = null;
-        try {
-            // no args constructor for default
-            injectConstructor = clazz.getConstructor(new Class[]{});
-            // find a annotated constructor which is specified for injection
-            for (Constructor constructor : constructors) {
-                if (constructor.getAnnotation(ForInject.class) != null && annotationConstructor == null) {
-                    annotationConstructor = constructor;
-                }
-            }
 
-            if (annotationConstructor != null) {
-                injectConstructor = annotationConstructor;
-            }
-
-        } catch (Exception e) {
-            log.error("Walk class for constructor encounter exception: {}", e.getMessage());
-            e.printStackTrace();
+        if (constructors.length == 0) {
+            throw new DependencyResolveException("Cannot resolve constructor for Type: " + clazz.getName());
         }
 
+        Constructor injectConstructor = constructors[0];
+
+        if (constructors.length > 1) {
+            try {
+
+                Constructor annotatedConstructor = null;
+                // find a annotated constructor which is specified for injection
+                for (Constructor constructor : constructors) {
+                    if (constructor.getAnnotation(ForInject.class) != null && annotatedConstructor == null) {
+                        annotatedConstructor = constructor;
+                    }
+                }
+
+                if (annotatedConstructor != null) {
+                    injectConstructor = annotatedConstructor;
+                }
+
+            } catch (Exception e) {
+                log.error("Walk class for constructor encounter exception: {}", e.getMessage());
+                e.printStackTrace();
+                throw e;
+            }
+        }
+
+        constructorMap.put(clazz, injectConstructor);
+
         return injectConstructor;
+    }
+
+    public static Constructor cachedInjectConstructor(Class<?> clazz) throws DependencyResolveException {
+        Constructor constructor = constructorMap.get(clazz);
+        if (constructor != null) {
+            return constructor;
+        }
+        constructor = findInjectConstructor(clazz);
+        if (constructor == null) {
+            throw new DependencyResolveException("Cannot resolve constructor for Type: " + clazz.getName());
+        }
+
+        return constructor;
     }
 }

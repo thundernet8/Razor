@@ -31,6 +31,16 @@
         </developer>
     </developers>
 
+    <scm>
+        <url>https://github.com/thundernet8/Razor/issues</url>
+        <connection>scm:git:git://github.com/thundernet8/Razor.git</connection>
+    </scm>
+
+    <issueManagement>
+        <url>https://github.com/Razor/Razor/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -123,6 +133,17 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <version>${netty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.9.11</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/asm/asm -->
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>3.3.1</version>
         </dependency>
     </dependencies>
 </project>

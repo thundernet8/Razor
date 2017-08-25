@@ -21,23 +21,43 @@
  */
 
 
-package com.razor.ioc;
+package com.razor.ioc.walker;
 
-import java.util.Set;
+
+import org.reflections.Reflections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Dependency injection services container
+ * Reflect classes for a interface
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public interface IContainerBuilder {
+public class ClassesWalker {
 
-    <T> IRegistrationBuilder registerType(Class<T> implementerOrImplementationType);
+    private static final Map<Class<?>, Class<?>[]> classesMap = new HashMap<>();
 
-    <T> IRegistrationBuilder registerInstance(T instance);
+    private static Class<?> appClass;
 
-    <T> void autoRegister(Class<T> abstractController);
+    public static <T> Class<?>[] reflectImplementers(Class<?> appClass, Class<T> implType) {
 
-    IContainer build();
+        Class<?>[] implementers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(implType).stream().map(impl -> (Class<?>)impl).toArray(Class<?>[]::new);
+
+        // cache reflection results
+        classesMap.put(implType, implementers);
+
+        ClassesWalker.appClass = appClass;
+
+        return implementers;
+    }
+
+    public static Class<?>[] cachedImplementers(Class<?> implType) {
+        Class<?>[] implementers = classesMap.get(implType);
+
+        if (implementers != null) {
+            return implementers;
+        }
+        return reflectImplementers(appClass, implType);
+    }
 }

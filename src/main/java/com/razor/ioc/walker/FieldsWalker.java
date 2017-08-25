@@ -21,23 +21,39 @@
  */
 
 
-package com.razor.ioc;
+package com.razor.ioc.walker;
 
-import java.util.Set;
+import com.razor.ioc.annotation.FromService;
+import java.util.*;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 
 /**
- * Dependency injection services container
+ * Find fields marked as from services
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public interface IContainerBuilder {
+public class FieldsWalker {
+    private static final Map<Class<?>, Field[]> fieldsMap = new HashMap<>();
 
-    <T> IRegistrationBuilder registerType(Class<T> implementerOrImplementationType);
+    public static Field[] findInjectFields(Class<?> clazz) {
 
-    <T> IRegistrationBuilder registerInstance(T instance);
+        Field[] fields = Arrays.stream(clazz.getFields()).filter(field ->
+                field.getAnnotation(FromService.class) != null
+        ).toArray(Field[]::new);
 
-    <T> void autoRegister(Class<T> abstractController);
+        // Cache fields
+        fieldsMap.put(clazz, fields);
 
-    IContainer build();
+        return fields;
+    }
+
+    public static Field[] cachedInjectFields(Class<?> clazz) {
+        Field[] fields = fieldsMap.get(clazz);
+        if (fields != null) {
+            return fields;
+        }
+        return findInjectFields(clazz);
+    }
 }

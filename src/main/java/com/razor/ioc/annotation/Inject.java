@@ -21,23 +21,23 @@
  */
 
 
-package com.razor.ioc;
+package com.razor.ioc.annotation;
 
-import java.util.Set;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Dependency injection services container
+ * Mark a class as auto-injected
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public interface IContainerBuilder {
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Inject {
 
-    <T> IRegistrationBuilder registerType(Class<T> implementerOrImplementationType);
-
-    <T> IRegistrationBuilder registerInstance(T instance);
-
-    <T> void autoRegister(Class<T> abstractController);
-
-    IContainer build();
+    String value() default "";
+    boolean sington() default false;
 }

@@ -23,11 +23,18 @@
 
 package com.razor.ioc;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.razor.ioc.annotation.Inject;
+import com.razor.ioc.walker.ClassesWalker;
+import com.razor.ioc.walker.ConstructorWalker;
+import com.razor.ioc.walker.FieldsWalker;
+import org.reflections.Reflections;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Parameter;
+import java.util.*;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Beans container builder
@@ -35,7 +42,14 @@ import java.util.stream.Collectors;
  * @author Touchumind
  * @since 0.0.1
  */
+@Slf4j
 public class ContainerBuilder implements IContainerBuilder {
+
+    private Class<?> appClass;
+
+    public ContainerBuilder(Class<?> appClass) {
+        this.appClass = appClass;
+    }
 
     private final List<RegistrationBuilder> rbs = new ArrayList<>();
 
@@ -43,6 +57,19 @@ public class ContainerBuilder implements IContainerBuilder {
     public <T> IRegistrationBuilder registerType(Class<T> implementationType) {
         RegistrationBuilder rb = RegistrationBuilder.forType(implementationType);
         rbs.add(rb);
+
+        // register these who implement the interface
+        if (implementationType.isInterface()) {
+            Class<?>[] implementers = ClassesWalker.reflectImplementers(appClass, implementationType);
+            Arrays.stream(implementers).forEach(implementer -> {
+                RegistrationBuilder _rb = (RegistrationBuilder)registerType(implementer).as(implementationType).named(implementer.getName());
+                if (implementer.getAnnotation(Inject.class).sington()) {
+                    _rb.singleInstance();
+                }
+                rbs.add(_rb);
+            });
+        }
+
         return rb;
     }
 
@@ -54,9 +81,52 @@ public class ContainerBuilder implements IContainerBuilder {
     }
 
     @Override
-    public IRegistrationBuilder registerControllers() {
-        // TODO
-        return null;
+    public <T> void autoRegister(Class<T> abstractController) {
+        this.registerControllers(abstractController);
+
+        // scan inject annotated class
+        Set<Class<?>> types = new Reflections(appClass.getPackage().getName()).getTypesAnnotatedWith(Inject.class);
+        types.forEach(this::registerType);
+
+        types.forEach(t -> {
+            try {
+                ConstructorWalker.findInjectConstructor(t);
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+        });
+    }
+
+    private  <T> void registerControllers(Class<T> abstractController) {
+        Set<Class<? extends T>> controllers = new Reflections(appClass.getPackage().getName().concat(".controllers")).getSubTypesOf(abstractController);
+        controllers.forEach(this::registerController);
+        log.info("Ioc registered {} controllers", controllers.size());
+    }
+
+    private void registerController(Class<?> clazz) {
+        // constructor self
+        registerType(clazz);
+
+        // constructor parameters
+        try {
+            Constructor constructor = ConstructorWalker.findInjectConstructor(clazz);
+            Parameter[] paramNames = constructor.getParameters();
+            Arrays.stream(paramNames).map(Parameter::getType).forEach(this::registerType);
+            log.info("Ioc registered {} for {} constructor", paramNames, clazz.getName());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+
+        // class fields
+        registerFields(clazz);
+    }
+
+    private void registerFields(Class<?> clazz) {
+
+        Field[] serviceFields = FieldsWalker.findInjectFields(clazz);
+        Arrays.stream(serviceFields).map(Field::getType).forEach(this::registerType);
+        log.info("Ioc registered {} fields for controller {}", serviceFields.length, clazz.getName());
     }
 
     @Override

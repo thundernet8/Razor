@@ -1,3 +1,5 @@
+package com.razor.test;
+
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -20,16 +22,6 @@
  * SOFTWARE.
  */
 
-import com.razor.Razor;
-import com.razor.server.NettyServer;
 
-public class TestNettyServer {
-    public static void main(String[] args) {
-        NettyServer nettyServer = new NettyServer();
-        try {
-            nettyServer.run(Razor.self(), args);
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
-    }
+public interface ITest {
 }

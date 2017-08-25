@@ -20,24 +20,18 @@
  * SOFTWARE.
  */
 
+package com.razor.test;
 
-package com.razor.ioc;
+import com.razor.Razor;
+import com.razor.test.controllers.BookController;
 
-import java.util.Set;
+public class IocTest {
 
-/**
- * Dependency injection services container
- *
- * @author Touchumind
- * @since 0.0.1
- */
-public interface IContainerBuilder {
-
-    <T> IRegistrationBuilder registerType(Class<T> implementerOrImplementationType);
-
-    <T> IRegistrationBuilder registerInstance(T instance);
-
-    <T> void autoRegister(Class<T> abstractController);
-
-    IContainer build();
+    public static void main(String[] args) {
+        Razor razor = Razor.self();
+        razor.start(IocTest.class, "127.0.0.1", 8090, args);
+        BookController bc = razor.getIoc().resolve(BookController.class);
+        InjectTest ic = razor.getIoc().resolve(InjectTest.class);
+        System.out.println(bc);
+    }
 }

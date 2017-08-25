@@ -23,13 +23,19 @@
 
 package com.razor;
 
+import com.razor.ioc.ContainerBuilder;
+import com.razor.ioc.IContainer;
+import com.razor.ioc.IContainerBuilder;
+import com.razor.env.Env;
+import com.razor.mvc.Controller;
 import com.razor.server.NettyServer;
 import lombok.extern.slf4j.Slf4j;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import com.razor.env.Env;
+import java.util.*;
+import org.reflections.Reflections;
 
 import static com.razor.mvc.Constants.*;
 
@@ -38,7 +44,6 @@ import static com.razor.mvc.Constants.*;
  *
  * @author Touchumind
  * @since 0.0.1
- * @date 2017/8/21
  */
 @Slf4j
 @Getter
@@ -47,6 +52,10 @@ public class Razor {
     private Env env = Env.defaults();
     // Application class
     private Class<?> appClass;
+    // Ioc container builder
+    private IContainerBuilder iocBuilder;
+    // Ioc container
+    private IContainer ioc;
 
     private NettyServer nettyServer = new NettyServer();
 
@@ -70,6 +79,8 @@ public class Razor {
             assert port >= 80 : "Port should be a positive value and greater or equal to 80";
             env.set(ENV_KEY_SERVER_PORT, port);
             this.appClass = appClass;
+            this.initIoc();
+            this.initRoutes();
             new Thread(() -> {
                 try {
                     nettyServer.run(Razor.this, args);
@@ -85,5 +96,20 @@ public class Razor {
 
     public void stop() {
         nettyServer.shutdown();
+    }
+
+
+    // IOC
+    private void initIoc() {
+        iocBuilder = new ContainerBuilder(appClass);
+        // register controllers
+        iocBuilder.autoRegister(Controller.class);
+
+        ioc = iocBuilder.build();
+    }
+
+    // Routes
+    private void initRoutes() {
+        // TODO
     }
 }
