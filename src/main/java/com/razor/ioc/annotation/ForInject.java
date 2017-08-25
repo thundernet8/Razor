@@ -21,21 +21,22 @@
  */
 
 
-package com.razor.ioc;
+package com.razor.ioc.annotation;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Dependency injection services container
+ * Inject annotation for helping ioc finding right constructor
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public interface IContainerBuilder {
+@Target(ElementType.CONSTRUCTOR)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ForInject {
 
-    <T> IRegistrationBuilder registerType(Class<T> implementerOrImplementationType);
-
-    <T> IRegistrationBuilder registerInstance(T instance);
-
-    IRegistrationBuilder registerControllers();
-
-    IContainer build();
+    String value() default "";
 }

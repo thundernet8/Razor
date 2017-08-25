@@ -37,12 +37,10 @@ import java.util.stream.Collectors;
  */
 public class ContainerBuilder implements IContainerBuilder {
 
-    private final Map<String, RegistrationData> rds = new HashMap<>();
-
     private final List<RegistrationBuilder> rbs = new ArrayList<>();
 
     @Override
-    public <T> IRegistrationBuilder registerType(T implementationType) {
+    public <T> IRegistrationBuilder registerType(Class<T> implementationType) {
         RegistrationBuilder rb = RegistrationBuilder.forType(implementationType);
         rbs.add(rb);
         return rb;

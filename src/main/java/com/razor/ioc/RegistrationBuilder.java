@@ -51,14 +51,14 @@ public class RegistrationBuilder implements IRegistrationBuilder {
         return rb;
     }
 
-    public static <T> RegistrationBuilder forType(T implementer) {
+    static <T> RegistrationBuilder forType(Class<T> implementer) {
         RegistrationBuilder rb = init();
-        rb.registrationData.setImplType((Class<?>) implementer);
+        rb.registrationData.setImplType(implementer);
 
         return rb;
     }
 
-    public static <T> RegistrationBuilder forInstance(T instance) {
+    static <T> RegistrationBuilder forInstance(T instance) {
         RegistrationBuilder rb = init();
 
         // instance's lifecycle must be sington

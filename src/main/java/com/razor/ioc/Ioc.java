@@ -23,9 +23,12 @@
 
 package com.razor.ioc;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import com.razor.ioc.walker.ConstructorWalker;
+
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Parameter;
+import java.util.*;
 
 /**
  * Beans container
@@ -43,6 +46,7 @@ public class Ioc implements IContainer {
     private final Map<String, Map<Object, ServiceBean>> keyedBeanPool = new HashMap<>();
 
     public Ioc(List<ServiceBean> beans) {
+        // TODO getInterfaces() and register
         for (ServiceBean bean : beans) {
             String typeName = bean.getRegType().getName();
             if (bean.hasKey()) {
@@ -78,7 +82,6 @@ public class Ioc implements IContainer {
 
     @SuppressWarnings("unchecked")
     private <T> T resolveBean(ServiceBean svb) {
-        // TODO
         if (svb == null) {
             return null;
         }
@@ -88,8 +91,14 @@ public class Ioc implements IContainer {
         }
 
         try {
-            Class<?> clazz = Class.forName(svb.getImplType().getName());
-            Object ins = clazz.newInstance();
+            Class<?> clazz = svb.getImplType();
+            Constructor constructor = ConstructorWalker.findInjectContructor(clazz);
+            Class[] parameterTypes = constructor.getParameterTypes();
+            if (parameterTypes.length == 0) {
+                return (T)constructor.newInstance();
+            }
+            Object[] args = Arrays.stream(parameterTypes).map(this::resolve).toArray();
+            Object ins = constructor.newInstance(args);
             return (T)ins;
         } catch (Exception e) {
             return null;
