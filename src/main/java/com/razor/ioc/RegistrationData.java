@@ -44,9 +44,9 @@ public class RegistrationData {
      */
     private boolean isSington = false;
 
-    private Class<?> type;
+    private Class<?> regType;
 
-    private Object implementer;
+    private Class<?> implType;
 
     private String name = "";
 

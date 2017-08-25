@@ -35,6 +35,7 @@ import java.util.List;
  */
 public class Ioc implements IContainer {
 
+    @SuppressWarnings("unchecked")
     private final Map<String, ServiceBean> beanPool = new HashMap();
 
     private final Map<String, ServiceBean> namedBeanPool = new HashMap<>();
@@ -43,7 +44,7 @@ public class Ioc implements IContainer {
 
     public Ioc(List<ServiceBean> beans) {
         for (ServiceBean bean : beans) {
-            String typeName = bean.getType().getName();
+            String typeName = bean.getRegType().getName();
             if (bean.hasKey()) {
                 Map<Object, ServiceBean> innerMap = keyedBeanPool.get(typeName);
                 if (innerMap == null) {
@@ -60,17 +61,39 @@ public class Ioc implements IContainer {
     }
 
     @Override
-    public <T> T resolve(T t) {
-        return t;
+    public <T> T resolve(Class<T> t) {
+        return resolveBean(beanPool.get(t.getName()));
     }
 
     @Override
-    public <T> T resolveNamed(T t, String name) {
-        return null;
+    public <T> T resolveNamed(Class<T> t, String name) {
+        return resolveBean(namedBeanPool.get(t.getName() + "-" + name));
     }
 
     @Override
-    public <T, E extends Enum<E>> T resolveKeyed(T t, E enumKey) {
-        return null;
+    public <T, E extends Enum<E>> T resolveKeyed(Class<T> t, E enumKey) {
+        Map<Object, ServiceBean> svbMap = keyedBeanPool.get(t.getName());
+        return resolveBean(svbMap.get(enumKey));
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T resolveBean(ServiceBean svb) {
+        // TODO
+        if (svb == null) {
+            return null;
+        }
+        Object bean = svb.getBean();
+        if (bean != null) {
+            return (T)bean;
+        }
+
+        try {
+            Class<?> clazz = Class.forName(svb.getImplType().getName());
+            Object ins = clazz.newInstance();
+            return (T)ins;
+        } catch (Exception e) {
+            return null;
+        }
+
     }
 }

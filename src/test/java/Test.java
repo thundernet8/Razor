@@ -20,16 +20,18 @@
  * SOFTWARE.
  */
 
-import com.razor.Razor;
-import com.razor.server.NettyServer;
+import com.razor.ioc.*;
 
-public class TestNettyServer {
+interface IClz {
+
+}
+
+public class Test implements IClz {
     public static void main(String[] args) {
-        NettyServer nettyServer = new NettyServer();
-        try {
-            nettyServer.run(Razor.self(), args);
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
+        ContainerBuilder builder = new ContainerBuilder();
+        builder.registerType(Test.class).named("name");
+        Ioc container = (Ioc)builder.build();
+        Test t = container.resolveNamed(Test.class, "name");
+        Test t2 = (Test)t;
     }
 }

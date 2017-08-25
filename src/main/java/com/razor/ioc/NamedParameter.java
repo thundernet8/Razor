@@ -20,16 +20,15 @@
  * SOFTWARE.
  */
 
-import com.razor.Razor;
-import com.razor.server.NettyServer;
 
-public class TestNettyServer {
-    public static void main(String[] args) {
-        NettyServer nettyServer = new NettyServer();
-        try {
-            nettyServer.run(Razor.self(), args);
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
-    }
+package com.razor.ioc;
+
+/**
+ * Named parameter for dependency resolving
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public class NamedParameter {
+
 }

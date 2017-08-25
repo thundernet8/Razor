@@ -31,11 +31,11 @@ package com.razor.ioc;
  */
 public interface IContainer {
 
-    <T> T resolve(T t);
+    <T> T resolve(Class<T> t);
 
-    <T> T resolveNamed(T t, String name);
+    <T> T resolveNamed(Class<T> t, String name);
 
-    <T, E extends Enum<E>> T resolveKeyed(T t, E enumKey);
+    <T, E extends Enum<E>> T resolveKeyed(Class<T> t, E enumKey);
 
     // TODO IContainer.Resolve<T>(NamedParameter namedParameter)
     // TODO container.Resolve<DBManager>(new NamedParameter("name", "SQL"))

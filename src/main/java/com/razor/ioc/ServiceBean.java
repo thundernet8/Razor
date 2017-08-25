@@ -35,7 +35,9 @@ import lombok.Getter;
 @Getter
 public class ServiceBean {
 
-    private Class<?> type;
+    private Class<?> regType;
+
+    private Class<?> implType;
 
     private String name;
 
@@ -52,11 +54,15 @@ public class ServiceBean {
     }
 
     private ServiceBean(RegistrationData rd) {
-        type = rd.getType();
+        implType = rd.getImplType();
+        regType = rd.getRegType();
         name = rd.getName();
         key = rd.getKey();
         bean = rd.getInstance();
 
+        if (regType == null) {
+            regType = implType;
+        }
         // TODO
     }
 

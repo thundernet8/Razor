@@ -31,11 +31,11 @@ package com.razor.ioc;
  */
 public interface IRegistrationBuilder {
 
-    <T> IRegistrationBuilder as(T implementationType);
+    <T> IRegistrationBuilder as(Class<T> implementationType);
 
-    <T> IRegistrationBuilder named(T implementationType, String name);
+    IRegistrationBuilder named(String name);
 
-    <T, E extends Enum<E>> IRegistrationBuilder keyed(T implementationType, E enumType);
+    <E extends Enum<E>> IRegistrationBuilder keyed(E enumType);
 
     IRegistrationBuilder instancePerDependency();
 

@@ -53,7 +53,7 @@ public class RegistrationBuilder implements IRegistrationBuilder {
 
     public static <T> RegistrationBuilder forType(T implementer) {
         RegistrationBuilder rb = init();
-        rb.registrationData.setImplementer(implementer);
+        rb.registrationData.setImplType((Class<?>) implementer);
 
         return rb;
     }
@@ -64,19 +64,19 @@ public class RegistrationBuilder implements IRegistrationBuilder {
         // instance's lifecycle must be sington
         rb.registrationData.setSington(true);
         rb.registrationData.setInstance(instance);
-        rb.registrationData.setType(instance.getClass());
+        rb.registrationData.setRegType(instance.getClass());
 
         return rb;
     }
 
     @Override
-    public <T> RegistrationBuilder as(T implementationType) {
-        registrationData.setType((Class<?>) implementationType);
+    public <T> RegistrationBuilder as(Class<T> implementationType) {
+        registrationData.setRegType(implementationType);
         return this;
     }
 
     @Override
-    public <T> RegistrationBuilder named(T implementationType, String name) {
+    public RegistrationBuilder named(String name) {
         if (registrationData.getKey() != null) {
             log.warn("redundant name identity assignment");
             return this;
@@ -86,7 +86,7 @@ public class RegistrationBuilder implements IRegistrationBuilder {
     }
 
     @Override
-    public <T, E extends Enum<E>> RegistrationBuilder keyed(T implementationType, E enumKey) {
+    public <E extends Enum<E>> RegistrationBuilder keyed(E enumKey) {
         if (!StringUtils.isEmpty(registrationData.getName())) {
             log.warn("redundant key identity assignment");
             return this;
