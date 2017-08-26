@@ -1,3 +1,5 @@
+package com.razor.mvc.route;
+
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -21,30 +23,5 @@
  */
 
 
-package com.razor.mvc.route;
-
-import lombok.extern.slf4j.Slf4j;
-
-/**
- * Routes manager
- *
- * @author Touchumind
- * @since 0.0.1
- */
-@Slf4j
-public class RouteManager {
-
-    private Class<?> appClass;
-
-    public RouteManager(Class<?> appClass) {
-        this.appClass = appClass;
-    }
-
-    public void registerRoutes() {
-        // TODO
-    }
-
-    public void addRoute(Route route) {
-        // TODO
-    }
+public class NotMatchHandler {
 }

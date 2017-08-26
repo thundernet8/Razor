@@ -28,6 +28,7 @@ import com.razor.ioc.IContainer;
 import com.razor.ioc.IContainerBuilder;
 import com.razor.env.Env;
 import com.razor.mvc.Controller;
+import com.razor.mvc.route.RouteManager;
 import com.razor.server.NettyServer;
 import lombok.extern.slf4j.Slf4j;
 import lombok.AccessLevel;
@@ -110,6 +111,6 @@ public class Razor {
 
     // Routes
     private void initRoutes() {
-        // TODO
+        new RouteManager(appClass).registerRoutes();
     }
 }
