@@ -25,12 +25,22 @@ package com.razor.test;
 import com.razor.Razor;
 import com.razor.test.controllers.BookController;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class IocTest {
 
     public static void main(String[] args) {
         Razor razor = Razor.self();
         razor.start(IocTest.class, "127.0.0.1", 8090, args);
         BookController bc = razor.getIoc().resolve(BookController.class);
+        bc.out();
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                razor.getIoc().resolve(BookController.class).out();
+            }
+        }, 1000, 2000);
         InjectTest ic = razor.getIoc().resolve(InjectTest.class);
         System.out.println(bc);
     }

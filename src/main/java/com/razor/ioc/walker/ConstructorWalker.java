@@ -23,7 +23,7 @@
 
 package com.razor.ioc.walker;
 
-import com.razor.ioc.DependencyResolveException;
+import com.razor.ioc.exception.DependencyResolveException;
 import com.razor.ioc.annotation.ForInject;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;

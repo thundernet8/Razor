@@ -21,23 +21,30 @@
  */
 
 
-package com.razor.ioc;
-
-import com.razor.ioc.exception.DependencyRegisterException;
+package com.razor.ioc.exception;
 
 /**
- * Dependency injection services container
+ * Exception of resolving dependencies
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public interface IContainerBuilder {
+public class DependencyResolveException extends Exception {
 
-    <T> IRegistrationBuilder registerType(Class<T> implementer) throws DependencyRegisterException;
+    public DependencyResolveException() {
+        super();
+    }
 
-    <T> IRegistrationBuilder registerInstance(T instance);
+    public DependencyResolveException(String message) {
+        super(message);
+    }
 
-    <T> void autoRegister(Class<T> abstractController);
+    public DependencyResolveException(Throwable cause) {
+        super(cause);
+    }
 
-    IContainer build();
+    public DependencyResolveException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }

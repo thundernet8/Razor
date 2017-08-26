@@ -1,3 +1,9 @@
+package com.razor.test;
+
+import com.razor.ioc.annotation.Inject;
+
+import java.util.Date;
+
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -21,23 +27,26 @@
  */
 
 
-package com.razor.ioc;
+@Inject(
+        sington = true
+)
+public class Service implements IService {
 
-import com.razor.ioc.exception.DependencyRegisterException;
+    public String name = "Service Name";
 
-/**
- * Dependency injection services container
- *
- * @author Touchumind
- * @since 0.0.1
- */
-public interface IContainerBuilder {
+    public Date date;
 
-    <T> IRegistrationBuilder registerType(Class<T> implementer) throws DependencyRegisterException;
+    public Service() {
+        date = new Date();
+    }
 
-    <T> IRegistrationBuilder registerInstance(T instance);
+    @Override
+    public String getName() {
+        return name;
+    }
 
-    <T> void autoRegister(Class<T> abstractController);
-
-    IContainer build();
+    @Override
+    public Date getDate() {
+        return date;
+    }
 }

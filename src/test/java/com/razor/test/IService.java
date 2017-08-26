@@ -1,3 +1,7 @@
+package com.razor.test;
+
+import java.util.Date;
+
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -21,30 +25,9 @@
  */
 
 
-package com.razor.ioc;
+public interface IService {
 
-/**
- * Exception of resolving dependencies
- *
- * @author Touchumind
- * @since 0.0.1
- */
-public class DependencyResolveException extends Exception {
+    public String getName();
 
-    public DependencyResolveException() {
-        super();
-    }
-
-    public DependencyResolveException(String message) {
-        super(message);
-    }
-
-    public DependencyResolveException(Throwable cause) {
-        super(cause);
-    }
-
-    public DependencyResolveException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
+    public Date getDate();
 }

@@ -23,6 +23,7 @@
 
 package com.razor.ioc;
 
+import com.razor.ioc.exception.DependencyResolveException;
 import com.razor.ioc.walker.ClassesWalker;
 import com.razor.ioc.walker.ConstructorWalker;
 import com.razor.ioc.walker.FieldsWalker;
@@ -68,6 +69,19 @@ public class Ioc implements IContainer {
 
     @Override
     public <T> T resolve(Class<T> t) {
+        if (t.isInterface()) {
+            Class<?>[] implementers = ClassesWalker.cachedImplementers(t);
+            if (implementers.length == 0) {
+                return null;
+            }
+            for (int i = 0; i < implementers.length; i++) {
+                Object ret = resolve(implementers[i]);
+                if (ret != null) {
+                    return (T)ret;
+                }
+            }
+            return null;
+        }
         try {
             return resolveBean(beanPool.get(t.getName()));
         } catch (DependencyResolveException e) {
@@ -78,6 +92,19 @@ public class Ioc implements IContainer {
 
     @Override
     public <T> T resolveNamed(Class<T> t, String name) {
+        if (t.isInterface()) {
+            Class<?>[] implementers = ClassesWalker.cachedImplementers(t);
+            if (implementers.length == 0) {
+                return null;
+            }
+            for (int i = 0; i < implementers.length; i++) {
+                Object ret = resolveNamed(implementers[i], name);
+                if (ret != null) {
+                    return (T)ret;
+                }
+            }
+            return null;
+        }
         try {
             return resolveBean(namedBeanPool.get(t.getName().concat("-").concat(name)));
         } catch (DependencyResolveException e) {
@@ -88,6 +115,19 @@ public class Ioc implements IContainer {
 
     @Override
     public <T, E extends Enum<E>> T resolveKeyed(Class<T> t, E enumKey) {
+        if (t.isInterface()) {
+            Class<?>[] implementers = ClassesWalker.cachedImplementers(t);
+            if (implementers.length == 0) {
+                return null;
+            }
+            for (int i = 0; i < implementers.length; i++) {
+                Object ret = resolveKeyed(implementers[i], enumKey);
+                if (ret != null) {
+                    return (T)ret;
+                }
+            }
+            return null;
+        }
         try {
             Map<Object, ServiceBean> svbMap = keyedBeanPool.get(t.getName());
             return resolveBean(svbMap.get(enumKey));
@@ -125,24 +165,33 @@ public class Ioc implements IContainer {
             // resolve constructor and args
             Constructor constructor = ConstructorWalker.cachedInjectConstructor(clazz);
             Class[] parameterTypes = constructor.getParameterTypes();
-            T ins = null;
+            Object ins;
             if (parameterTypes.length == 0) {
-                ins = (T)constructor.newInstance();
+                ins = constructor.newInstance();
             } else {
                 Object[] args = Arrays.stream(parameterTypes).map(this::resolve).toArray();
-                ins = (T)constructor.newInstance(args);
-
-                // resolve fields
-                Field[] fields = FieldsWalker.cachedInjectFields(clazz);
-
-                // TODO add fields to instance
+                ins = constructor.newInstance(args);
             }
+
+            // resolve fields
+            Field[] fields = FieldsWalker.cachedInjectFields(clazz);
+            Arrays.stream(fields).forEach(field -> {
+                boolean accessible = field.isAccessible();
+                field.setAccessible(true);
+                try {
+                    field.set(ins, resolve(field.getType()));
+                } catch (IllegalAccessException e) {
+                    log.error("Access field {} of {} with exception: {}", field.getName(), clazz.getName(), e.getMessage());
+                }
+                field.setAccessible(accessible);
+            });
+
 
             if (svb.isSington()) {
                 svb.setBean(ins);
             }
 
-            return ins;
+            return (T)ins;
         } catch (Exception e) {
             e.printStackTrace();
             throw new DependencyResolveException(e.getMessage(), e.getCause());

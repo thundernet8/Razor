@@ -24,10 +24,26 @@
 package com.razor.test.controllers;
 
 
+import com.razor.ioc.annotation.FromService;
 import com.razor.mvc.Controller;
 import com.razor.test.ITest;
+import com.razor.test.Service;
+import com.razor.test.IService;
 
 public class BookController extends Controller implements ITest {
 
     public String defaultName = "book";
+
+    @FromService
+    public IService service;
+
+    public BookController(Service service0) {
+        System.out.println(service0.name);
+        System.out.println(service0.date);
+    }
+
+    public void out() {
+        System.out.println(service.getName());
+        System.out.println(service.getDate());
+    }
 }
