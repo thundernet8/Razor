@@ -23,12 +23,15 @@
 
 package com.razor.mvc;
 
+import com.razor.mvc.annotation.RoutePrefix;
+
 /**
  * Razor abstract controller
  *
  * @author Touchumind
  * @since 0.0.1
  */
+@RoutePrefix
 public abstract class Controller {
 
 }

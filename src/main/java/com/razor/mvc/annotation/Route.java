@@ -21,63 +21,20 @@
  */
 
 
-package com.razor.ioc;
+package com.razor.mvc.annotation;
 
-import org.apache.commons.lang3.StringUtils;
-import lombok.Getter;
+import java.lang.annotation.*;
 
 /**
- * Bean descriptor
+ * Mark route for controller actions
  *
  * @author Touchumind
  * @since 0.0.1
  */
-@Getter
-class ServiceBean {
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface Route {
 
-    private Class<?> regType;
-
-    private Class<?> implType;
-
-    private String name;
-
-    private Object key;
-
-    private Object bean;
-
-    private boolean sington;
-
-    boolean hasName() {
-        return !StringUtils.isEmpty(name);
-    }
-
-    boolean hasKey() {
-        return key != null;
-    }
-
-    boolean isSington() {
-        return sington;
-    }
-
-    private ServiceBean(RegistrationData rd) {
-        implType = rd.getImplType();
-        regType = rd.getRegType();
-        name = rd.getName();
-        key = rd.getKey();
-        bean = rd.getInstance();
-        sington = rd.isSington();
-
-        if (regType == null) {
-            regType = implType;
-        }
-        // TODO
-    }
-
-    void setBean(Object bean) {
-        this.bean = bean;
-    }
-
-    static ServiceBean fromRegistrationData(RegistrationData rd) {
-        return new ServiceBean(rd);
-    }
+    String value();
 }

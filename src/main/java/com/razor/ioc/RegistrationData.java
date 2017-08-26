@@ -37,7 +37,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class RegistrationData {
+class RegistrationData {
 
     /**
      * Determinate the lifecycle of ServiceBean which will bind to this registration.
@@ -54,7 +54,7 @@ public class RegistrationData {
 
     private Object instance = null;
 
-    public static RegistrationData defaults() {
+    static RegistrationData defaults() {
         return new RegistrationData();
     }
 }

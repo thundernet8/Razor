@@ -28,7 +28,7 @@ import java.util.Date;
 
 
 @Inject(
-        sington = true
+        sington = false
 )
 public class Service implements IService {
 
