@@ -61,20 +61,24 @@ public class Razor {
     private NettyServer nettyServer = new NettyServer();
 
     public static Razor self() {
+
         return new Razor();
     }
 
     public Razor listen(@NonNull String host, @NonNull int port) {
+
         env.set(ENV_KEY_SERVER_HOST, host);
         env.set(ENV_KEY_SERVER_PORT, port);
         return this;
     }
 
     public void start(@NonNull Class<?> appClass, String[] args) {
+
         start(appClass, DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT, args);
     }
 
     public void start(@NonNull Class<?> appClass, @NonNull String host, @NonNull int port, String[] args) {
+
         try {
             env.set(ENV_KEY_SERVER_HOST, host);
             assert port >= 80 : "Port should be a positive value and greater or equal to 80";
@@ -96,13 +100,15 @@ public class Razor {
 
 
     public void stop() {
+
         nettyServer.shutdown();
     }
 
 
     // IOC
     private void initIoc() {
-        iocBuilder = new ContainerBuilder(appClass);
+
+        iocBuilder = ContainerBuilder.getInstance(appClass);
         // register controllers
         iocBuilder.autoRegister(Controller.class);
 
@@ -111,6 +117,7 @@ public class Razor {
 
     // Routes
     private void initRoutes() {
-        new RouteManager(appClass).registerRoutes();
+
+        RouteManager.getInstance(appClass).registerRoutes();
     }
 }

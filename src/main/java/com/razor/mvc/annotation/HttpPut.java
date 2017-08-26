@@ -23,7 +23,7 @@
 
 package com.razor.mvc.annotation;
 
-import com.razor.mvc.http.EHttpMethod;
+import com.razor.mvc.http.IHttpMethod;
 
 import java.lang.annotation.*;
 
@@ -36,7 +36,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface HttpMethod {
+public @interface HttpPut {
 
-    EHttpMethod value() default EHttpMethod.GET;
+    String value() default IHttpMethod.PUT;
 }

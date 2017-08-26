@@ -45,10 +45,24 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ContainerBuilder implements IContainerBuilder {
 
+    private static ContainerBuilder instance;
+
     private Class<?> appClass;
 
-    public ContainerBuilder(Class<?> appClass) {
+    private ContainerBuilder(Class<?> appClass) {
         this.appClass = appClass;
+    }
+
+    public static ContainerBuilder getInstance(Class<?> appClass) {
+        if (instance == null) {
+            synchronized (ContainerBuilder.class) {
+                if (instance == null) {
+                    instance = new ContainerBuilder(appClass);
+                }
+            }
+        }
+
+        return instance;
     }
 
     private final List<RegistrationBuilder> rbs = new ArrayList<>();

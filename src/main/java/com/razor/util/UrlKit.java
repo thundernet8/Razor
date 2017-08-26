@@ -21,14 +21,36 @@
  */
 
 
-package com.razor.mvc.route;
+package com.razor.util;
 
 /**
- * Router executor interface
+ * Url related util
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public interface IRouteExecutor {
+public class UrlKit {
 
+    /**
+     * Remove hash part of a url
+     *
+     * @param url String
+     * @return String
+     */
+    public static String purgeUrlHash(String url) {
+        // TODO
+        return url;
+    }
+
+
+    /**
+     * Remove queries part of a url
+     *
+     * @param url String
+     * @return String
+     */
+    public static String purgeUrlQueries(String url) {
+        // TODO
+        return url;
+    }
 }

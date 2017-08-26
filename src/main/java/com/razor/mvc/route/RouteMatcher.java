@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Route matcher
+ * Router matcher
  *
  * @author Touchumind
  * @since 0.0.1
@@ -40,7 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 @Slf4j
 public class RouteMatcher {
 
-    // Route prefix not support Regex
+    // Router prefix not support Regex
     private String routePrefix;
 
     private String route;
@@ -51,12 +51,45 @@ public class RouteMatcher {
 
     private Pattern pattern;
 
-    public RouteMatcher(String routePrefix, String route) {
+    private boolean isValid = true;
+
+    boolean isValid() {
+
+        return isValid;
+    }
+
+    public String getRoutePrefix() {
+
+        return routePrefix;
+    }
+
+    public String getRoute() {
+
+        return route;
+    }
+
+    public String[] getParamNames() {
+
+        return paramNames;
+    }
+
+    public String[] getParamTypes() {
+
+        return paramTypes;
+    }
+
+    public Pattern getPattern() {
+
+        return pattern;
+    }
+
+    RouteMatcher(String routePrefix, String route) {
         this.routePrefix = routePrefix;
         // books/{string:category}/{int:id}.html
         this.route = route;
 
         if (!this.validateRoutes()) {
+            isValid = false;
             return;
         }
 
@@ -116,16 +149,16 @@ public class RouteMatcher {
         Pattern pattern = Pattern.compile("^([^/])([0-9a-zA-Z-_/]+)([^/])$");
         Matcher matcher = pattern.matcher(routePrefix);
         if (!matcher.matches()) {
-            log.error("Route Prefix {} is illegal, should consist of '0-9 a-z A-Z - _ /' and should not start or end with /", routePrefix);
-            //throw new RazorException("Route prefix ".concat(routePrefix).concat(" is illegal"));
+            log.error("Router Prefix {} is illegal, should consist of '0-9 a-z A-Z - _ /' and should not start or end with /", routePrefix);
+            //throw new RazorException("Router prefix ".concat(routePrefix).concat(" is illegal"));
             return false;
         }
 
         pattern = Pattern.compile("^([^/])([0-9a-zA-Z-_/{}:]+)([^/])$");
         matcher = pattern.matcher(route.replace(" ", ""));
         if (!matcher.matches()) {
-            log.error("Route {} is illegal", route);
-            //throw new RazorException("Route prefix ".concat(routePrefix).concat(" is illegal"));
+            log.error("Router {} is illegal", route);
+            //throw new RazorException("Router prefix ".concat(routePrefix).concat(" is illegal"));
         }
 
         return true;

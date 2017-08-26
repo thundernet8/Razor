@@ -21,14 +21,22 @@
  */
 
 
-package com.razor.mvc.route;
+package com.razor.mvc.annotation;
+
+import com.razor.mvc.http.IHttpMethod;
+
+import java.lang.annotation.*;
 
 /**
- * Router executor interface
+ * Mark http method for controller actions
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public interface IRouteExecutor {
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface HttpGet {
 
+    String value() default IHttpMethod.GET;
 }

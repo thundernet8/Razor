@@ -26,10 +26,15 @@ package com.razor.test.controllers;
 
 import com.razor.ioc.annotation.FromService;
 import com.razor.mvc.Controller;
+import com.razor.mvc.annotation.HttpGet;
+import com.razor.mvc.annotation.HttpPost;
+import com.razor.mvc.annotation.Route;
+import com.razor.mvc.annotation.RoutePrefix;
 import com.razor.test.ITest;
 import com.razor.test.Service;
 import com.razor.test.IService;
 
+@RoutePrefix("shop")
 public class BookController extends Controller implements ITest {
 
     public String defaultName = "book";
@@ -45,5 +50,33 @@ public class BookController extends Controller implements ITest {
     public void out() {
         System.out.println(service.getName());
         System.out.println(service.getDate());
+    }
+
+    @HttpGet
+    @Route("books/{int:id}.html")
+    public String getBookDetail(int id) {
+
+        return "Book ".concat(Integer.toString(id)).concat(" detail");
+    }
+
+    @HttpPost
+    @Route("books/{int:id}.html")
+    public String updateBookDetail(int id) {
+
+        return "Book ".concat(Integer.toString(id)).concat(" update");
+    }
+
+    @HttpGet
+    @Route("books/{string:category}/list")
+    public String getCategoriedBooks(String category) {
+
+        return "Books list of category ".concat(category);
+    }
+
+    @HttpGet
+    @Route("books/list")
+    public String getBooks() {
+
+        return "Books list of ";
     }
 }

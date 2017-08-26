@@ -21,14 +21,14 @@
  */
 
 
-package com.razor.mvc.route;
+package com.razor.mvc.http;
 
 /**
- * Router executor interface
+ * Http Context accessible for all actions
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public interface IRouteExecutor {
+public class HttpContext {
 
 }

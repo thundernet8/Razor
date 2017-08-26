@@ -23,9 +23,13 @@ package com.razor.mvc.http;
  */
 
 
-public enum EHttpMethod {
-    GET,
-    POST,
-    PUT,
-    DELETE
+public interface IHttpMethod {
+
+    String GET = "GET";
+
+    String POST = "POST";
+
+    String PUT = "PUT";
+
+    String DELETE = "DELETE";
 }
