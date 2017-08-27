@@ -157,7 +157,8 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         // TODO
 
         // content-type based on file mime
-        response.header(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN);
+        response.header(HttpHeaderNames.CONTENT_TYPE, new AsciiString("image/x-icon"));
+        response.header(HttpHeaderNames.CONTENT_DISPOSITION, "inline");
 
         // cache-control
 

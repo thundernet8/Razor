@@ -24,11 +24,11 @@
 package com.razor.server;
 
 import com.razor.Razor;
+import com.razor.exception.RazorException;
 import com.razor.ioc.IContainer;
 import com.razor.mvc.Controller;
 import com.razor.mvc.http.Request;
 import com.razor.mvc.http.Response;
-import com.razor.mvc.route.RouteManager;
 import com.razor.mvc.route.RouteSignature;
 import com.razor.mvc.route.Router;
 import com.razor.mvc.route.RouteParameter;
@@ -124,15 +124,12 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
 
-        // super.channelReadComplete(ctx);
         ctx.writeAndFlush(Unpooled.EMPTY_BUFFER)
                 .addListener(ChannelFutureListener.CLOSE);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-
-        // super.exceptionCaught(ctx, cause);
 
         ctx.writeAndFlush(new DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1,
@@ -142,22 +139,26 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
         cause.printStackTrace();
         ctx.close();
+
+        log.error(cause.getMessage());
     }
 
-    private void handleRoute(ChannelHandlerContext ctx, RouteSignature signature) {
+    private void handleRoute(ChannelHandlerContext ctx, RouteSignature signature) throws RazorException {
 
         IContainer ioc = razor.getIoc();
         Class<?> controllerClass = signature.getRouter().getTargetType();
 
         if (controllerClass.getSuperclass() != Controller.class) {
-            // throw exception
+
+            throw new RazorException(controllerClass.getName() + " is not a controller");
         }
 
         Controller controller = (Controller)ioc.resolve(controllerClass);
         Method action = signature.getRouter().getAction();
         RouteParameter[] params = signature.getRouter().getRouteMatcher().getParams(signature.request().path());
+
         try {
-            String result = action.invoke(controller, Arrays.stream(params).map(p -> p.getValue()).toArray(Object[]::new)).toString();
+            String result = action.invoke(controller, Arrays.stream(params).map(RouteParameter::getValue).toArray(Object[]::new)).toString();
             ctx.writeAndFlush(new DefaultFullHttpResponse(
                     HttpVersion.HTTP_1_1,
                     HttpResponseStatus.OK,

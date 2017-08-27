@@ -127,6 +127,16 @@ public class Response {
     }
 
     /**
+     * Set response header
+     * @param field header field, ref {@link HttpHeaderNames}
+     * @param value header value
+     */
+    public void header(AsciiString field, String value) {
+
+        header(field, new AsciiString(value));
+    }
+
+    /**
      * Send response immediately when error occurs
      * @param status Http response status including code and cause message
      */
