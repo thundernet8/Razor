@@ -88,6 +88,11 @@ public class RouteMatcher {
      */
     public UrlParameter[] getParams(String path) {
         Matcher matcher = pattern.matcher(path);
+
+        if (!matcher.find()) {
+            return null;
+        }
+
         Set<UrlParameter> params = new HashSet<>();
         for (int i = 0; i < Math.min(paramTypes.length, paramNames.length); i++) {
             String value = matcher.group(i + 1);

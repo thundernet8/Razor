@@ -30,21 +30,18 @@ import com.razor.mvc.annotation.HttpGet;
 import com.razor.mvc.annotation.HttpPost;
 import com.razor.mvc.annotation.Route;
 import com.razor.mvc.annotation.RoutePrefix;
-import com.razor.test.ITest;
-import com.razor.test.Service;
 import com.razor.test.IService;
 
 @RoutePrefix("shop")
-public class BookController extends Controller implements ITest {
+public class BookController extends Controller {
 
     public String defaultName = "book";
 
     @FromService
     public IService service;
 
-    public BookController(Service service0) {
-        System.out.println(service0.name);
-        System.out.println(service0.date);
+    public BookController() {
+
     }
 
     public void out() {
