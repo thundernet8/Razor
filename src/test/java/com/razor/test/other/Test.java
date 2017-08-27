@@ -1,6 +1,12 @@
-package com.razor.test;
+package com.razor.test.other;
 
 import com.razor.Razor;
+import com.razor.mvc.Constants;
+import com.razor.test.MvcTest;
+
+import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
@@ -25,13 +31,21 @@ import com.razor.Razor;
  */
 
 
-public class MvcTest {
+public class Test {
 
     public static void main(String[] args) {
-        Razor razor = Razor.self();
+        String host = "baidu.com";
+        Pattern pattern = Pattern.compile("^([^:]+)(:(\\d+))?$");
+        Matcher matcher = pattern.matcher(host);
+        matcher.find();
+        String hostname = matcher.group(1);
 
-        razor.content("web");
-        razor.addStatic("/txt/");
-        razor.start(MvcTest.class, "127.0.0.1", 8090, args);
+        try {
+            String pa = new File(Constants.class.getResource("/").getPath()).getCanonicalPath();
+            System.out.println(pa);
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+        System.out.println(File.separator);
     }
 }

@@ -1,7 +1,3 @@
-package com.razor.test;
-
-import com.razor.Razor;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -25,13 +21,20 @@ import com.razor.Razor;
  */
 
 
-public class MvcTest {
+package com.razor.server;
 
-    public static void main(String[] args) {
-        Razor razor = Razor.self();
+import com.razor.exception.RazorException;
+import com.razor.mvc.http.Request;
+import com.razor.mvc.http.Response;
+import io.netty.channel.ChannelHandlerContext;
 
-        razor.content("web");
-        razor.addStatic("/txt/");
-        razor.start(MvcTest.class, "127.0.0.1", 8090, args);
-    }
+/**
+ * Request handler interface
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public interface IRequestHandler<T> {
+
+    T handle(ChannelHandlerContext ctx, Request request, Response response) throws RazorException;
 }

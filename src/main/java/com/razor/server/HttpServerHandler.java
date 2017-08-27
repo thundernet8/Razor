@@ -31,7 +31,7 @@ import com.razor.mvc.http.Response;
 import com.razor.mvc.route.RouteManager;
 import com.razor.mvc.route.RouteSignature;
 import com.razor.mvc.route.Router;
-import com.razor.mvc.route.UrlParameter;
+import com.razor.mvc.route.RouteParameter;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -58,15 +58,19 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
     private Razor razor;
 
-    public HttpServerHandler(Razor razor) {
+    private StaticFileHandler staticFileHandler;
+
+    HttpServerHandler(Razor razor) {
+
         this.razor = razor;
+        this.staticFileHandler = new StaticFileHandler(razor);
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         // super.channelRead(ctx, msg);
-        if (msg instanceof FullHttpRequest)
-        {
+        if (msg instanceof FullHttpRequest) {
+
             final FullHttpRequest fullHttpRequest = (FullHttpRequest) msg;
             final String responseMessage = "Hello from Netty!";
             FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(
@@ -75,6 +79,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
                     copiedBuffer(responseMessage.getBytes())
             );
 
+            ////////////////////////// test
             if (HttpUtil.isKeepAlive(fullHttpRequest))
             {
                 fullHttpResponse.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
@@ -82,13 +87,23 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
             fullHttpResponse.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/plain");
             fullHttpResponse.headers().set(HttpHeaders.Names.CONTENT_LENGTH, responseMessage.length());
             fullHttpResponse.headers().set("X-Power-By", "Razor");
+            ////////////////////////// test end
 
             // TODO
-            Request request = Request.build(ctx, fullHttpRequest);
-            Response response = null;
-            RouteSignature routeSignature = RouteSignature.builder().request(request).response(response).build();
+            // HEAD request
 
-            Router router = RouteManager.getInstance(razor.getAppClass()).findRoute(request.uri(), fullHttpRequest.method().name());
+            Request request = Request.build(ctx, fullHttpRequest);
+            Response response = Response.build(ctx, request);
+
+            if (request.isStatic()) {
+                staticFileHandler.handle(ctx, request, response);
+                return;
+            }
+
+            // TODO a special case, path "/" should check dynamic content, if not found, check index.html/index.htm static content
+
+            RouteSignature routeSignature = RouteSignature.builder().request(request).response(response).build();
+            Router router = request.router();
             if (router != null) {
                 routeSignature.setRouter(router);
                 this.handleRoute(ctx, routeSignature);
@@ -100,15 +115,15 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
             //ctx.write(fullHttpResponse);
 
             ReferenceCountUtil.release(msg);
-        }
-        else
-        {
+        } else {
+
             super.channelRead(ctx, msg);
         }
     }
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+
         // super.channelReadComplete(ctx);
         ctx.writeAndFlush(Unpooled.EMPTY_BUFFER)
                 .addListener(ChannelFutureListener.CLOSE);
@@ -116,6 +131,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+
         // super.exceptionCaught(ctx, cause);
 
         ctx.writeAndFlush(new DefaultFullHttpResponse(
@@ -139,7 +155,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
         Controller controller = (Controller)ioc.resolve(controllerClass);
         Method action = signature.getRouter().getAction();
-        UrlParameter[] params = signature.getRouter().getRouteMatcher().getParams(signature.request().uri());
+        RouteParameter[] params = signature.getRouter().getRouteMatcher().getParams(signature.request().path());
         try {
             String result = action.invoke(controller, Arrays.stream(params).map(p -> p.getValue()).toArray(Object[]::new)).toString();
             ctx.writeAndFlush(new DefaultFullHttpResponse(

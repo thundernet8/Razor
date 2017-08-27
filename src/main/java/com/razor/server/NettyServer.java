@@ -25,6 +25,7 @@ package com.razor.server;
 
 import com.razor.Razor;
 import com.razor.env.Env;
+import com.razor.mvc.http.Request;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -58,6 +59,7 @@ public class NettyServer {
     public void run(Razor razor, String[] args) throws Exception {
         this.razor = razor;
         this.env = razor.getEnv();
+        Request.app = razor;
 
         this.startServer();
     }
@@ -80,6 +82,8 @@ public class NettyServer {
     }
 
     public void shutdown() {
+        Request.app = null;
+
         slaveGroup.shutdownGracefully();
         masterGroup.shutdownGracefully();
         try {

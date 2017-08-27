@@ -34,7 +34,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public class UrlParameter {
+public class RouteParameter {
 
     String name;
 

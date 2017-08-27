@@ -130,7 +130,6 @@ public class RouteManager {
     }
 
     public Router findRoute(String path, String httpMethod) {
-        path = UrlKit.purgeUrlQueries(UrlKit.purgeUrlHash(path));
 
         Router router = routerMap.get(path.concat("::").concat(httpMethod));
         if (router != null) {

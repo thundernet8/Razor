@@ -23,6 +23,11 @@
 
 package com.razor.util;
 
+import com.razor.mvc.http.UrlQuery;
+
+import java.util.Optional;
+import java.util.Set;
+
 /**
  * Url related util
  *
@@ -32,25 +37,28 @@ package com.razor.util;
 public class UrlKit {
 
     /**
-     * Remove hash part of a url
-     *
-     * @param url String
-     * @return String
-     */
-    public static String purgeUrlHash(String url) {
-        // TODO
-        return url;
-    }
-
-
-    /**
      * Remove queries part of a url
      *
-     * @param url String
-     * @return String
+     * @param url url
+     * @return url without queries
      */
     public static String purgeUrlQueries(String url) {
         // TODO
         return url;
+    }
+
+    /**
+     * Parse url queries
+     * @param url url
+     * @return url queries
+     */
+    public static UrlQuery[] parseQueries(String url) {
+        // TODO
+        return null;
+    }
+
+    public static boolean isStaticFile(Set<String> statics, String url) {
+        Optional<String> result = statics.stream().filter(s -> s.equals(url) || url.startsWith(s)).findFirst();
+        return result.isPresent();
     }
 }

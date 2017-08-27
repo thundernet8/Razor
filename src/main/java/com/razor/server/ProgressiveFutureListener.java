@@ -21,69 +21,47 @@
  */
 
 
-package com.razor.mvc.route;
+package com.razor.server;
 
-import com.razor.exception.RazorException;
-import com.razor.mvc.http.Request;
-import com.razor.mvc.http.Response;
-import lombok.Builder;
-import java.lang.reflect.Method;
+import io.netty.channel.ChannelProgressiveFuture;
+import io.netty.channel.ChannelProgressiveFutureListener;
+import lombok.extern.slf4j.Slf4j;
+import java.io.RandomAccessFile;
 
 /**
- * Signature for route matching of one request
+ * Implement of {@link ChannelProgressiveFutureListener} for file progressive future listener
  *
  * @author Touchumind
  * @since 0.0.1
  */
-@Builder
-public class RouteSignature {
+@Slf4j
+public class ProgressiveFutureListener implements ChannelProgressiveFutureListener {
 
-    private Router router;
+    private RandomAccessFile raf;
 
-    private Method action;
+    public ProgressiveFutureListener(RandomAccessFile raf) {
 
-    /**
-     * parameters are these applied to the action, including 0 or multi parameters from url
-     */
-    private Object[] parameters;
-
-    private Request request;
-
-    private Response response;
-
-    public Router getRouter() {
-        return router;
+        this.raf = raf;
     }
 
-    public Request request() {
+    @Override
+    public void operationProgressed(ChannelProgressiveFuture future, long progress, long total) throws Exception {
 
-        return request;
-    }
-
-    public Response response() {
-
-        return response;
-    }
-
-    public void setRouter(Router router) throws RazorException {
-
-        this.router = router;
-        this.action = router.getAction();
-
-        if (action != null) {
-            this.initParams();
+        if (total < 0) {
+            log.debug("Channel {} transfer progress: {}", future.channel(), progress);
+        } else {
+            log.debug("Channel {} transfer progress: {}, total {}", future.channel(), progress, total);
         }
     }
 
-    private void initParams() throws RazorException {
-        // TODO
+    @Override
+    public void operationComplete(ChannelProgressiveFuture future) throws Exception {
 
-        if (request == null) {
-            throw new RazorException("Empty request error");
+        try {
+            raf.close();
+            log.debug("Channel {} transfer complete", future.channel());
+        } catch (Exception e) {
+            log.error("Close randomAccessFile with error", e);
         }
-
-        RouteParameter[] urlParams = this.router.getRouteMatcher().getParams(request.path());
-
-        // TODO
     }
 }

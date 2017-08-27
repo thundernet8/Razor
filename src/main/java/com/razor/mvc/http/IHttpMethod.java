@@ -32,4 +32,6 @@ public interface IHttpMethod {
     String PUT = "PUT";
 
     String DELETE = "DELETE";
+
+    String HEAD= "HEAD";
 }

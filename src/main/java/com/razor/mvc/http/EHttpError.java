@@ -1,7 +1,3 @@
-package com.razor.test;
-
-import com.razor.Razor;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -25,13 +21,33 @@ import com.razor.Razor;
  */
 
 
-public class MvcTest {
+package com.razor.mvc.http;
 
-    public static void main(String[] args) {
-        Razor razor = Razor.self();
+/**
+ * Http errors
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public enum EHttpError {
 
-        razor.content("web");
-        razor.addStatic("/txt/");
-        razor.start(MvcTest.class, "127.0.0.1", 8090, args);
-    }
+    /**
+     * Static content not found
+     */
+    SC_NOT_FOUND,
+
+    /**
+     * Not allowed http method
+     */
+    METHOD_NOT_ALLOWED,
+
+    /**
+     * Forbidden access to a directory or a file
+     */
+    ACCESS_FORBIDDEN,
+
+    /**
+     * Indicate a server inner error
+     */
+    SERVER_ERROR
 }

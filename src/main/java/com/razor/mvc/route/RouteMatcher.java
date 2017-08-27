@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.razor.exception.RazorException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -86,24 +85,24 @@ public class RouteMatcher {
      * @param path url path
      * @return parameter values in url
      */
-    public UrlParameter[] getParams(String path) {
+    public RouteParameter[] getParams(String path) {
         Matcher matcher = pattern.matcher(path);
 
         if (!matcher.find()) {
             return null;
         }
 
-        Set<UrlParameter> params = new HashSet<>();
+        Set<RouteParameter> params = new HashSet<>();
         for (int i = 0; i < Math.min(paramTypes.length, paramNames.length); i++) {
             String value = matcher.group(i + 1);
             if (StringUtils.equals(paramTypes[i], "int")) {
-                params.add(new UrlParameter(paramNames[i], Integer.parseInt(value)));
+                params.add(new RouteParameter(paramNames[i], Integer.parseInt(value)));
             } else {
-                params.add(new UrlParameter(paramNames[i], value));
+                params.add(new RouteParameter(paramNames[i], value));
             }
         }
 
-        return params.toArray(new UrlParameter[0]);
+        return params.toArray(new RouteParameter[0]);
     }
 
     public Pattern getPattern() {

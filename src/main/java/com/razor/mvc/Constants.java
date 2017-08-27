@@ -23,20 +23,30 @@
 
 package com.razor.mvc;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Razor global constants
  *
  * @author Touchumind
  * @since 0.0.1
- * @date 2017/8/22
  */
 public interface Constants {
     // Version
     String VERSION = "0.0.1-SNAPSHOT";
 
-    // Server constants
+    // System
+    String CLASS_PATH = new File(Constants.class.getResource("/").getPath()).getAbsolutePath();
+
+    // Server default constants
     String DEFAULT_SERVER_HOST = "0.0.0.0";
     int DEFAULT_SERVER_PORT = 8088;
+    String DEFAULT_RESOURCE_CONTENT_DIR = "content";
+    List<String> DEFAULT_STATICS = Arrays.asList("/favicon.ico", "/robots.txt", "/sitemap.xml");
+    List<String> DEFAULT_INDEX_FILES = Arrays.asList("index.html", "index.htm");
+    boolean DEFAULT_SSL_ENABLE = false;
 
     // Http constants
     String DEFAULT_CHARSET = "UTF-8";
@@ -45,6 +55,9 @@ public interface Constants {
     String CONTENT_TYPE_TEXT = "text/plain; charset=" + DEFAULT_CHARSET;
 
     // Env keys
-    String ENV_KEY_SERVER_HOST = "server.host";
-    String ENV_KEY_SERVER_PORT = "server.port";
+    String ENV_KEY_SERVER_HOST = "razor.server.host";
+    String ENV_KEY_SERVER_PORT = "razor.server.port";
+    String ENV_KEY_SSL = "razor.server.ssl";
+    String ENV_KEY_RESOURCE_CONTENT_DIR = "razor.web.content";
+    String ENV_KEY_INDEX_FILES = "razor.web.indexs";
 }
