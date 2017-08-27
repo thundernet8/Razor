@@ -23,76 +23,67 @@
 
 package com.razor.mvc.route;
 
-import com.razor.mvc.Controller;
+import com.razor.exception.RazorException;
+import com.razor.mvc.http.Request;
+import com.razor.mvc.http.Response;
+import lombok.Builder;
 import java.lang.reflect.Method;
-import lombok.Getter;
 
 /**
- * Router
+ * Signature for route matching of one request
  *
  * @author Touchumind
  * @since 0.0.1
  */
-@Getter
-public class Router {
+@Builder
+public class RouteSignature {
 
-    private RouteMatcher routeMatcher;
+    private Router router;
 
-    private String httpMethod;
-
-    /**
-     * Controller class
-     */
-    private Class<?> targetType;
-
-    /**
-     * Controller instance
-     */
-//    private Controller target;
-
-
-    /**
-     * Router bind method
-     */
     private Method action;
 
-
-
-    public Router(String httpMethod, Class<?> targetType, Method action, RouteMatcher routeMatcher) {
-
-        this.httpMethod = httpMethod.toUpperCase();
-        this.targetType = targetType;
-        this.action = action;
-        this.routeMatcher = routeMatcher;
-    }
-
-    public boolean match (String url) {
-
-        return routeMatcher.getPattern().matcher(url).matches();
-    }
-
-    public String getFullPath() {
-
-        return routeMatcher.getRoutePrefix().concat("/").concat(routeMatcher.getRoute());
-    }
-
     /**
-     * Unique string for a router
-     *
-     * @return String
+     * parameters are these applied to the action, including 0 or multi parameters from url
      */
-    public String getHashKey() {
+    private Object[] parameters;
 
-        return getFullPath().concat("::").concat(httpMethod.toUpperCase());
+    private Request request;
+
+    private Response response;
+
+    public Router getRouter() {
+        return router;
     }
 
-    /**
-     * Router got a generic url match
-     *
-     * @return boolean
-     */
-    public boolean isGeneric() {
+    public Request request() {
 
-        return routeMatcher.getParamTypes().length > 0;
+        return request;
+    }
+
+    public Response response() {
+
+        return response;
+    }
+
+    public void setRouter(Router router) throws RazorException {
+
+        this.router = router;
+        this.action = router.getAction();
+
+        if (action != null) {
+            this.initParams();
+        }
+    }
+
+    private void initParams() throws RazorException {
+        // TODO
+
+        if (request == null) {
+            throw new RazorException("Empty request error");
+        }
+
+        UrlParameter[] urlParams = this.router.getRouteMatcher().getParams(request.uri());
+
+        // TODO
     }
 }

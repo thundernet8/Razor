@@ -24,6 +24,8 @@
 package com.razor.mvc.route;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -78,13 +80,34 @@ public class RouteMatcher {
         return paramTypes;
     }
 
+    /**
+     * Get url parameters for one request
+     *
+     * @param path url path
+     * @return parameter values in url
+     */
+    public UrlParameter[] getParams(String path) {
+        Matcher matcher = pattern.matcher(path);
+        Set<UrlParameter> params = new HashSet<>();
+        for (int i = 0; i < Math.min(paramTypes.length, paramNames.length); i++) {
+            String value = matcher.group(i + 1);
+            if (StringUtils.equals(paramTypes[i], "int")) {
+                params.add(new UrlParameter(paramNames[i], Integer.parseInt(value)));
+            } else {
+                params.add(new UrlParameter(paramNames[i], value));
+            }
+        }
+
+        return params.toArray(new UrlParameter[0]);
+    }
+
     public Pattern getPattern() {
 
         return pattern;
     }
 
     RouteMatcher(String routePrefix, String route) {
-        this.routePrefix = routePrefix;
+        this.routePrefix = routePrefix.startsWith("/") ? routePrefix : "/".concat(routePrefix);
         // books/{string:category}/{int:id}.html
         this.route = route;
 
@@ -102,7 +125,7 @@ public class RouteMatcher {
         StringBuilder currentParamType = new StringBuilder();
         StringBuilder currentParamName = new StringBuilder();
         StringBuilder patternBuilder = new StringBuilder("^");
-        patternBuilder.append(routePrefix);
+        patternBuilder.append(this.routePrefix);
         patternBuilder.append("/");
         while (start < route.length()) {
             String ch = route.substring(start, start + 1);
@@ -146,7 +169,7 @@ public class RouteMatcher {
     }
 
     private boolean validateRoutes() {
-        Pattern pattern = Pattern.compile("^([^/])([0-9a-zA-Z-_/]+)([^/])$");
+        Pattern pattern = Pattern.compile("^/([0-9a-zA-Z-_/]+)([^/])$");
         Matcher matcher = pattern.matcher(routePrefix);
         if (!matcher.matches()) {
             log.error("Router Prefix {} is illegal, should consist of '0-9 a-z A-Z - _ /' and should not start or end with /", routePrefix);
@@ -154,7 +177,7 @@ public class RouteMatcher {
             return false;
         }
 
-        pattern = Pattern.compile("^([^/])([0-9a-zA-Z-_/{}:]+)([^/])$");
+        pattern = Pattern.compile("^([^/])([0-9a-zA-Z-_/{}:.]+)([^/])$");
         matcher = pattern.matcher(route.replace(" ", ""));
         if (!matcher.matches()) {
             log.error("Router {} is illegal", route);

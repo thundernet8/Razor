@@ -138,7 +138,7 @@ public class RouteManager {
         }
 
         for (Router router1 : routerSet) {
-            if (router1.matcher(path).matches()) {
+            if (StringUtils.equals(router1.getHttpMethod(), httpMethod) && router1.match(path)) {
                 return router1;
             }
         }

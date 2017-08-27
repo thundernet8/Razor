@@ -24,15 +24,25 @@
 package com.razor.server;
 
 import com.razor.Razor;
-import io.netty.buffer.ByteBuf;
+import com.razor.ioc.IContainer;
+import com.razor.mvc.Controller;
+import com.razor.mvc.http.Request;
+import com.razor.mvc.http.Response;
+import com.razor.mvc.route.RouteManager;
+import com.razor.mvc.route.RouteSignature;
+import com.razor.mvc.route.Router;
+import com.razor.mvc.route.UrlParameter;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
-import io.netty.util.CharsetUtil;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.util.ReferenceCountUtil;
+
+import lombok.extern.slf4j.Slf4j;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import static io.netty.buffer.Unpooled.copiedBuffer;
 
@@ -42,6 +52,7 @@ import static io.netty.buffer.Unpooled.copiedBuffer;
  * @author Touchumind
  * @since 0.0.1
  */
+@Slf4j
 @Sharable
 public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
@@ -56,23 +67,38 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
         // super.channelRead(ctx, msg);
         if (msg instanceof FullHttpRequest)
         {
-            final FullHttpRequest request = (FullHttpRequest) msg;
+            final FullHttpRequest fullHttpRequest = (FullHttpRequest) msg;
             final String responseMessage = "Hello from Netty!";
-            FullHttpResponse response = new DefaultFullHttpResponse(
+            FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(
                     HttpVersion.HTTP_1_1,
                     HttpResponseStatus.OK,
                     copiedBuffer(responseMessage.getBytes())
             );
 
-            if (HttpHeaders.isKeepAlive(request))
+            if (HttpUtil.isKeepAlive(fullHttpRequest))
             {
-                response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+                fullHttpResponse.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
             }
-            response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/plain");
-            response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, responseMessage.length());
-            response.headers().set("X-Power-By", "Razor");
+            fullHttpResponse.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/plain");
+            fullHttpResponse.headers().set(HttpHeaders.Names.CONTENT_LENGTH, responseMessage.length());
+            fullHttpResponse.headers().set("X-Power-By", "Razor");
 
-            ctx.write(response);
+            // TODO
+            Request request = Request.build(ctx, fullHttpRequest);
+            Response response = null;
+            RouteSignature routeSignature = RouteSignature.builder().request(request).response(response).build();
+
+            Router router = RouteManager.getInstance(razor.getAppClass()).findRoute(request.uri(), fullHttpRequest.method().name());
+            if (router != null) {
+                routeSignature.setRouter(router);
+                this.handleRoute(ctx, routeSignature);
+            } else {
+                // TODO 404
+                ctx.write(fullHttpResponse);
+            }
+
+            //ctx.write(fullHttpResponse);
+
             ReferenceCountUtil.release(msg);
         }
         else
@@ -100,5 +126,36 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
         cause.printStackTrace();
         ctx.close();
+    }
+
+    private void handleRoute(ChannelHandlerContext ctx, RouteSignature signature) {
+
+        IContainer ioc = razor.getIoc();
+        Class<?> controllerClass = signature.getRouter().getTargetType();
+
+        if (controllerClass.getSuperclass() != Controller.class) {
+            // throw exception
+        }
+
+        Controller controller = (Controller)ioc.resolve(controllerClass);
+        Method action = signature.getRouter().getAction();
+        UrlParameter[] params = signature.getRouter().getRouteMatcher().getParams(signature.request().uri());
+        try {
+            String result = action.invoke(controller, Arrays.stream(params).map(p -> p.getValue()).toArray(Object[]::new)).toString();
+            ctx.writeAndFlush(new DefaultFullHttpResponse(
+                    HttpVersion.HTTP_1_1,
+                    HttpResponseStatus.OK,
+                    copiedBuffer(result.getBytes())
+            ));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            ctx.writeAndFlush(new DefaultFullHttpResponse(
+                    HttpVersion.HTTP_1_1,
+                    HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                    copiedBuffer(e.getMessage().getBytes())
+            ));
+        }
+
+        // TODO
     }
 }

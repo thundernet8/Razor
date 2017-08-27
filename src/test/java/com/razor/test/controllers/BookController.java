@@ -77,6 +77,6 @@ public class BookController extends Controller implements ITest {
     @Route("books/list")
     public String getBooks() {
 
-        return "Books list of ";
+        return "Books list ";
     }
 }
