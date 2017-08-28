@@ -41,13 +41,11 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
 import static com.razor.mvc.Constants.*;
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
+import static io.netty.handler.codec.http.HttpResponseStatus.*;
 
 /**
  * Static files handler
@@ -81,7 +79,7 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
 
         // security check, more TODO
         if (path.contains("..") || path.contains(".".concat(File.separator)) || path.contains(File.separator.concat(".")) || path.charAt(0) == '.' || path.charAt(path.length() - 1) == '.') {
-            response.sendError(HttpResponseStatus.NOT_FOUND);
+            response.sendError(NOT_FOUND);
             return false;
         }
 
@@ -90,27 +88,39 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         String absPath = webRoot.concat(path);
 
         File file = new File(absPath);
-        if (!simpleFileCheck(file, request, response)) {
+
+        if (!file.exists() || file.isHidden()) {
+            response.sendError(NOT_FOUND);
+            return false;
+        }
+
+        if (!file.isFile() && !file.isDirectory()) {
+            response.sendError(FORBIDDEN);
             return false;
         }
 
         if (file.isDirectory()) {
             // find directory index file
-            List<String> indexs = (ArrayList<String>)env.getObject(ENV_KEY_INDEX_FILES).orElse(DEFAULT_INDEX_FILES);
+            Set<String> indexs = new HashSet<>((List<String>)env.getObject(ENV_KEY_INDEX_FILES).orElse(DEFAULT_INDEX_FILES));
 
+            File indexFile = null;
             for (String index : indexs) {
-                String filePath = absPath.concat(File.separator).concat(index);
-                file = new File(filePath);
-                if (simpleFileCheck(file, request, response)) {
+                String filePath = absPath.endsWith(File.separator) ? absPath.concat(index) : absPath.concat(File.separator).concat(index);
+                File tmpFile = new File(filePath);
+                if (tmpFile.exists() && tmpFile.isFile() && !tmpFile.isHidden()) {
+                    indexFile = tmpFile;
                     break;
                 }
             }
 
-            if (file.isDirectory()) {
-                response.sendError(HttpResponseStatus.NOT_FOUND);
+            if (indexFile == null) {
+                response.sendError(NOT_FOUND);
                 return false;
             }
+
+            file = indexFile;
         }
+
 
         // check if cache and 304
         if (checkCache(file, request, response)) {
@@ -130,7 +140,7 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         } catch (FileNotFoundException e) {
             log.error("Static file not found: {}", file.getPath());
 
-            response.sendError(HttpResponseStatus.NOT_FOUND);
+            response.sendError(NOT_FOUND);
             throw new RazorException(e);
         } catch (IOException e) {
             log.error("Static file IO exception: {}", file.getPath());
@@ -139,21 +149,6 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
             throw new RazorException(e);
         }
 
-    }
-
-    private boolean simpleFileCheck(File file, Request request, Response response) {
-
-        if (!file.exists() || file.isHidden()) {
-            response.sendError(HttpResponseStatus.NOT_FOUND);
-            return false;
-        }
-
-        if (!file.isFile()) {
-            response.sendError(HttpResponseStatus.FORBIDDEN);
-            return false;
-        }
-
-        return true;
     }
 
     /**

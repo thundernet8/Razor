@@ -122,12 +122,12 @@ public class Razor {
 
     /**
      * Add static path rule
-     * @param rule static path rule, a full path or path prefix or file extension, e.g `/favicon.png`, `/statics/`, `.png`
+     * @param rules static path rule, a full path or path prefix or file extension, e.g `/favicon.png`, `/statics/`, `.png`
      * @return Razor
      */
-    public Razor addStatic(String rule) {
+    public Razor addStatic(String... rules) {
 
-        statics.add(rule);
+        statics.addAll(Arrays.asList(rules));
 
         return this;
     }
