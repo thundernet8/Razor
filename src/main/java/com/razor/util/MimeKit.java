@@ -38,6 +38,7 @@ public class MimeKit {
 
     /**
      * Search mime type through file name
+     *
      * @param name file name
      * @return mime type
      */
@@ -59,7 +60,31 @@ public class MimeKit {
     }
 
     /**
+     * Search mime info through file name
+     *
+     * @param name file name
+     * @return object including mime detail info
+     */
+    public static EContentType detailOf(String name) {
+        name = name.toLowerCase();
+
+        // whole name searching
+        EContentType type = EContentType.fromFileExtension(name);
+        if (type != EContentType.EMPTY) {
+            return type;
+        }
+
+        // .ext searching
+        int index = name.lastIndexOf('.');
+        if (index < 0 || index == name.length() - 1) {
+            return null;
+        }
+        return detailOfExt(name.substring(index + 1));
+    }
+
+    /**
      * Search mime type through extension
+     *
      * @param ext file extension, e.g `.jpg` or `jpg`
      * @return mime type
      */
@@ -70,6 +95,22 @@ public class MimeKit {
             return null;
         } else {
             return type.getMimeType();
+        }
+    }
+
+    /**
+     * Search mime info through extension
+     *
+     * @param ext file extension, e.g `.jpg` or `jpg`
+     * @return mime type
+     */
+    public static EContentType detailOfExt(String ext) {
+
+        EContentType type = EContentType.fromFileExtension(ext);
+        if (type == EContentType.EMPTY) {
+            return null;
+        } else {
+            return type;
         }
     }
 

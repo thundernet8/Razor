@@ -23,6 +23,7 @@
 
 package com.razor.util;
 
+import com.razor.mvc.http.EContentType;
 import com.razor.mvc.http.UrlQuery;
 
 import java.util.Optional;
@@ -49,6 +50,7 @@ public class UrlKit {
 
     /**
      * Parse url queries
+     *
      * @param url url
      * @return url queries
      */
@@ -58,7 +60,27 @@ public class UrlKit {
     }
 
     public static boolean isStaticFile(Set<String> statics, String url) {
+
+        if (url.endsWith("/") && !url.equals("/")) {
+            // treat as directory
+
+            return true;
+        }
+
         Optional<String> result = statics.stream().filter(s -> s.equals(url) || url.startsWith(s)).findFirst();
-        return result.isPresent();
+        if (result.isPresent()) {
+            return true;
+        }
+
+        // extension match
+        int index = url.lastIndexOf('.');
+        if (index > 0 && index != url.length() - 1) {
+            String ext = url.substring(index + 1);
+            if (EContentType.fromFileExtension(ext) != EContentType.EMPTY) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

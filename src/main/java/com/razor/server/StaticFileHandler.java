@@ -25,6 +25,7 @@ package com.razor.server;
 
 import com.razor.Razor;
 import com.razor.exception.RazorException;
+import com.razor.mvc.http.EContentType;
 import com.razor.mvc.http.IHttpMethod;
 import com.razor.mvc.http.Request;
 import com.razor.mvc.http.Response;
@@ -33,7 +34,6 @@ import com.razor.util.MimeKit;
 import io.netty.channel.ChannelHandlerContext;
 import com.razor.env.Env;
 import io.netty.handler.codec.http.*;
-import io.netty.util.AsciiString;
 import lombok.extern.slf4j.Slf4j;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
@@ -167,7 +168,8 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
 
         String ifMdf = request.get(IF_MODIFIED_SINCE);
         String cacheControl = request.get(CACHE_CONTROL);
-        if (ifMdf == null || ifMdf.isEmpty() || cacheControl.toLowerCase().equals("no-cache")) {
+
+        if (ifMdf == null || ifMdf.isEmpty() || Arrays.asList("max-age=0", "no-cache", "no-store").contains(cacheControl.toLowerCase())) {
             return false;
         }
 
@@ -184,12 +186,16 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
 
     private void setHeaders(File file, Request request, Response response) {
 
+        String filename = file.getName();
         response.setDate();
 
+        EContentType contentType = MimeKit.detailOf(filename);
+
         // content-type based on file mime
-        response.header(CONTENT_TYPE, MimeKit.of(file.getName()));
-        // TODO response data mode: attachment | inline
-        // response.header(CONTENT_DISPOSITION, "inline");
+        response.header(CONTENT_TYPE, contentType.getMimeType());
+        // content-disposition
+        String disposition = contentType.isInline() ? "inline" : "attachment;filename=".concat(filename);
+        response.header(CONTENT_DISPOSITION, disposition);
 
         // cache-control
         int cacheSeconds = razor.getEnv().getInt(ENV_KEY_HTTP_CACHE_SECONDS, DEFAULT_HTTP_CACHE_SECONDS);

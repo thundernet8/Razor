@@ -32,7 +32,7 @@ public class MvcTest {
 
         razor.content("web");
         razor.addStatic("/txt/");
-        razor.addStatic("/images/");
+//        razor.addStatic("/images/");
         razor.start(MvcTest.class, "127.0.0.1", 8090, args);
     }
 }

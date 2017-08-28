@@ -63,6 +63,7 @@ public class Response {
     private boolean flushed = false;
 
     public boolean flushed() {
+
         return flushed;
     }
 
@@ -113,15 +114,18 @@ public class Response {
     }
 
     public static Response build(ChannelHandlerContext cxt, Request req, FullHttpResponse res) {
+
         return new Response(cxt, req, res);
     }
 
     public static Response build(ChannelHandlerContext cxt, Request req) {
+
         return new Response(cxt, req, null);
     }
 
     /**
      * Set response header
+     *
      * @param field header field, ref {@link HttpHeaderNames}
      * @param value header value, ref {@link HttpHeaderValues}
      */
@@ -136,12 +140,24 @@ public class Response {
 
     /**
      * Set response header
+     *
      * @param field header field, ref {@link HttpHeaderNames}
      * @param value header value
      */
     public void header(AsciiString field, String value) {
 
         header(field, new AsciiString(value));
+    }
+
+    /**
+     * Set response header
+     *
+     * @param field header field, ref {@link HttpHeaderNames}
+     * @param value header value
+     */
+    public void header(String field, String value) {
+
+        header(new AsciiString(field), new AsciiString(value));
     }
 
     /**
@@ -207,11 +223,19 @@ public class Response {
     }
 
     /**
+     * Send the response
+     */
+    public void send() {
+
+        // TODO
+    }
+
+    /**
      * Write and flush channel context
      *
      * @param close whether close http connection
      */
-    public void writeFlush(boolean close) {
+    private void writeFlush(boolean close) {
 
         if (close) {
             channelCxt.writeAndFlush(httpResponse).addListener(ChannelFutureListener.CLOSE);
@@ -222,7 +246,7 @@ public class Response {
         flushed = true;
     }
 
-    public void flush() {
+    private void flush() {
 
         flushed = true;
     }

@@ -36,69 +36,67 @@ import java.util.Map;
  */
 public enum EContentType {
 
-    TEXT("text/plain", "text", "txt", "text"),
+    TEXT("text/plain", "text", true, "txt", "text"),
 
-    AUDIO_MPEG("audio/mpeg", "mpeg", "mpga", "mp2", "mp2a", "mp3", "m2a", "m3a"),
+    AUDIO_MPEG("audio/mpeg", "mpeg", false, "mpga", "mp2", "mp2a", "mp3", "m2a", "m3a"),
 
-    AVI("video/x-msvideo", "avi", "avi"),
+    AVI("video/x-msvideo", "avi", false, "avi"),
 
-    MP4A("video/mp4", "mp4a", "mp4", "mp4a", "mpg4"),
+    MP4A("video/mp4", "mp4a", false, "mp4", "mp4a", "mpg4"),
 
-    MP4V("video/mp4v-es", "mp4v", "mp4v"),
+    MP4V("video/mp4v-es", "mp4v", false, "mp4v"),
 
-    WAV("audio/x-wav", "wav", "wav"),
+    WAV("audio/x-wav", "wav", false, "wav"),
 
-    BITTORRENT("application/x-bittorrent", "bittorrent", "torrent"),
+    BITTORRENT("application/x-bittorrent", "bittorrent", false, "torrent"),
 
-    JPEG("image/jpeg", "jpeg", "jpeg", "jpg", "jpe"),
+    JPEG("image/jpeg", "jpeg", true, "jpeg", "jpg", "jpe"),
 
-    BMP("image/x-ms-bmp", "bmp", "bmp"),
+    BMP("image/x-ms-bmp", "bmp", true, "bmp"),
 
-    PNG("image/png", "png", "png"),
+    PNG("image/png", "png", true, "png"),
 
-    GIF("image/gif", "gif", "gif"),
+    GIF("image/gif", "gif", true, "gif"),
 
-    ICO("image/x-ico", "ico", "ico"),
+    ICO("image/x-ico", "ico", true, "ico"),
 
-    TIFF("image/tiff", "tiff", "tiff", "tif"),
+    TIFF("image/tiff", "tiff", true, "tiff", "tif"),
 
-    WEBP("image/webp", "webp", "webp"),
+    WEBP("image/webp", "webp", true, "webp"),
 
-    FLASH("application/x-shockwave-flash", "flash", "swf"),
+    FLASH("application/x-shockwave-flash", "flash", false, "swf"),
 
-    FLASH_VIDEO("video/x-flv", "flash-video", "flv"),
+    FLASH_VIDEO("video/x-flv", "flash-video", false, "flv"),
 
-    GNU_INFO("text/x-info", "gnu-info", "info"),
+    GNU_INFO("text/x-info", "gnu-info", true, "info"),
 
-    GZIP("application/x-gzip", "gzip", "gz"),
+    GZIP("application/x-gzip", "gzip", false, "gz"),
 
-    HTML("text/html", "html", "html", "htm"),
+    HTML("text/html", "html", true, "html", "htm"),
 
-    JAVASCRIPT("application/javascript", "javascript", "js"),
+    JAVASCRIPT("application/javascript", "javascript", true, "js"),
 
-    CSS("text/css", "css", "css"),
+    CSS("text/css", "css", true, "css"),
 
-    JSON("application/json", "json", "json"),
+    JSON("application/json", "json", true, "json"),
 
-    JSON_ML("application/jsonml+json", "jsonml", "jsonml"),
+    JSON_ML("application/jsonml+json", "jsonml", true, "jsonml"),
 
-    RSS("application/rss+xml", "rss", "rss"),
+    RSS("application/rss+xml", "rss", true, "rss"),
 
-    PDF("application/pdf", "pdf", "pdf"),
+    PDF("application/pdf", "pdf", false, "pdf"),
 
-    CSV("text/csv", "csv", "csv"),
+    CSV("text/csv", "csv", false, "csv"),
 
-    EPUB("application/epub+zip", "epub", "epub"),
+    EPUB("application/epub+zip", "epub", false, "epub"),
 
-    MICROSOFT_EXCEL("application/vnd.ms-excel", "excel", "xls", "xlm", "xla", "xlc", "xlt", "xlw", "xlsx"),
+    MICROSOFT_EXCEL("application/vnd.ms-excel", "excel", false, "xls", "xlm", "xla", "xlc", "xlt", "xlw", "xlsx"),
 
-    MICROSOFT_WORD("application/msword", "word", "doc", "dot", "docx"),
+    MICROSOFT_WORD("application/msword", "word", false, "doc", "dot", "docx"),
 
-    MICROSOFT_ACCESS("application/x-msaccess", "access", "mdb"),
+    MICROSOFT_ACCESS("application/x-msaccess", "access", false, "mdb"),
 
-    MICROSOFT_OFFICE("application/vnd.openxmlformats-officedocument", "office"),
-
-    EMPTY("application/octet-stream", "other"),;
+    EMPTY("application/octet-stream", "other", true),;
 
     private final static Map<String, EContentType> mimeTypeMap = new HashMap<>();
 
@@ -124,12 +122,24 @@ public enum EContentType {
     private final String shortName;
 
     @Getter
+    private final boolean inline;
+
+    @Getter
     private final String[] extensions;
 
-    private EContentType(String mimeType, String shortName, String... extensions) {
+    /**
+     * Construct new instance
+     *
+     * @param mimeType mime type, e.g `text/plain`
+     * @param shortName mime type short name, e.g `text`
+     * @param inline content-disposition property, true for `inline`, others such as `attachment` treat as false
+     * @param extensions possible file extensions for this mime type
+     */
+    private EContentType(String mimeType, String shortName, boolean inline, String... extensions) {
 
         this.mimeType = mimeType;
         this.shortName = shortName;
+        this.inline = inline;
         this.extensions = extensions;
     }
 
