@@ -121,7 +121,7 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
             raf = new RandomAccessFile(file, "r");
             long length = raf.length();
 
-            response.header(HttpHeaderNames.CONTENT_LENGTH, Long.toString(length));
+            response.header(CONTENT_LENGTH, Long.toString(length));
             setHeaders(file, request, response);
 
             response.sendFile(raf, length);
@@ -165,8 +165,9 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
      */
     private boolean checkCache(File file, Request request, Response response) {
 
-        String ifMdf = request.get(HttpHeaderNames.IF_MODIFIED_SINCE);
-        if (ifMdf == null || ifMdf.isEmpty()) {
+        String ifMdf = request.get(IF_MODIFIED_SINCE);
+        String cacheControl = request.get(CACHE_CONTROL);
+        if (ifMdf == null || ifMdf.isEmpty() || cacheControl.toLowerCase().equals("no-cache")) {
             return false;
         }
 
@@ -186,9 +187,9 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         response.setDate();
 
         // content-type based on file mime
-        response.header(HttpHeaderNames.CONTENT_TYPE, MimeKit.of(file.getName()));
+        response.header(CONTENT_TYPE, MimeKit.of(file.getName()));
         // TODO response data mode: attachment | inline
-        // response.header(HttpHeaderNames.CONTENT_DISPOSITION, "inline");
+        // response.header(CONTENT_DISPOSITION, "inline");
 
         // cache-control
         int cacheSeconds = razor.getEnv().getInt(ENV_KEY_HTTP_CACHE_SECONDS, DEFAULT_HTTP_CACHE_SECONDS);
@@ -206,7 +207,7 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
 
         // keep-alive
         if (request.keepAlive()) {
-            response.header(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+            response.header(CONNECTION, KEEP_ALIVE);
         }
     }
 }
