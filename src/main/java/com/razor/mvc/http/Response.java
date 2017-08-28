@@ -184,6 +184,8 @@ public class Response {
 
         this.status = status;
 
+        setDate();
+
         setHttpResponse(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8)));
         header(HttpHeaderNames.CONTENT_TYPE, new AsciiString(Constants.CONTENT_TYPE_TEXT));
 
@@ -199,6 +201,8 @@ public class Response {
         this.status = HttpResponseStatus.OK;
 
         setHttpResponse(new DefaultHttpResponse(HttpVersion.HTTP_1_1, status, true));
+
+        header("X-Power-By", "Razor");
 
         // Write initial line and headers
         channelCxt.write(httpResponse);

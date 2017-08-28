@@ -173,15 +173,15 @@ public class RouteMatcher {
     }
 
     private boolean validateRoutes() {
-        Pattern pattern = Pattern.compile("^/([0-9a-zA-Z-_/]+)([^/])$");
+        Pattern pattern = Pattern.compile("^/([0-9a-zA-Z-_/]+)?$");
         Matcher matcher = pattern.matcher(routePrefix);
         if (!matcher.matches()) {
-            log.error("Router Prefix {} is illegal, should consist of '0-9 a-z A-Z - _ /' and should not start or end with /", routePrefix);
+            log.error("Router Prefix {} is illegal, should consist of '0-9 a-z A-Z - _ /'", routePrefix);
             //throw new RazorException("Router prefix ".concat(routePrefix).concat(" is illegal"));
             return false;
         }
 
-        pattern = Pattern.compile("^([^/])([0-9a-zA-Z-_/{}:.]+)([^/])$");
+        pattern = Pattern.compile("^(([^/])([0-9a-zA-Z-_/{}:.]+)([^/]))?$");
         matcher = pattern.matcher(route.replace(" ", ""));
         if (!matcher.matches()) {
             log.error("Router {} is illegal", route);

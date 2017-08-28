@@ -73,7 +73,13 @@ public class Router {
 
     public String getFullPath() {
 
-        return routeMatcher.getRoutePrefix().concat("/").concat(routeMatcher.getRoute());
+        String routePrefix = routeMatcher.getRoutePrefix();
+        String route = routeMatcher.getRoute();
+
+        if (route == null || route.isEmpty()) {
+            return routePrefix;
+        }
+        return routePrefix.concat("/").concat(route);
     }
 
     /**

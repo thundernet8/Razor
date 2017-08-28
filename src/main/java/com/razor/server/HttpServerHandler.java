@@ -27,6 +27,7 @@ import com.razor.Razor;
 import com.razor.exception.RazorException;
 import com.razor.ioc.IContainer;
 import com.razor.mvc.Controller;
+import com.razor.mvc.http.ActionResult;
 import com.razor.mvc.http.HttpContext;
 import com.razor.mvc.http.Request;
 import com.razor.mvc.http.Response;
@@ -48,6 +49,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import static io.netty.buffer.Unpooled.copiedBuffer;
+import static io.netty.handler.codec.http.HttpHeaderNames.*;
+import static io.netty.handler.codec.http.HttpResponseStatus.*;
 
 /**
  * Default ChannelInboundHandler
@@ -75,22 +78,6 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
         if (msg instanceof FullHttpRequest) {
 
             final FullHttpRequest fullHttpRequest = (FullHttpRequest) msg;
-            final String responseMessage = "Hello from Netty!";
-            FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(
-                    HttpVersion.HTTP_1_1,
-                    HttpResponseStatus.OK,
-                    copiedBuffer(responseMessage.getBytes())
-            );
-
-            ////////////////////////// test
-            if (HttpUtil.isKeepAlive(fullHttpRequest))
-            {
-                fullHttpResponse.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
-            }
-            fullHttpResponse.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/plain");
-            fullHttpResponse.headers().set(HttpHeaders.Names.CONTENT_LENGTH, responseMessage.length());
-            fullHttpResponse.headers().set("X-Power-By", "Razor");
-            ////////////////////////// test end
 
             // TODO
             // HEAD request
@@ -103,7 +90,6 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
                 return;
             }
 
-            // TODO a special case, path "/" should check dynamic content, if not found, check index.html/index.htm static content
 
             RouteSignature routeSignature = RouteSignature.builder().request(request).response(response).build();
             Router router = request.router();
@@ -111,11 +97,8 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
                 routeSignature.setRouter(router);
                 this.handleRoute(ctx, routeSignature);
             } else {
-                // TODO 404
-                ctx.write(fullHttpResponse);
+                response.sendError(NOT_FOUND);
             }
-
-            //ctx.write(fullHttpResponse);
 
             ReferenceCountUtil.release(msg);
         } else {
@@ -161,27 +144,43 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
         // inject httpContext
         try {
+
             Field contextField = superClass.getDeclaredField("httpContext");
             contextField.setAccessible(true);
             contextField.set(controller, HttpContext.build(signature.request(), signature.response()));
             contextField.setAccessible(false);
         } catch (NoSuchFieldException e) {
+
             log.error("{} has no httpContext field, it's not a controller", superClass.getName());
         } catch (IllegalAccessException e) {
+
             log.error("{} httpContext field is unaccessible", superClass.getName());
         }
 
         Method action = signature.getRouter().getAction();
-        RouteParameter[] params = signature.getRouter().getRouteMatcher().getParams(signature.request().path());
 
         try {
-            String result = action.invoke(controller, Arrays.stream(params).map(RouteParameter::getValue).toArray(Object[]::new)).toString();
+
+            Object result;
+            if (action.getParameterTypes().length == 0) {
+
+                result = action.invoke(controller);
+            } else {
+
+                RouteParameter[] params = signature.getRouter().getRouteMatcher().getParams(signature.request().path());
+                Object[] args = params == null ? new Object[0] : Arrays.stream(params).map(RouteParameter::getValue).toArray(Object[]::new);
+                result = action.invoke(controller, args);
+            }
+
+            Class<?> returnType = action.getReturnType();
+
             ctx.writeAndFlush(new DefaultFullHttpResponse(
                     HttpVersion.HTTP_1_1,
                     HttpResponseStatus.OK,
-                    copiedBuffer(result.getBytes())
+                    copiedBuffer(ActionResult.build(result, returnType).getBytes())
             ));
         } catch (Exception e) {
+
             log.error(e.getMessage());
             ctx.writeAndFlush(new DefaultFullHttpResponse(
                     HttpVersion.HTTP_1_1,
@@ -189,7 +188,5 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
                     copiedBuffer(e.getMessage().getBytes())
             ));
         }
-
-        // TODO
     }
 }
