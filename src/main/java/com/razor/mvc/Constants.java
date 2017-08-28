@@ -34,6 +34,10 @@ import java.util.List;
  * @since 0.0.1
  */
 public interface Constants {
+
+    // Package
+    String PACKAGE_NAME = "Razor";
+
     // Version
     String VERSION = "0.0.1-SNAPSHOT";
 

@@ -32,18 +32,22 @@ package com.razor.ioc.exception;
 public class DependencyRegisterException extends Exception {
 
     public DependencyRegisterException() {
+
         super();
     }
 
     public DependencyRegisterException(String message) {
+
         super(message);
     }
 
     public DependencyRegisterException(Throwable cause) {
+
         super(cause);
     }
 
     public DependencyRegisterException(String message, Throwable cause) {
+
         super(message, cause);
     }
 

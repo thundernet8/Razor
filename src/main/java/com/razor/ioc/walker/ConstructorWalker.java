@@ -25,11 +25,12 @@ package com.razor.ioc.walker;
 
 import com.razor.ioc.exception.DependencyResolveException;
 import com.razor.ioc.annotation.ForInject;
+
+import lombok.extern.slf4j.Slf4j;
+
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Find right inject constructor for a class
@@ -43,9 +44,11 @@ public class ConstructorWalker {
     private static final Map<Class<?>, Constructor> constructorMap = new HashMap<>();
 
     public static Constructor findInjectConstructor(Class<?> clazz) throws DependencyResolveException {
+
         Constructor[] constructors = clazz.getConstructors();
 
         if (constructors.length == 0) {
+
             throw new DependencyResolveException("Cannot resolve constructor for Type: " + clazz.getName());
         }
 
@@ -57,16 +60,20 @@ public class ConstructorWalker {
                 Constructor annotatedConstructor = null;
                 // find a annotated constructor which is specified for injection
                 for (Constructor constructor : constructors) {
+
                     if (constructor.getAnnotation(ForInject.class) != null && annotatedConstructor == null) {
+
                         annotatedConstructor = constructor;
                     }
                 }
 
                 if (annotatedConstructor != null) {
+
                     injectConstructor = annotatedConstructor;
                 }
 
             } catch (Exception e) {
+
                 log.error("Walk class for constructor encounter exception: {}", e.getMessage());
                 e.printStackTrace();
                 throw e;
@@ -79,12 +86,15 @@ public class ConstructorWalker {
     }
 
     public static Constructor cachedInjectConstructor(Class<?> clazz) throws DependencyResolveException {
+
         Constructor constructor = constructorMap.get(clazz);
         if (constructor != null) {
+
             return constructor;
         }
         constructor = findInjectConstructor(clazz);
         if (constructor == null) {
+
             throw new DependencyResolveException("Cannot resolve constructor for Type: " + clazz.getName());
         }
 

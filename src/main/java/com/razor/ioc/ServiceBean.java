@@ -48,18 +48,22 @@ class ServiceBean {
     private boolean sington;
 
     boolean hasName() {
+
         return !StringUtils.isEmpty(name);
     }
 
     boolean hasKey() {
+
         return key != null;
     }
 
     boolean isSington() {
+
         return sington;
     }
 
     private ServiceBean(RegistrationData rd) {
+
         implType = rd.getImplType();
         regType = rd.getRegType();
         name = rd.getName();
@@ -68,16 +72,19 @@ class ServiceBean {
         sington = rd.isSington();
 
         if (regType == null) {
+
             regType = implType;
         }
         // TODO
     }
 
     void setBean(Object bean) {
+
         this.bean = bean;
     }
 
     static ServiceBean fromRegistrationData(RegistrationData rd) {
+
         return new ServiceBean(rd);
     }
 }

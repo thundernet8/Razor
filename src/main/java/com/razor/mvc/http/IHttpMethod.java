@@ -1,5 +1,3 @@
-package com.razor.mvc.http;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -23,6 +21,14 @@ package com.razor.mvc.http;
  */
 
 
+package com.razor.mvc.http;
+
+/**
+ * Http methods
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
 public interface IHttpMethod {
 
     String ALL = "ALL";

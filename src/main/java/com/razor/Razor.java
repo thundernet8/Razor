@@ -30,15 +30,15 @@ import com.razor.env.Env;
 import com.razor.mvc.Controller;
 import com.razor.mvc.route.RouteManager;
 import com.razor.server.NettyServer;
+
 import lombok.extern.slf4j.Slf4j;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+
 import java.util.*;
 import java.util.regex.Pattern;
-
-import org.reflections.Reflections;
 
 import static com.razor.mvc.Constants.*;
 
@@ -95,6 +95,7 @@ public class Razor {
     public void start(@NonNull Class<?> appClass, @NonNull String host, @NonNull int port, String[] args) {
 
         try {
+
             env.set(ENV_KEY_SERVER_HOST, host);
             assert port >= 80 : "Port should be a positive value and greater or equal to 80";
             env.set(ENV_KEY_SERVER_PORT, port);
@@ -102,14 +103,18 @@ public class Razor {
             this.initIoc();
             this.initRoutes();
             this.startUp();
+
             new Thread(() -> {
                 try {
+
                     nettyServer.run(Razor.this, args);
                 } catch (Exception e) {
+
                     log.error("Run razor in new thread failed, error: {}", e.getMessage());
                 }
             }).start();
         } catch (Exception e) {
+
             log.error("Run razor failed, error: {}", e.getMessage());
         }
     }
@@ -140,13 +145,17 @@ public class Razor {
     public Razor content(String contentDir) {
 
         if (!Pattern.compile("^([^/.])([0-9a-zA-Z_]*)([^/.])$").matcher(contentDir).find()) {
+
             log.error("Content package should only include numbers, latin letters, _ or /, and should not start or end with /");
+
             return this;
         }
         try {
+
             env.set(ENV_KEY_RESOURCE_CONTENT_DIR, contentDir);
             statics.add("/".concat(contentDir).concat("/"));
         } catch (Exception e) {
+
             log.error(e.getMessage());
         }
 
@@ -161,8 +170,10 @@ public class Razor {
     public Razor indexs(List<String> indexs) {
 
         try {
+
             env.set(ENV_KEY_INDEX_FILES, indexs);
         } catch (Exception e) {
+
             log.error(e.getMessage());
         }
 
@@ -178,8 +189,10 @@ public class Razor {
     public Razor ssl(boolean ssl) {
 
         try {
+
             env.set(ENV_KEY_SSL, ssl);
         } catch (Exception e) {
+
             log.error(e.getMessage());
         }
 
@@ -190,6 +203,7 @@ public class Razor {
     private void initIoc() {
 
         iocBuilder = ContainerBuilder.getInstance(appClass);
+
         // register controllers
         iocBuilder.autoRegister(Controller.class);
 
@@ -207,8 +221,6 @@ public class Razor {
      */
     private void startUp() {
 
-        // add content folder path to statics paths
-        String contentDir = env.get(ENV_KEY_RESOURCE_CONTENT_DIR, DEFAULT_RESOURCE_CONTENT_DIR);
-        statics.add("/".concat(contentDir).concat("/"));
+
     }
 }

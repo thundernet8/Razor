@@ -26,12 +26,13 @@ package com.razor.server;
 import com.razor.Razor;
 import com.razor.env.Env;
 import com.razor.mvc.http.Request;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import lombok.extern.slf4j.Slf4j;
 import io.netty.channel.Channel;
+import lombok.extern.slf4j.Slf4j;
 
 import static com.razor.mvc.Constants.*;
 
@@ -52,11 +53,13 @@ public class NettyServer {
     private final NioEventLoopGroup slaveGroup;
 
     public NettyServer() {
+
         masterGroup = new NioEventLoopGroup();
         slaveGroup = new NioEventLoopGroup();
     }
 
     public void run(Razor razor, String[] args) throws Exception {
+
         this.razor = razor;
         this.env = razor.getEnv();
         Request.app = razor;
@@ -65,30 +68,38 @@ public class NettyServer {
     }
 
     private void startServer() throws Exception {
+
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
 
         try {
+
             ServerBootstrap bootstrap = new ServerBootstrap();
+
             bootstrap.group(masterGroup, slaveGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new HttpServerInitializer(razor))
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
+
             this.channel = bootstrap.bind(env.get(ENV_KEY_SERVER_HOST, DEFAULT_SERVER_HOST), env.getInt(ENV_KEY_SERVER_PORT, DEFAULT_SERVER_PORT)).sync().channel();
             log.info("{} started and listen on {}", HttpServerHandler.class.getName(), channel.localAddress());
         } catch (final InterruptedException e){
+
             log.error("Netty server startup failed, error: {}", e.getMessage());
         }
     }
 
     public void shutdown() {
+
         Request.app = null;
 
         slaveGroup.shutdownGracefully();
         masterGroup.shutdownGracefully();
         try {
+
             channel.closeFuture().sync();
         } catch (InterruptedException e) {
+
             log.error("Netty server shutdown failed, error: {}", e.getMessage());
         }
     }

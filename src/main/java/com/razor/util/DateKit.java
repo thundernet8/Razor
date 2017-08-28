@@ -23,10 +23,6 @@
 
 package com.razor.util;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -99,6 +95,7 @@ public class DateKit {
     public static String getGmtDateString(LocalDateTime date) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+
         return formatter.format(date.atZone(ZoneId.of("GMT")));
     }
 

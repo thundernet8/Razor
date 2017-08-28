@@ -26,6 +26,7 @@ package com.razor.server;
 import io.netty.channel.ChannelProgressiveFuture;
 import io.netty.channel.ChannelProgressiveFutureListener;
 import lombok.extern.slf4j.Slf4j;
+
 import java.io.RandomAccessFile;
 
 /**
@@ -48,8 +49,10 @@ public class ProgressiveFutureListener implements ChannelProgressiveFutureListen
     public void operationProgressed(ChannelProgressiveFuture future, long progress, long total) throws Exception {
 
         if (total < 0) {
+
             log.debug("Channel {} transfer progress: {}", future.channel(), progress);
         } else {
+
             log.debug("Channel {} transfer progress: {}, total {}", future.channel(), progress, total);
         }
     }
@@ -58,9 +61,11 @@ public class ProgressiveFutureListener implements ChannelProgressiveFutureListen
     public void operationComplete(ChannelProgressiveFuture future) throws Exception {
 
         try {
+
             raf.close();
             log.debug("Channel {} transfer complete", future.channel());
         } catch (Exception e) {
+
             log.error("Close randomAccessFile with error", e);
         }
     }

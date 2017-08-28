@@ -103,12 +103,18 @@ public enum EContentType {
     private final static Map<String, EContentType> extensionMap = new HashMap<>();
 
     static {
+
         for (EContentType type : values()) {
+
             if (type.mimeType != null) {
+
                 mimeTypeMap.put(type.mimeType.toLowerCase(), type);
             }
+
             if (type.extensions != null) {
+
                 for (String extension : type.extensions) {
+
                     extensionMap.put(extension, type);
                 }
             }
@@ -135,7 +141,7 @@ public enum EContentType {
      * @param inline content-disposition property, true for `inline`, others such as `attachment` treat as false
      * @param extensions possible file extensions for this mime type
      */
-    private EContentType(String mimeType, String shortName, boolean inline, String... extensions) {
+    EContentType(String mimeType, String shortName, boolean inline, String... extensions) {
 
         this.mimeType = mimeType;
         this.shortName = shortName;

@@ -23,6 +23,7 @@
 
 package com.razor.util;
 
+import com.razor.exception.NotImplementException;
 import com.razor.mvc.http.EContentType;
 
 import java.io.File;
@@ -43,19 +44,25 @@ public class MimeKit {
      * @return mime type
      */
     public static String of(String name) {
+
         name = name.toLowerCase();
 
         // whole name searching
         EContentType type = EContentType.fromFileExtension(name);
+
         if (type != EContentType.EMPTY) {
+
             return type.getMimeType();
         }
 
         // .ext searching
         int index = name.lastIndexOf('.');
+
         if (index < 0 || index == name.length() - 1) {
+
             return null;
         }
+
         return ofExt(name.substring(index + 1));
     }
 
@@ -66,19 +73,25 @@ public class MimeKit {
      * @return object including mime detail info
      */
     public static EContentType detailOf(String name) {
+
         name = name.toLowerCase();
 
         // whole name searching
         EContentType type = EContentType.fromFileExtension(name);
+
         if (type != EContentType.EMPTY) {
+
             return type;
         }
 
         // .ext searching
         int index = name.lastIndexOf('.');
+
         if (index < 0 || index == name.length() - 1) {
+
             return null;
         }
+
         return detailOfExt(name.substring(index + 1));
     }
 
@@ -91,9 +104,12 @@ public class MimeKit {
     public static String ofExt(String ext) {
 
         EContentType type = EContentType.fromFileExtension(ext);
+
         if (type == EContentType.EMPTY) {
+
             return null;
         } else {
+
             return type.getMimeType();
         }
     }
@@ -107,9 +123,12 @@ public class MimeKit {
     public static EContentType detailOfExt(String ext) {
 
         EContentType type = EContentType.fromFileExtension(ext);
+
         if (type == EContentType.EMPTY) {
+
             return null;
         } else {
+
             return type;
         }
     }
@@ -117,12 +136,12 @@ public class MimeKit {
     public static String ofStream(InputStream stream) {
 
         // TODO
-        return null;
+        throw new NotImplementException();
     }
 
     public static String ofFile(File file) {
 
         // TODO
-        return null;
+        throw new NotImplementException();
     }
 }

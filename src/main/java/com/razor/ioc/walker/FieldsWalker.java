@@ -24,6 +24,7 @@
 package com.razor.ioc.walker;
 
 import com.razor.ioc.annotation.FromService;
+
 import java.util.*;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -50,10 +51,13 @@ public class FieldsWalker {
     }
 
     public static Field[] cachedInjectFields(Class<?> clazz) {
+
         Field[] fields = fieldsMap.get(clazz);
         if (fields != null) {
+
             return fields;
         }
+
         return findInjectFields(clazz);
     }
 }

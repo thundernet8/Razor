@@ -26,6 +26,7 @@ package com.razor.mvc.http;
 import com.razor.mvc.Constants;
 import com.razor.server.ProgressiveFutureListener;
 import com.razor.util.DateKit;
+
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -36,8 +37,6 @@ import io.netty.util.AsciiString;
 import io.netty.util.CharsetUtil;
 
 import java.io.RandomAccessFile;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -45,7 +44,6 @@ import java.util.Map;
 import static io.netty.handler.codec.http.HttpVersion.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
-import static io.netty.handler.codec.http.HttpHeaderValues.*;
 
 /**
  * Http Request
@@ -84,12 +82,16 @@ public class Response {
         Iterator<Map.Entry<AsciiString, AsciiString>> iterator = headerQueue.entrySet().iterator();
 
         while (iterator.hasNext()) {
+
             Map.Entry<AsciiString, AsciiString> entry = iterator.next();
             AsciiString field = entry.getKey();
             AsciiString value = entry.getValue();
+
             if (!field.isEmpty() && !value.isEmpty()) {
+
                 httpResponse.headers().set(entry.getKey(), entry.getValue());
             }
+
             iterator.remove();
         }
     }
@@ -132,8 +134,10 @@ public class Response {
     public void header(AsciiString field, AsciiString value) {
 
         if (httpResponse == null) {
+
             headerQueue.put(field, value);
         } else {
+
             httpResponse.headers().set(field, value);
         }
     }
@@ -211,8 +215,10 @@ public class Response {
         ChannelFuture lastContentFuture;
 
         if (false /* if has ssl handler */) {
+
             // TODO support ssl
         } else {
+
             sendFileFuture = channelCxt.write(new DefaultFileRegion(raf.getChannel(), 0, length), channelCxt.newProgressivePromise());
             lastContentFuture = channelCxt.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
         }
@@ -220,6 +226,7 @@ public class Response {
         sendFileFuture.addListener(new ProgressiveFutureListener(raf));
 
         if (request == null || !request.keepAlive()) {
+
             lastContentFuture.addListener(ChannelFutureListener.CLOSE);
         }
 
@@ -242,8 +249,10 @@ public class Response {
     private void writeFlush(boolean close) {
 
         if (close) {
+
             channelCxt.writeAndFlush(httpResponse).addListener(ChannelFutureListener.CLOSE);
         } else {
+
             channelCxt.writeAndFlush(httpResponse);
         }
 

@@ -26,7 +26,9 @@ package com.razor.mvc.route;
 import com.razor.exception.RazorException;
 import com.razor.mvc.http.Request;
 import com.razor.mvc.http.Response;
+
 import lombok.Builder;
+
 import java.lang.reflect.Method;
 
 /**
@@ -52,6 +54,7 @@ public class RouteSignature {
     private Response response;
 
     public Router getRouter() {
+
         return router;
     }
 
@@ -71,6 +74,7 @@ public class RouteSignature {
         this.action = router.getAction();
 
         if (action != null) {
+
             this.initParams();
         }
     }
@@ -79,6 +83,7 @@ public class RouteSignature {
         // TODO
 
         if (request == null) {
+
             throw new RazorException("Empty request error");
         }
 

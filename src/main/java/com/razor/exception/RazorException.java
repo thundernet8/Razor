@@ -30,32 +30,39 @@ public class RazorException extends Exception {
     private int code = 0;
 
     public RazorException() {
+
         super();
     }
 
     public RazorException(String message) {
+
         super(message);
     }
 
     public RazorException(int code, String message) {
+
         super(message);
         this.code = code;
     }
 
     public RazorException(Throwable cause) {
+
         super(cause);
     }
 
     public RazorException(String message, Throwable cause) {
+
         super(message, cause);
     }
 
     public RazorException(int code, String message, Throwable cause) {
+
         super(message, cause);
         this.code = code;
     }
 
     public int getCode() {
+
         return code;
     }
 }

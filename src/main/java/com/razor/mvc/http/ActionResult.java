@@ -42,11 +42,6 @@ public class ActionResult {
         // TODO
     }
 
-    public static ActionResult build() {
-
-        return new ActionResult();
-    }
-
     public static ActionResult build(Object result, Class<?> type) {
 
         ActionResult actionResult = new ActionResult();

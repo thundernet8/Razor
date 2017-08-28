@@ -25,6 +25,7 @@ package com.razor.ioc.walker;
 
 
 import org.reflections.Reflections;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,11 +54,14 @@ public class ClassesWalker {
     }
 
     public static Class<?>[] cachedImplementers(Class<?> implType) {
+
         Class<?>[] implementers = classesMap.get(implType);
 
         if (implementers != null) {
+
             return implementers;
         }
+
         return reflectImplementers(appClass, implType);
     }
 }

@@ -55,6 +55,7 @@ class RegistrationData {
     private Object instance = null;
 
     static RegistrationData defaults() {
+        
         return new RegistrationData();
     }
 }

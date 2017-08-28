@@ -34,6 +34,7 @@ import com.razor.mvc.http.Response;
 import com.razor.mvc.route.RouteSignature;
 import com.razor.mvc.route.Router;
 import com.razor.mvc.route.RouteParameter;
+
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -41,7 +42,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.util.ReferenceCountUtil;
-
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
@@ -49,7 +49,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import static io.netty.buffer.Unpooled.copiedBuffer;
-import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
 
 /**
@@ -75,6 +74,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
+        log.info("channelRead");
         if (msg instanceof FullHttpRequest) {
 
             final FullHttpRequest fullHttpRequest = (FullHttpRequest) msg;
@@ -86,6 +86,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
             Response response = Response.build(ctx, request);
 
             if (request.isStatic()) {
+
                 staticFileHandler.handle(ctx, request, response);
                 return;
             }
@@ -93,10 +94,13 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
             RouteSignature routeSignature = RouteSignature.builder().request(request).response(response).build();
             Router router = request.router();
+
             if (router != null) {
+
                 routeSignature.setRouter(router);
                 this.handleRoute(ctx, routeSignature);
             } else {
+
                 response.sendError(NOT_FOUND);
             }
 
@@ -110,14 +114,16 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
 
-        ctx.writeAndFlush(Unpooled.EMPTY_BUFFER)
-                .addListener(ChannelFutureListener.CLOSE);
+        log.info("channelReadComplete");
+        // TODO fix timeout issue, connection not close
+        ctx.flush();
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 
         ctx.writeAndFlush(new DefaultFullHttpResponse(
+
                 HttpVersion.HTTP_1_1,
                 HttpResponseStatus.INTERNAL_SERVER_ERROR,
                 copiedBuffer(cause.getMessage().getBytes())
@@ -176,9 +182,9 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
             ctx.writeAndFlush(new DefaultFullHttpResponse(
                     HttpVersion.HTTP_1_1,
-                    HttpResponseStatus.OK,
+                    HttpResponseStatus.OK, // TODO get status from response object
                     copiedBuffer(ActionResult.build(result, returnType).getBytes())
-            ));
+            )).addListener(ChannelFutureListener.CLOSE);
         } catch (Exception e) {
 
             log.error(e.getMessage());
@@ -186,7 +192,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
                     HttpVersion.HTTP_1_1,
                     HttpResponseStatus.INTERNAL_SERVER_ERROR,
                     copiedBuffer(e.getMessage().getBytes())
-            ));
+            )).addListener(ChannelFutureListener.CLOSE);
         }
     }
 }

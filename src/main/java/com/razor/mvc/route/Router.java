@@ -23,9 +23,9 @@
 
 package com.razor.mvc.route;
 
-import com.razor.mvc.Controller;
-import java.lang.reflect.Method;
 import lombok.Getter;
+
+import java.lang.reflect.Method;
 
 /**
  * Router
@@ -58,7 +58,7 @@ public class Router {
 
 
 
-    public Router(String httpMethod, Class<?> targetType, Method action, RouteMatcher routeMatcher) {
+    Router(String httpMethod, Class<?> targetType, Method action, RouteMatcher routeMatcher) {
 
         this.httpMethod = httpMethod.toUpperCase();
         this.targetType = targetType;
@@ -66,19 +66,21 @@ public class Router {
         this.routeMatcher = routeMatcher;
     }
 
-    public boolean match (String url) {
+    boolean match (String url) {
 
         return routeMatcher.getPattern().matcher(url).matches();
     }
 
-    public String getFullPath() {
+    String getFullPath() {
 
         String routePrefix = routeMatcher.getRoutePrefix();
         String route = routeMatcher.getRoute();
 
         if (route == null || route.isEmpty()) {
+
             return routePrefix;
         }
+
         return routePrefix.concat("/").concat(route);
     }
 
@@ -87,7 +89,7 @@ public class Router {
      *
      * @return String
      */
-    public String getHashKey() {
+    String getHashKey() {
 
         return getFullPath().concat("::").concat(httpMethod.toUpperCase());
     }
@@ -97,7 +99,7 @@ public class Router {
      *
      * @return boolean
      */
-    public boolean isGeneric() {
+    boolean isGeneric() {
 
         return routeMatcher.getParamTypes().length > 0;
     }

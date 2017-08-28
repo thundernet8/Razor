@@ -24,6 +24,7 @@
 package com.razor.server;
 
 import com.razor.Razor;
+
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -46,11 +47,13 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
     private Razor razor;
 
     public HttpServerInitializer(Razor razor) {
+
         this.razor = razor;
     }
 
     @Override
     public void initChannel(final SocketChannel socketChannel) throws Exception {
+
         ChannelPipeline pl = socketChannel.pipeline();
         pl.addLast("codec", new HttpServerCodec());
         pl.addLast("continue", new HttpServerExpectContinueHandler());

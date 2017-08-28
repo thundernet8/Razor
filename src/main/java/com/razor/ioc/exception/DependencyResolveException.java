@@ -32,18 +32,22 @@ package com.razor.ioc.exception;
 public class DependencyResolveException extends Exception {
 
     public DependencyResolveException() {
+
         super();
     }
 
     public DependencyResolveException(String message) {
+
         super(message);
     }
 
     public DependencyResolveException(Throwable cause) {
+
         super(cause);
     }
 
     public DependencyResolveException(String message, Throwable cause) {
+
         super(message, cause);
     }
 

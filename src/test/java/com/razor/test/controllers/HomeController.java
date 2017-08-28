@@ -31,6 +31,7 @@ public class HomeController extends Controller {
     @Route("")
     public String index() {
 
+        System.out.println("home controller");
         return "Home page";
     }
 }

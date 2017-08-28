@@ -54,9 +54,12 @@ public class ContainerBuilder implements IContainerBuilder {
     }
 
     public static ContainerBuilder getInstance(Class<?> appClass) {
+
         if (instance == null) {
             synchronized (ContainerBuilder.class) {
+
                 if (instance == null) {
+
                     instance = new ContainerBuilder(appClass);
                 }
             }
@@ -71,7 +74,9 @@ public class ContainerBuilder implements IContainerBuilder {
 
     @Override
     public <T> IRegistrationBuilder registerType(Class<T> implementer) throws DependencyRegisterException {
+
         if (implementer.isInterface()) {
+
             throw new DependencyRegisterException("Should not register a interface directly");
         }
         RegistrationBuilder rb = RegistrationBuilder.forType(implementer);
@@ -82,6 +87,7 @@ public class ContainerBuilder implements IContainerBuilder {
 
     @Override
     public <T> IRegistrationBuilder registerInstance(T instance) {
+
         RegistrationBuilder rb = RegistrationBuilder.forInstance(instance);
         rbs.add(rb);
         return rb;
@@ -89,6 +95,7 @@ public class ContainerBuilder implements IContainerBuilder {
 
     @Override
     public <T> void autoRegister(Class<T> abstractController) {
+
         this.registerControllers(abstractController);
 
         // scan inject annotated class
@@ -98,21 +105,26 @@ public class ContainerBuilder implements IContainerBuilder {
         // cache constructors
         types.forEach(t -> {
             try {
+
                 ConstructorWalker.findInjectConstructor(t);
             } catch (Exception e) {
+
                 log.error(e.getMessage());
             }
         });
     }
 
     private  <T> void registerControllers(Class<T> abstractController) {
+
         Set<Class<? extends T>> controllers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(abstractController);
         controllers.forEach(this::recursiveRegisterType);
         log.info("Ioc registered {} controllers", controllers.size());
     }
 
     private void recursiveRegisterType(Class<?> clazz) {
+
         if (registeredTypes.contains(clazz)) {
+
             return;
         }
 
@@ -120,6 +132,7 @@ public class ContainerBuilder implements IContainerBuilder {
 
         // register these who implement the interface
         if (clazz.isInterface()) {
+
             Class<?>[] implementers = ClassesWalker.reflectImplementers(appClass, clazz);
             Arrays.stream(implementers).forEach(this::recursiveRegisterType);
             return;
@@ -143,6 +156,7 @@ public class ContainerBuilder implements IContainerBuilder {
             // class fields
             registerFields(clazz);
         } catch (Exception e) {
+
             log.error(e.getMessage());
             e.printStackTrace();
         }
@@ -151,10 +165,12 @@ public class ContainerBuilder implements IContainerBuilder {
     private void registerFields(Class<?> clazz) throws DependencyRegisterException  {
 
         try {
+
             Field[] serviceFields = FieldsWalker.findInjectFields(clazz);
             Arrays.stream(serviceFields).map(Field::getType).forEach(this::recursiveRegisterType);
             log.info("Ioc registered {} fields for controller {}", serviceFields.length, clazz.getName());
         } catch (Exception e) {
+
             log.error(e.getMessage());
             e.printStackTrace();
         }
@@ -162,6 +178,7 @@ public class ContainerBuilder implements IContainerBuilder {
 
     @Override
     public IContainer build() {
+
         Ioc ioc = new Ioc(rbs.stream().map(t -> ServiceBean.fromRegistrationData(t.getRegistrationData())).collect(Collectors.toList()));
 
         // dispose

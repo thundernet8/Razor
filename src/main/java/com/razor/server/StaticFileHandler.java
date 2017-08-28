@@ -31,10 +31,12 @@ import com.razor.mvc.http.Request;
 import com.razor.mvc.http.Response;
 import com.razor.util.DateKit;
 import com.razor.util.MimeKit;
-import io.netty.channel.ChannelHandlerContext;
 import com.razor.env.Env;
+
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import lombok.extern.slf4j.Slf4j;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -67,19 +69,24 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
     public Boolean handle(ChannelHandlerContext ctx, Request request, Response response) throws RazorException {
 
         if (!request.method().equals(IHttpMethod.GET)) {
-            response.sendError(HttpResponseStatus.METHOD_NOT_ALLOWED);
+
+            response.sendError(METHOD_NOT_ALLOWED);
             return false;
         }
 
         String path = request.path();
+
         if (path.toUpperCase().startsWith("/WEB-INF")) {
-            response.sendError(HttpResponseStatus.FORBIDDEN);
+
+            response.sendError(FORBIDDEN);
             return false;
         }
 
         // security check, more TODO
         if (path.contains("..") || path.contains(".".concat(File.separator)) || path.contains(File.separator.concat(".")) || path.charAt(0) == '.' || path.charAt(path.length() - 1) == '.') {
+
             response.sendError(NOT_FOUND);
+
             return false;
         }
 
@@ -90,30 +97,40 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         File file = new File(absPath);
 
         if (!file.exists() || file.isHidden()) {
+
             response.sendError(NOT_FOUND);
+
             return false;
         }
 
         if (!file.isFile() && !file.isDirectory()) {
+
             response.sendError(FORBIDDEN);
+
             return false;
         }
 
         if (file.isDirectory()) {
+
             // find directory index file
             Set<String> indexs = new HashSet<>((List<String>)env.getObject(ENV_KEY_INDEX_FILES).orElse(DEFAULT_INDEX_FILES));
 
             File indexFile = null;
+
             for (String index : indexs) {
+
                 String filePath = absPath.endsWith(File.separator) ? absPath.concat(index) : absPath.concat(File.separator).concat(index);
                 File tmpFile = new File(filePath);
+
                 if (tmpFile.exists() && tmpFile.isFile() && !tmpFile.isHidden()) {
+
                     indexFile = tmpFile;
                     break;
                 }
             }
 
             if (indexFile == null) {
+
                 response.sendError(NOT_FOUND);
                 return false;
             }
@@ -124,11 +141,13 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
 
         // check if cache and 304
         if (checkCache(file, request, response)) {
+
             return false;
         }
 
         RandomAccessFile raf;
         try {
+
             raf = new RandomAccessFile(file, "r");
             long length = raf.length();
 
@@ -136,8 +155,10 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
             setHeaders(file, request, response);
 
             response.sendFile(raf, length);
+
             return true;
         } catch (FileNotFoundException e) {
+
             log.error("Static file not found: {}", file.getPath());
 
             response.sendError(NOT_FOUND);
@@ -145,7 +166,7 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         } catch (IOException e) {
             log.error("Static file IO exception: {}", file.getPath());
 
-            response.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+            response.sendError(INTERNAL_SERVER_ERROR);
             throw new RazorException(e);
         }
 
@@ -165,6 +186,7 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         String cacheControl = request.get(CACHE_CONTROL);
 
         if (ifMdf == null || ifMdf.isEmpty() || Arrays.asList("max-age=0", "no-cache", "no-store").contains(cacheControl.toLowerCase())) {
+
             return false;
         }
 
@@ -172,6 +194,7 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         long ifMdfSinceSecs = ifMdfSinceDate.getTime() / 1000;
         long fileLastMdfSecs = file.lastModified() / 1000;
         if ((fileLastMdfSecs < 0 && ifMdfSinceSecs <= Instant.now().getEpochSecond()) || fileLastMdfSecs == ifMdfSinceSecs) {
+
             response.notModified();
             return true;
         }
@@ -200,14 +223,17 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
 
         String lastMdf;
         if (file != null) {
+
             lastMdf = DateKit.getGmtDateString(new Date(file.lastModified()));
         } else {
+
             lastMdf = DateKit.getGmtDateString();
         }
         response.header(LAST_MODIFIED, lastMdf);
 
         // keep-alive
         if (request.keepAlive()) {
+
             response.header(CONNECTION, KEEP_ALIVE);
         }
     }

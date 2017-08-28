@@ -21,14 +21,34 @@
  */
 
 
-package com.razor.mvc.route;
+package com.razor.exception;
 
 /**
- * Router executor interface
+ * Method not implement exception
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public interface IRouteExecutor {
+public class NotImplementException extends RuntimeException {
+
+    public NotImplementException() {
+
+        super("Method is not implemented");
+    }
+
+    public NotImplementException(String message) {
+
+        super(message);
+    }
+
+    public NotImplementException(Throwable cause) {
+
+        super(cause);
+    }
+
+    public NotImplementException(String message, Throwable cause) {
+
+        super(message, cause);
+    }
 
 }

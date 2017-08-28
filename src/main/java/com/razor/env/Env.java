@@ -27,10 +27,10 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-import static com.razor.mvc.Constants.*;
 
 /**
  * Razor environment handler
@@ -45,70 +45,91 @@ public class Env {
     private Properties props = new Properties();
 
     public static Env defaults() {
+
         return new Env();
     }
 
     public Env set(@NonNull String key, @NonNull Object value) {
+
         props.put(key, value);
+
         return this;
     }
 
     public Env setMulti(@NonNull Map<String, String> map) {
+
         map.forEach((key, value) -> {
             props.setProperty(key, value);
         });
+
         return this;
     }
 
     public Optional<String> get(@NonNull String key) {
+
         return Optional.ofNullable(props.getProperty(key));
     }
 
     public String get(@NonNull String key, String defaultValue) {
+
         return props.getProperty(key, defaultValue);
     }
 
     public Optional<Object> getObject(@NonNull String key) {
+
         return Optional.ofNullable(props.get(key));
     }
 
     public Optional<Integer> getInt(@NonNull String key) {
+
         Optional<Object> optional = getObject(key);
+
         return optional.isPresent() ? Optional.of(Integer.parseInt(optional.get().toString())) : Optional.empty();
     }
 
     public Integer getInt(@NonNull String key, int defaultValue) {
+
         return getInt(key).orElse(defaultValue);
     }
 
     public Optional<Long> getLong(@NonNull String key) {
+
         Optional<Object> optional = getObject(key);
+
         return optional.isPresent() ? Optional.of(Long.parseLong(optional.get().toString())) : Optional.empty();
     }
 
     public Long getLong(@NonNull String key, long defaultValue) {
+
         return getLong(key).orElse(defaultValue);
     }
 
     public Optional<Double> getDouble(@NonNull String key) {
+
         Optional<Object> optional = getObject(key);
+
         return optional.isPresent() ? Optional.of(Double.parseDouble(optional.get().toString())) : Optional.empty();
     }
 
     public Double getDouble(@NonNull String key, double defaultValue) {
+
         return getDouble(key).orElse(defaultValue);
     }
 
     public Optional<Boolean> getBool(@NonNull String key) {
+
         Optional<Object> optional = getObject(key);
+
         return optional.isPresent() ? Optional.of(Boolean.parseBoolean(optional.get().toString())) : Optional.empty();
     }
 
     public Boolean getBool(@NonNull String key, boolean defaultValue) {
+
         return getBool(key).orElse(defaultValue);
     }
 
     public Properties getProps() {
+
         return props;
     }
 

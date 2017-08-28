@@ -28,6 +28,7 @@ import com.razor.mvc.route.RouteManager;
 import com.razor.mvc.route.Router;
 import com.razor.mvc.route.RouteParameter;
 import com.razor.util.UrlKit;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -52,6 +53,7 @@ public class Request {
     private ChannelHandlerContext channelCxt;
 
     public ChannelHandlerContext serverContext() {
+
         return channelCxt;
     }
 
@@ -68,6 +70,7 @@ public class Request {
     private String path;
 
     public String path() {
+
         return path;
     }
 
@@ -118,6 +121,7 @@ public class Request {
     private String protocol;
 
     public String protocol() {
+
         return protocol;
     }
 
@@ -128,6 +132,7 @@ public class Request {
      * @return true for ssl connection, otherwise false
      */
     public boolean secure() {
+
         return secure;
     }
 
@@ -137,6 +142,7 @@ public class Request {
     private String method;
 
     public String method() {
+
         return method;
     }
 
@@ -146,6 +152,7 @@ public class Request {
     private boolean matchRoute = false;
 
     public boolean matchRoute() {
+
         return matchRoute;
     }
 
@@ -155,6 +162,7 @@ public class Request {
     private Router router;
 
     public Router router() {
+
         return router;
     }
 
@@ -164,6 +172,7 @@ public class Request {
     private RouteParameter[] params;
 
     public RouteParameter[] params() {
+
         return params;
     }
 
@@ -173,6 +182,7 @@ public class Request {
     private UrlQuery[] queries;
 
     public UrlQuery[] queries() {
+
         return queries;
     }
 
@@ -182,6 +192,7 @@ public class Request {
     private boolean xhr;
 
     public boolean xhr() {
+
         return xhr;
     }
 
@@ -191,6 +202,7 @@ public class Request {
     private boolean isStatic;
 
     public boolean isStatic() {
+
         return isStatic;
     }
 
@@ -204,13 +216,16 @@ public class Request {
     }
 
     private Request(ChannelHandlerContext channelCxt, FullHttpRequest fullHttpRequest) {
+
         this.channelCxt = channelCxt;
         this.fullHttpRequest = fullHttpRequest;
 
         HttpHeaders headers = fullHttpRequest.headers();
         host = headers.get("Host");
         Matcher matcher = Pattern.compile("^([^:]+)(:(\\\\d+))?$").matcher(host);
+
         if (matcher.find()) {
+
             hostname = matcher.group(1);
             // port = matcher.group(3);
         }
@@ -235,12 +250,14 @@ public class Request {
         isStatic = UrlKit.isStaticFile(app.getStatics(), path);
 
         if (isStatic) {
+
             return;
         }
 
         // below for non static requests
         Router router = RouteManager.getInstance(app.getAppClass()).findRoute(path, method);
         if (router != null) {
+
             matchRoute = true;
             this.router = router;
             params = router.getRouteMatcher().getParams(path);
@@ -248,10 +265,10 @@ public class Request {
     }
 
     public static Request build(ChannelHandlerContext cxt, FullHttpRequest req) {
+
         return new Request(cxt, req);
     }
 
-    // Methods
 
     /**
      * Check if specified content type are acceptable and return the best match, empty for none match
@@ -259,6 +276,7 @@ public class Request {
      * @return matched content type
      */
     public String accept(String docType) {
+
         // TODO
         return "";
     }
@@ -269,6 +287,7 @@ public class Request {
      * @return matched content type
      */
     public String accept(String[] docTypes) {
+
         // TODO
         return "";
     }

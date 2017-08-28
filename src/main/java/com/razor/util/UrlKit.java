@@ -68,15 +68,20 @@ public class UrlKit {
         }
 
         Optional<String> result = statics.stream().filter(s -> s.equals(url) || url.startsWith(s)).findFirst();
+
         if (result.isPresent()) {
+
             return true;
         }
 
         // extension match
         int index = url.lastIndexOf('.');
         if (index > 0 && index != url.length() - 1) {
+
             String ext = url.substring(index + 1);
+
             if (EContentType.fromFileExtension(ext) != EContentType.EMPTY) {
+
                 return true;
             }
         }
