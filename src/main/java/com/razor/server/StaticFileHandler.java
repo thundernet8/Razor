@@ -28,6 +28,8 @@ import com.razor.exception.RazorException;
 import com.razor.mvc.http.IHttpMethod;
 import com.razor.mvc.http.Request;
 import com.razor.mvc.http.Response;
+import com.razor.util.DateKit;
+import com.razor.util.MimeKit;
 import io.netty.channel.ChannelHandlerContext;
 import com.razor.env.Env;
 import io.netty.handler.codec.http.*;
@@ -37,10 +39,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
 import static com.razor.mvc.Constants.*;
+import static io.netty.handler.codec.http.HttpHeaderNames.*;
 
 /**
  * Static files handler
@@ -88,10 +94,11 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         }
 
         if (file.isDirectory()) {
-            // find indexs
+            // find directory index file
             List<String> indexs = (ArrayList<String>)env.getObject(ENV_KEY_INDEX_FILES).orElse(DEFAULT_INDEX_FILES);
-            for (int i=0; i<indexs.size(); i++) {
-                String filePath = absPath.concat(File.separator).concat(indexs.get(i));
+
+            for (String index : indexs) {
+                String filePath = absPath.concat(File.separator).concat(index);
                 file = new File(filePath);
                 if (simpleFileCheck(file, request, response)) {
                     break;
@@ -114,7 +121,7 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
             raf = new RandomAccessFile(file, "r");
             long length = raf.length();
 
-            response.header(HttpHeaderNames.CONTENT_LENGTH, new AsciiString(Long.toString(length)));
+            response.header(HttpHeaderNames.CONTENT_LENGTH, Long.toString(length));
             setHeaders(file, request, response);
 
             response.sendFile(raf, length);
@@ -148,19 +155,54 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         return true;
     }
 
+    /**
+     * Check 304 status
+     *
+     * @param file request file
+     * @param request request object
+     * @param response response object
+     * @return true for not modified
+     */
     private boolean checkCache(File file, Request request, Response response) {
-        // TODO
+
+        String ifMdf = request.get(HttpHeaderNames.IF_MODIFIED_SINCE);
+        if (ifMdf == null || ifMdf.isEmpty()) {
+            return false;
+        }
+
+        Date ifMdfSinceDate = DateKit.dateFromGmt(ifMdf);
+        long ifMdfSinceSecs = ifMdfSinceDate.getTime() / 1000;
+        long fileLastMdfSecs = file.lastModified() / 1000;
+        if ((fileLastMdfSecs < 0 && ifMdfSinceSecs <= Instant.now().getEpochSecond()) || fileLastMdfSecs == ifMdfSinceSecs) {
+            response.notModified();
+            return true;
+        }
+
         return false;
     }
 
     private void setHeaders(File file, Request request, Response response) {
-        // TODO
+
+        response.setDate();
 
         // content-type based on file mime
-        response.header(HttpHeaderNames.CONTENT_TYPE, new AsciiString("image/x-icon"));
-        response.header(HttpHeaderNames.CONTENT_DISPOSITION, "inline");
+        response.header(HttpHeaderNames.CONTENT_TYPE, MimeKit.of(file.getName()));
+        // TODO response data mode: attachment | inline
+        // response.header(HttpHeaderNames.CONTENT_DISPOSITION, "inline");
 
         // cache-control
+        int cacheSeconds = razor.getEnv().getInt(ENV_KEY_HTTP_CACHE_SECONDS, DEFAULT_HTTP_CACHE_SECONDS);
+        LocalDateTime expireDateTime = LocalDateTime.now().plusSeconds(cacheSeconds);
+        response.header(EXPIRES, DateKit.getGmtDateString(expireDateTime));
+        response.header(CACHE_CONTROL, "private, max-age=" + cacheSeconds);
+
+        String lastMdf;
+        if (file != null) {
+            lastMdf = DateKit.getGmtDateString(new Date(file.lastModified()));
+        } else {
+            lastMdf = DateKit.getGmtDateString();
+        }
+        response.header(LAST_MODIFIED, lastMdf);
 
         // keep-alive
         if (request.keepAlive()) {

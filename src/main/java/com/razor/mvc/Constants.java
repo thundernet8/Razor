@@ -50,6 +50,7 @@ public interface Constants {
 
     // Http constants
     String DEFAULT_CHARSET = "UTF-8";
+    Integer DEFAULT_HTTP_CACHE_SECONDS = 3600;
     String CONTENT_TYPE_HTML = "text/html; charset=" + DEFAULT_CHARSET;
     String CONTENT_TYPE_JSON = "application/json; charset=" + DEFAULT_CHARSET;
     String CONTENT_TYPE_TEXT = "text/plain; charset=" + DEFAULT_CHARSET;
@@ -60,4 +61,5 @@ public interface Constants {
     String ENV_KEY_SSL = "razor.server.ssl";
     String ENV_KEY_RESOURCE_CONTENT_DIR = "razor.web.content";
     String ENV_KEY_INDEX_FILES = "razor.web.indexs";
+    String ENV_KEY_HTTP_CACHE_SECONDS = "razor.web.http.cache.seconds";
 }

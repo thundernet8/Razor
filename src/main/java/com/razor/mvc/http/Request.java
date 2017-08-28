@@ -32,6 +32,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpUtil;
+import io.netty.util.AsciiString;
 import lombok.Setter;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -278,6 +279,17 @@ public class Request {
      * @return field value
      */
     public String get(String field) {
+
+        return fullHttpRequest.headers().get(field);
+    }
+
+    /**
+     * Returns the specified HTTP request header field (case-insensitive match)
+     * @param field header field {@link AsciiString}
+     * @return field value
+     */
+    public String get(AsciiString field) {
+
         return fullHttpRequest.headers().get(field);
     }
 }

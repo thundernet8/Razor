@@ -25,6 +25,7 @@ package com.razor.mvc.http;
 
 import com.razor.mvc.Constants;
 import com.razor.server.ProgressiveFutureListener;
+import com.razor.util.DateKit;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -35,9 +36,16 @@ import io.netty.util.AsciiString;
 import io.netty.util.CharsetUtil;
 
 import java.io.RandomAccessFile;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import static io.netty.handler.codec.http.HttpVersion.*;
+import static io.netty.handler.codec.http.HttpResponseStatus.*;
+import static io.netty.handler.codec.http.HttpHeaderNames.*;
+import static io.netty.handler.codec.http.HttpHeaderValues.*;
 
 /**
  * Http Request
@@ -137,18 +145,33 @@ public class Response {
     }
 
     /**
+     * Set 304 response header
+     */
+    public void notModified() {
+
+        setHttpResponse(new DefaultFullHttpResponse(HTTP_1_1, NOT_MODIFIED));
+        setDate();
+
+        writeFlush(true);
+    }
+
+    public void setDate() {
+
+        header(DATE, DateKit.getGmtDateString());
+    }
+
+    /**
      * Send response immediately when error occurs
      * @param status Http response status including code and cause message
      */
     public void sendError(HttpResponseStatus status) {
 
-        setHttpResponse(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8)));
-        header(HttpHeaderNames.CONTENT_TYPE, new AsciiString(Constants.CONTENT_TYPE_TEXT));
-        channelCxt.writeAndFlush(httpResponse).addListener(ChannelFutureListener.CLOSE);
-
         this.status = status;
 
-        flush();
+        setHttpResponse(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8)));
+        header(HttpHeaderNames.CONTENT_TYPE, new AsciiString(Constants.CONTENT_TYPE_TEXT));
+
+        writeFlush(true);
     }
 
     /**
@@ -183,8 +206,18 @@ public class Response {
         flush();
     }
 
-    public void writeFlush() {
-        // TODO
+    /**
+     * Write and flush channel context
+     *
+     * @param close whether close http connection
+     */
+    public void writeFlush(boolean close) {
+
+        if (close) {
+            channelCxt.writeAndFlush(httpResponse).addListener(ChannelFutureListener.CLOSE);
+        } else {
+            channelCxt.writeAndFlush(httpResponse);
+        }
 
         flushed = true;
     }
