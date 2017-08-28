@@ -25,6 +25,8 @@ package com.razor.mvc.http;
 
 public interface IHttpMethod {
 
+    String ALL = "ALL";
+
     String GET = "GET";
 
     String POST = "POST";

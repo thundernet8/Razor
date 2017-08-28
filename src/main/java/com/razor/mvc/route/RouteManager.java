@@ -102,6 +102,7 @@ public class RouteManager {
             assert !StringUtils.isEmpty(route) : action.getName() + " Route should not have a empty path";
             RouteMatcher matcher = new RouteMatcher(routePrefix, route);
             assert matcher.isValid() : clazz.getName().concat(" controller Route prefix or ").concat(action.getName()).concat(" action route has invalid format");
+            HttpGet getAnnotation = action.getAnnotation(HttpGet.class);
             HttpPost postAnnotation = action.getAnnotation(HttpPost.class);
             HttpPut putAnnotation = action.getAnnotation(HttpPut.class);
             HttpDelete delAnnotation = action.getAnnotation(HttpDelete.class);
@@ -112,8 +113,10 @@ public class RouteManager {
                 httpMethod = IHttpMethod.PUT;
             } else if (postAnnotation != null) {
                 httpMethod = IHttpMethod.POST;
-            } else {
+            } else if (getAnnotation != null) {
                 httpMethod = IHttpMethod.GET;
+            } else {
+                httpMethod = IHttpMethod.ALL;
             }
 
             addRoute(new Router(httpMethod, clazz, action, matcher));
@@ -132,6 +135,11 @@ public class RouteManager {
     public Router findRoute(String path, String httpMethod) {
 
         Router router = routerMap.get(path.concat("::").concat(httpMethod));
+        if (router != null) {
+            return router;
+        }
+
+        router = routerMap.get(path.concat("::").concat(IHttpMethod.ALL));
         if (router != null) {
             return router;
         }
