@@ -23,6 +23,9 @@
 
 package com.razor.mvc.http;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Http Context accessible for all actions
  *
@@ -31,4 +34,28 @@ package com.razor.mvc.http;
  */
 public class HttpContext {
 
+    private Request request;
+
+    private Response response;
+
+    public Request request() {
+
+        return request;
+    }
+
+    public Response response() {
+
+        return response;
+    }
+
+    private HttpContext(Request request, Response response) {
+
+        this.request = request;
+        this.response = response;
+    }
+
+    public static HttpContext build(Request request, Response response) {
+
+        return new HttpContext(request, response);
+    }
 }

@@ -24,6 +24,7 @@
 package com.razor.mvc;
 
 import com.razor.mvc.annotation.RoutePrefix;
+import com.razor.mvc.http.HttpContext;
 
 /**
  * Razor abstract controller
@@ -34,4 +35,10 @@ import com.razor.mvc.annotation.RoutePrefix;
 @RoutePrefix
 public abstract class Controller {
 
+    private HttpContext httpContext;
+
+    protected HttpContext context() {
+
+        return httpContext;
+    }
 }

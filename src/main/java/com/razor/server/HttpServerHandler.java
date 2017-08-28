@@ -27,6 +27,7 @@ import com.razor.Razor;
 import com.razor.exception.RazorException;
 import com.razor.ioc.IContainer;
 import com.razor.mvc.Controller;
+import com.razor.mvc.http.HttpContext;
 import com.razor.mvc.http.Request;
 import com.razor.mvc.http.Response;
 import com.razor.mvc.route.RouteSignature;
@@ -41,6 +42,8 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.util.ReferenceCountUtil;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -147,13 +150,27 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
         IContainer ioc = razor.getIoc();
         Class<?> controllerClass = signature.getRouter().getTargetType();
+        Class<?> superClass = controllerClass.getSuperclass();
 
-        if (controllerClass.getSuperclass() != Controller.class) {
+        if (superClass != Controller.class) {
 
             throw new RazorException(controllerClass.getName() + " is not a controller");
         }
 
         Controller controller = (Controller)ioc.resolve(controllerClass);
+
+        // inject httpContext
+        try {
+            Field contextField = superClass.getDeclaredField("httpContext");
+            contextField.setAccessible(true);
+            contextField.set(controller, HttpContext.build(signature.request(), signature.response()));
+            contextField.setAccessible(false);
+        } catch (NoSuchFieldException e) {
+            log.error("{} has no httpContext field, it's not a controller", superClass.getName());
+        } catch (IllegalAccessException e) {
+            log.error("{} httpContext field is unaccessible", superClass.getName());
+        }
+
         Method action = signature.getRouter().getAction();
         RouteParameter[] params = signature.getRouter().getRouteMatcher().getParams(signature.request().path());
 

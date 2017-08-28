@@ -30,6 +30,8 @@ import com.razor.mvc.annotation.HttpGet;
 import com.razor.mvc.annotation.HttpPost;
 import com.razor.mvc.annotation.Route;
 import com.razor.mvc.annotation.RoutePrefix;
+import com.razor.mvc.http.HttpContext;
+import com.razor.mvc.http.Request;
 import com.razor.test.IService;
 
 @RoutePrefix("shop")
@@ -74,6 +76,14 @@ public class BookController extends Controller {
     @Route("books/list")
     public String getBooks() {
 
-        return "Books list ";
+        HttpContext context = context();
+
+        if (context == null) {
+            return "null context";
+        }
+
+        Request request = context.request();
+        return request.getBaseUrl();
+//        return "Books list ";
     }
 }
