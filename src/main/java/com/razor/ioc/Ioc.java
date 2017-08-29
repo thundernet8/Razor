@@ -55,16 +55,20 @@ public class Ioc implements IContainer {
         for (ServiceBean bean : beans) {
 
             String typeName = bean.getRegType().getName();
+
             if (bean.hasKey()) {
 
                 Map<Object, ServiceBean> innerMap = keyedBeanPool.get(typeName);
+
                 if (innerMap == null) {
 
                     innerMap = new HashMap<>();
                 }
+
                 innerMap.put(bean.getKey(), bean);
                 keyedBeanPool.put(typeName, innerMap);
             }
+
             if (bean.hasName()) {
 
                 namedBeanPool.put(typeName.concat("-").concat(bean.getName()), bean);
@@ -80,13 +84,15 @@ public class Ioc implements IContainer {
         if (t.isInterface()) {
 
             Class<?>[] implementers = ClassesWalker.cachedImplementers(t);
+
             if (implementers.length == 0) {
                 return null;
             }
 
-            for (int i = 0; i < implementers.length; i++) {
+            for (Class<?> implementer : implementers) {
 
-                Object ret = resolve(implementers[i]);
+                Object ret = resolve(implementer);
+
                 if (ret != null) {
 
                     return (T)ret;
@@ -119,9 +125,10 @@ public class Ioc implements IContainer {
                 return null;
             }
 
-            for (int i = 0; i < implementers.length; i++) {
+            for (Class<?> implementer : implementers) {
 
-                Object ret = resolveNamed(implementers[i], name);
+                Object ret = resolveNamed(implementer, name);
+
                 if (ret != null) {
 
                     return (T)ret;
@@ -154,9 +161,9 @@ public class Ioc implements IContainer {
                 return null;
             }
 
-            for (int i = 0; i < implementers.length; i++) {
+            for (Class<?> implementer : implementers) {
 
-                Object ret = resolveKeyed(implementers[i], enumKey);
+                Object ret = resolveKeyed(implementer, enumKey);
 
                 if (ret != null) {
 
@@ -189,6 +196,7 @@ public class Ioc implements IContainer {
         }
 
         Object bean = svb.getBean();
+
         if (bean != null) {
 
             return (T)bean;
@@ -200,9 +208,10 @@ public class Ioc implements IContainer {
             if (clazz.isInterface()) {
 
                 Class<?>[] implementers = ClassesWalker.cachedImplementers(clazz);
-                for (int i=0; i<implementers.length; i++) {
+                for (Class<?> implementer : implementers) {
 
-                    Object ret = resolve(implementers[i]);
+                    Object ret = resolve(implementer);
+
                     if (ret != null) {
 
                         return (T)ret;
@@ -239,6 +248,7 @@ public class Ioc implements IContainer {
 
                     log.error("Access field {} of {} with exception: {}", field.getName(), clazz.getName(), e.getMessage());
                 }
+
                 field.setAccessible(accessible);
             });
 

@@ -76,6 +76,19 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>central</name>
+            <url>http://central.maven.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>jcenter</id>
+            <name>jcenter</name>
+            <url>https://jcenter.bintray.com/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -144,6 +157,12 @@
             <groupId>asm</groupId>
             <artifactId>asm</artifactId>
             <version>3.3.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jtwig</groupId>
+            <artifactId>jtwig-core</artifactId>
+            <version>5.86.0.RELEASE</version>
         </dependency>
     </dependencies>
 </project>
