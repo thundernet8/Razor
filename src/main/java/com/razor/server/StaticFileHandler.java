@@ -45,7 +45,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.razor.mvc.Constants.*;
-import static io.netty.handler.codec.http.HttpHeaderNames.*;
+import static com.razor.mvc.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
 
 /**
@@ -194,7 +194,7 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         long fileLastMdfSecs = file.lastModified() / 1000;
         if ((fileLastMdfSecs < 0 && ifMdfSinceSecs <= Instant.now().getEpochSecond()) || fileLastMdfSecs == ifMdfSinceSecs) {
 
-            response.notModified();
+            response.status(304).end();
             return true;
         }
 
@@ -233,7 +233,7 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         // keep-alive
         if (request.keepAlive()) {
 
-            response.header(CONNECTION, KEEP_ALIVE);
+            response.header(CONNECTION, "keep-alive");
         }
     }
 }

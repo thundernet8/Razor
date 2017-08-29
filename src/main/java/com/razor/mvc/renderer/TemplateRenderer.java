@@ -31,7 +31,7 @@ import com.razor.mvc.template.TemplateEngineFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.netty.handler.codec.http.HttpHeaderNames.*;
+import static com.razor.mvc.http.HttpHeaderNames.*;
 
 /**
  * Renderer using template
@@ -79,7 +79,7 @@ public class TemplateRenderer extends Renderer {
             if (response.header(CONTENT_TYPE) == null) {
                 response.header(CONTENT_TYPE, getContentType().getMimeType());
             }
-            response.send(view);
+            response.end(view);
 
         } catch (Exception e) {
 

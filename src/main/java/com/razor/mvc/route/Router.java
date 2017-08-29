@@ -81,6 +81,11 @@ public class Router {
             return routePrefix;
         }
 
+        if (routePrefix.endsWith("/")) {
+
+            return routePrefix.concat(route);
+        }
+
         return routePrefix.concat("/").concat(route);
     }
 

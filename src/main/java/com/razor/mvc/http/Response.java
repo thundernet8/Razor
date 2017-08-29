@@ -27,6 +27,7 @@ import com.razor.mvc.Constants;
 import com.razor.server.ProgressiveFutureListener;
 import com.razor.util.DateKit;
 
+import com.razor.util.MimeKit;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -37,14 +38,14 @@ import io.netty.util.AsciiString;
 import io.netty.util.CharsetUtil;
 
 import java.io.RandomAccessFile;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static io.netty.buffer.Unpooled.copiedBuffer;
 import static io.netty.handler.codec.http.HttpVersion.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
-import static io.netty.handler.codec.http.HttpHeaderNames.*;
+import static com.razor.mvc.http.HttpHeaderNames.*;
 
 /**
  * Http Request
@@ -56,8 +57,10 @@ public class Response {
 
     private ChannelHandlerContext channelCxt;
 
+    private boolean keepAlive = true;
+
     /**
-     * Indicate the response has been flushed or not
+     * Indicate the response has been flushed or not(which also means headers has been sent)
      */
     private boolean flushed = false;
 
@@ -76,6 +79,11 @@ public class Response {
      */
     private HttpResponse httpResponse;
 
+    /**
+     * The real response sent by netty server
+     *
+     * @param response netty defined http response
+     */
     private void setHttpResponse(HttpResponse response) {
 
         httpResponse = response;
@@ -121,6 +129,11 @@ public class Response {
         this.channelCxt = cxt;
         this.request = req;
         this.httpResponse = res;
+
+        if (req != null && !req.keepAlive()) {
+
+            keepAlive = false;
+        }
         // TODO
 
     }
@@ -140,8 +153,9 @@ public class Response {
      *
      * @param field header field, ref {@link HttpHeaderNames}
      * @param value header value, ref {@link HttpHeaderValues}
+     * @return Response self
      */
-    public void header(AsciiString field, AsciiString value) {
+    public Response header(AsciiString field, AsciiString value) {
 
         if (httpResponse == null) {
 
@@ -150,6 +164,8 @@ public class Response {
 
             httpResponse.headers().set(field, value);
         }
+
+        return this;
     }
 
     /**
@@ -158,9 +174,9 @@ public class Response {
      * @param field header field, ref {@link HttpHeaderNames}
      * @param value header value
      */
-    public void header(AsciiString field, String value) {
+    public Response header(AsciiString field, String value) {
 
-        header(field, new AsciiString(value));
+        return header(field, new AsciiString(value));
     }
 
     /**
@@ -168,10 +184,11 @@ public class Response {
      *
      * @param field header field, ref {@link HttpHeaderNames}
      * @param value header value
+     * @return Response self
      */
-    public void header(String field, String value) {
+    public Response header(String field, String value) {
 
-        header(new AsciiString(field), new AsciiString(value));
+        return header(new AsciiString(field), new AsciiString(value));
     }
 
     /**
@@ -209,14 +226,135 @@ public class Response {
     }
 
     /**
-     * Set 304 response header
+     * Set Content-Disposition to attachment, and the the resource will have a download behaviour when be requested
      */
-    public void notModified() {
+    public Response attachment() {
 
-        setHttpResponse(new DefaultFullHttpResponse(HTTP_1_1, NOT_MODIFIED));
-        setDate();
+        header(CONTENT_DISPOSITION, "attachment");
 
-        writeFlush(true);
+        return this;
+    }
+
+    /**
+     * Set Content-Disposition to attachment, mime type also be auto-detected and set
+     *
+     * @param filePath file path
+     * @return Response self
+     */
+    public Response attachment(String filePath) {
+
+        int index = filePath.lastIndexOf("/");
+        String filename = index > -1 ? filePath.substring(index+1) : filePath;
+        String mime = MimeKit.of(filename);
+
+        header(CONTENT_DISPOSITION, "attachment; filename=".concat(filename));
+        header(CONTENT_TYPE, mime);
+
+        return this;
+    }
+
+    /**
+     * Set cookie
+     *
+     * @param name cookie name
+     * @param value cookie value
+     * @return Response self
+     */
+    public Response cookie(String name, String value) {
+
+        return cookie(name, value, null);
+    }
+
+    /**
+     * Set cookie
+     *
+     * @param name cookie name
+     * @param value cookie value
+     * @param options cookie options (options key now support `domain`, `expires`, `httpOnly`, `maxAge`, `path`, `secure`, `sameSite`)
+     * @return Response self
+     */
+    public Response cookie(String name, String value, Map<String, Object> options) {
+
+        StringBuilder sb = new StringBuilder(name);
+        sb.append("=").append(value).append(";");
+
+        if (options != null) {
+
+            Object domain = options.get("domain");
+            if (domain != null) {
+
+                sb.append(" Domain=").append(domain.toString()).append(";");
+            }
+
+            Object expires = options.get("expires");
+            if (expires != null) {
+
+                sb.append(" Expires=").append(expires.toString()).append(";");
+            }
+
+            Object maxAge = options.get("maxAge");
+            if (maxAge != null) {
+
+                sb.append(" Max-Age=").append(maxAge.toString()).append(";");
+            }
+
+            Object path = options.get("path");
+            if (path != null) {
+
+                sb.append(" Path=").append(path.toString()).append(";");
+            }
+
+            Object secure = options.get("secure");
+            if (secure != null && (boolean)secure) {
+
+                sb.append(" Secure;");
+            }
+
+            Object httpOnly = options.get("httpOnly");
+            if (httpOnly != null && (boolean)httpOnly) {
+
+                sb.append(" HttpOnly;");
+            }
+
+            Object sameSite = options.get("sameSite");
+            if (sameSite != null && (boolean)sameSite) {
+
+                sb.append(" SameSite=Strict;");
+            }
+        }
+
+        header(SET_COOKIE, sb.toString());
+
+        return this;
+    }
+
+    public Response clearCookie(String name) {
+
+        Map<String, Object> options = new HashMap<>();
+        options.put("expires", DateKit.getGmtDateString(new Date(0)));
+
+        if (httpResponse != null) {
+
+            httpResponse.headers().remove(name);
+        } else {
+
+            headerQueue.remove(name);
+        }
+
+        return cookie(name, "", options);
+    }
+
+    /**
+     * Set http response status code and reason
+     *
+     * @param statusCode http status code
+     * @return Response self
+     */
+    public Response status(int statusCode) {
+
+        this.status = HttpResponseStatus.valueOf(statusCode);
+
+        return this;
     }
 
     public void setDate() {
@@ -227,7 +365,49 @@ public class Response {
     public void setPowerBy() {
 
         header(SERVER, "Netty");
-        header("X-Power-By", "Razor");
+        header(X_POWER_BY, "Razor");
+    }
+
+    /**
+     * Send json response
+     *
+     * @param data data to send
+     */
+    public void json(Object data) {
+
+        // TODO
+    }
+
+    /**
+     * Redirect
+     *
+     * @param path new path to visit
+     */
+    public void location(String path) {
+
+        location(path, 302);
+    }
+
+    /**
+     * Redirect
+     *
+     * @param path new path to visit
+     * @param code response code
+     */
+    public void location(String path, int code) {
+
+        keepAlive = false;
+
+        header(LOCATION, path);
+
+        if (code < 300 || code >= 400) {
+
+            code = 302;
+        }
+
+        status = HttpResponseStatus.valueOf(code);
+
+        end();
     }
 
     /**
@@ -238,10 +418,8 @@ public class Response {
 
         this.status = status;
 
-        setDate();
-
-        setHttpResponse(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8)));
-        header(HttpHeaderNames.CONTENT_TYPE, new AsciiString(Constants.CONTENT_TYPE_TEXT));
+        setHttpResponse(new DefaultFullHttpResponse(HTTP_1_1, status, Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8)));
+        header(CONTENT_TYPE, Constants.CONTENT_TYPE_TEXT);
 
         writeFlush(true);
     }
@@ -254,9 +432,10 @@ public class Response {
 
         this.status = HttpResponseStatus.OK;
 
-        setHttpResponse(new DefaultHttpResponse(HttpVersion.HTTP_1_1, status, true));
+        setDate();
+        setPowerBy();
 
-        header("X-Power-By", "Razor");
+        setHttpResponse(new DefaultHttpResponse(HTTP_1_1, status, true));
 
         // Write initial line and headers
         channelCxt.write(httpResponse);
@@ -275,7 +454,7 @@ public class Response {
 
         sendFileFuture.addListener(new ProgressiveFutureListener(raf));
 
-        if (request == null || !request.keepAlive()) {
+        if (!keepAlive) {
 
             lastContentFuture.addListener(ChannelFutureListener.CLOSE);
         }
@@ -283,45 +462,6 @@ public class Response {
         flush();
     }
 
-    /**
-     * Send the response
-     */
-    public void send() {
-
-        // TODO
-    }
-
-    public void send(String view) {
-
-        // TODO
-        setDate();
-
-        setHttpResponse(new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1,
-                getStatus(),
-                Unpooled.copiedBuffer(view, CharsetUtil.UTF_8)
-        ));
-
-        header(CONTENT_LENGTH, Integer.toString(view.length()));
-
-        writeFlush(request == null || !request.keepAlive());
-    }
-
-    public void send(byte[] data) {
-
-        // TODO
-        setDate();
-
-        setHttpResponse(new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1,
-                getStatus(),
-                Unpooled.copiedBuffer(data)
-        ));
-
-        header(CONTENT_LENGTH, Integer.toString(data.length));
-
-        writeFlush(request == null || !request.keepAlive());
-    }
 
     /**
      * Write and flush channel context
@@ -330,6 +470,7 @@ public class Response {
      */
     private void writeFlush(boolean close) {
 
+        setDate();
         setPowerBy();
 
         if (close) {
@@ -337,15 +478,74 @@ public class Response {
             channelCxt.writeAndFlush(httpResponse).addListener(ChannelFutureListener.CLOSE);
         } else {
 
-            header(CONNECTION, KEEP_ALIVE);
+            header(CONNECTION, "keep-alive");
             channelCxt.writeAndFlush(httpResponse);
         }
 
-        flushed = true;
+        flush();
     }
 
     private void flush() {
 
         flushed = true;
+
+        request = null;
+        httpResponse = null;
     }
+
+    /**
+     * End the response immediately
+     */
+    public void end() {
+
+        if (httpResponse == null) {
+
+            setHttpResponse(new DefaultFullHttpResponse(HTTP_1_1, getStatus()));
+        }
+
+        writeFlush(!keepAlive);
+    }
+
+    /**
+     * End the response immediately
+     *
+     * @param data data to send
+     * @param options more options, specify the second arg of a valid encoding option, e.g `gzip`, `deflate`
+     */
+    public void end(String data, String[]... options) {
+
+        // TODO encoding
+        header(CONTENT_LENGTH, Integer.toString(data.length()));
+
+        if (httpResponse == null) {
+
+            setHttpResponse(new DefaultFullHttpResponse(
+                    HTTP_1_1,
+                    getStatus(),
+                    Unpooled.copiedBuffer(data, CharsetUtil.UTF_8)
+            ));
+        }
+
+        writeFlush(!keepAlive);
+    }
+
+    /**
+     * End the response immediately
+     *
+     * @param data bytes data to send
+     * @param options more options, specify the second arg of a valid encoding option, e.g `gzip`, `deflate`
+     */
+    public void end(byte[] data, String[]... options) {
+
+        setHttpResponse(new DefaultFullHttpResponse(
+                HTTP_1_1,
+                getStatus(),
+                Unpooled.copiedBuffer(data)
+        ));
+
+        header(CONTENT_LENGTH, Integer.toString(data.length));
+
+        writeFlush(!keepAlive);
+    }
+
 }

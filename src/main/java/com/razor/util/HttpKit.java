@@ -1,8 +1,3 @@
-package com.razor.test.controllers;
-
-import com.razor.mvc.Controller;
-import com.razor.mvc.annotation.Route;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -26,31 +21,60 @@ import com.razor.mvc.annotation.Route;
  */
 
 
-public class HomeController extends Controller {
+package com.razor.util;
 
-    @Route("")
-    public void index() {
+import io.netty.handler.codec.http.HttpHeaders;
 
-        //return "Home page";
+import static com.razor.mvc.http.HttpHeaderNames.*;
 
-        Render("home.twig", "var", "home result using twig");
+
+/**
+ * Http request/response related utils
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public class HttpKit {
+
+    /**
+     * Get proxy ip list from headers
+     *
+     * @param headers http headers
+     * @return ip list
+     */
+    public static String[] proxyIP(HttpHeaders headers) {
+
+        CharSequence ip = headers.get(X_FORWARDED_FOR);
+
+        if (ip == null) {
+
+            return new String[]{};
+        }
+
+        return ip.toString().split(",");
     }
 
-    @Route("redirect")
-    public void redirect() {
+    public static String getIP(HttpHeaders headers) {
 
-        context().response().location("http://www.baidu.com/");
-    }
+        String[] ips = proxyIP(headers);
 
-    @Route("redirect-local")
-    public void redirectLocal() {
+        if (ips.length > 0 && !ips[0].equals("")) {
 
-        context().response().location("/local");
-    }
+            return ips[0].split(":")[0];
+        }
 
-    @Route("local")
-    public String local() {
+        CharSequence realIpChar = headers.get(X_REAL_IP);
 
-        return "local";
+        if (realIpChar != null) {
+
+            String[] realIp = realIpChar.toString().split(":");
+
+            if (realIp.length > 0 && !realIp[0].equals("[")) {
+
+                return realIp[0];
+            }
+        }
+
+        return "127.0.0.1";
     }
 }

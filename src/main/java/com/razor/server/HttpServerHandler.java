@@ -185,7 +185,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
                 return;
             }
 
-            response.send(ActionResult.build(result, returnType).getBytes());
+            response.end(ActionResult.build(result, returnType).getBytes());
         } catch (Exception e) {
 
             log.error(e.getMessage());

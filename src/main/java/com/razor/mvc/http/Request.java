@@ -27,6 +27,7 @@ import com.razor.Razor;
 import com.razor.mvc.route.RouteManager;
 import com.razor.mvc.route.Router;
 import com.razor.mvc.route.RouteParameter;
+import com.razor.util.HttpKit;
 import com.razor.util.UrlKit;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -232,6 +233,8 @@ public class Request {
 
         String requestWith = headers.get("X-Requested-With");
         xhr = StringUtils.equals(requestWith, "XMLHttpRequest");
+
+        ip = HttpKit.getIP(headers);
 
         method = fullHttpRequest.method().name().toUpperCase();
 
