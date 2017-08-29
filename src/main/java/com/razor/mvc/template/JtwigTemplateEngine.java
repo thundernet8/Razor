@@ -1,7 +1,3 @@
-package com.razor.test;
-
-import com.razor.Razor;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -25,14 +21,33 @@ import com.razor.Razor;
  */
 
 
-public class MvcTest {
+package com.razor.mvc.template;
 
-    public static void main(String[] args) {
-        Razor razor = Razor.self();
+import org.jtwig.JtwigModel;
+import org.jtwig.JtwigTemplate;
 
-        razor.webRoot("web");
-        razor.addStatic("/txt/");
-//        razor.addStatic("/images/");
-        razor.start(MvcTest.class, "127.0.0.1", 8090, args);
+import java.util.Map;
+
+/**
+ * Jtwig template engine
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public class JtwigTemplateEngine implements TemplateEngine{
+
+    @Override
+    public String getName() {
+
+        return "Jtwig";
+    }
+
+    @Override
+    public String render(String templatePath, Map<String, Object> data) throws Exception {
+
+        JtwigTemplate template = JtwigTemplate.classpathTemplate(templatePath);
+        JtwigModel model = JtwigModel.newModel(data);
+
+        return template.render(model);
     }
 }

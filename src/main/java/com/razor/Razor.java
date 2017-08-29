@@ -138,13 +138,14 @@ public class Razor {
     }
 
     /**
-     * Specify content dir of resource, default `content` which means a content folder under your resources folder
-     * @param contentDir content dir
+     * Specify web root dir of resource, default `web` which means a web folder under your resources folder, and web folder under your classpath when running
+     *
+     * @param webDir web root dir
      * @return Razor
      */
-    public Razor content(String contentDir) {
+    public Razor webRoot(String webDir) {
 
-        if (!Pattern.compile("^([^/.])([0-9a-zA-Z_]*)([^/.])$").matcher(contentDir).find()) {
+        if (!Pattern.compile("^([^/.])([0-9a-zA-Z_]*)([^/.])$").matcher(webDir).find()) {
 
             log.error("Content package should only include numbers, latin letters, _ or /, and should not start or end with /");
 
@@ -152,8 +153,8 @@ public class Razor {
         }
         try {
 
-            env.set(ENV_KEY_RESOURCE_CONTENT_DIR, contentDir);
-            statics.add("/".concat(contentDir).concat("/"));
+            env.set(ENV_KEY_WEB_ROOT_DIR, webDir);
+            statics.add("/".concat(webDir).concat("/"));
         } catch (Exception e) {
 
             log.error(e.getMessage());

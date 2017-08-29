@@ -23,8 +23,17 @@
 
 package com.razor.mvc;
 
+import com.razor.exception.RazorException;
 import com.razor.mvc.annotation.RoutePrefix;
 import com.razor.mvc.http.HttpContext;
+import com.razor.mvc.renderer.TemplateRenderer;
+
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.File;
+import java.util.Map;
+
+import static com.razor.mvc.Constants.*;
 
 /**
  * Razor abstract controller
@@ -32,6 +41,7 @@ import com.razor.mvc.http.HttpContext;
  * @author Touchumind
  * @since 0.0.1
  */
+@Slf4j
 @RoutePrefix
 public abstract class Controller {
 
@@ -40,5 +50,58 @@ public abstract class Controller {
     protected HttpContext context() {
 
         return httpContext;
+    }
+
+    protected void Render(String templatePath) {
+
+        TemplateRenderer renderer = new TemplateRenderer(templateFullPath(templatePath));
+
+        proxyRender(renderer);
+    }
+
+    protected void Render(String templatePath, Map<String, Object> data) {
+
+        TemplateRenderer renderer = new TemplateRenderer(templateFullPath(templatePath), data);
+
+        proxyRender(renderer);
+    }
+
+    protected void Render(String templatePath, String dataKey, String dataValue) {
+
+        TemplateRenderer renderer = new TemplateRenderer(templateFullPath(templatePath), dataKey, dataValue);
+
+        proxyRender(renderer);
+    }
+
+    private void proxyRender(TemplateRenderer renderer) {
+
+        try {
+
+            renderer.render(httpContext.request(), httpContext.response());
+        } catch (RazorException e) {
+
+            // TODO
+            // confirm this exception could be captured by {@link HttpServerHandler} and send 500 message
+            // or we should send 500 in the response
+            log.error(e.toString());
+        }
+    }
+
+    /**
+     * Full path relative to classpath
+     *
+     * @param path origin path
+     * @return full path
+     */
+    private String templateFullPath(String path) {
+
+        if (path.startsWith(File.separator)) {
+            path = path.substring(1);
+        }
+
+        String webDir = httpContext.app().getEnv().get(ENV_KEY_WEB_ROOT_DIR, DEFAULT_WEB_ROOT_DIR);
+
+        // TODO the value is fixed after app start, should cache it, do not query env every time.
+        return webDir.concat("/templates/").concat(path);
     }
 }

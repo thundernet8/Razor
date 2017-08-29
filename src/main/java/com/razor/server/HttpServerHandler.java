@@ -92,6 +92,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
             }
 
 
+            // TODO complete RouteSignature
             RouteSignature routeSignature = RouteSignature.builder().request(request).response(response).build();
             Router router = request.router();
 
@@ -153,7 +154,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
             Field contextField = superClass.getDeclaredField("httpContext");
             contextField.setAccessible(true);
-            contextField.set(controller, HttpContext.build(signature.request(), signature.response()));
+            contextField.set(controller, HttpContext.build(signature.request(), signature.response(), razor));
             contextField.setAccessible(false);
         } catch (NoSuchFieldException e) {
 
@@ -179,10 +180,16 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
             }
 
             Class<?> returnType = action.getReturnType();
+            Response response = signature.response();
+
+            if (returnType == Void.TYPE || response.flushed()) {
+                // mostly a view renderer happened
+                return;
+            }
 
             ctx.writeAndFlush(new DefaultFullHttpResponse(
                     HttpVersion.HTTP_1_1,
-                    HttpResponseStatus.OK, // TODO get status from response object
+                    response.getStatus(),
                     copiedBuffer(ActionResult.build(result, returnType).getBytes())
             )).addListener(ChannelFutureListener.CLOSE);
         } catch (Exception e) {

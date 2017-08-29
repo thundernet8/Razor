@@ -47,7 +47,7 @@ public interface Constants {
     // Server default constants
     String DEFAULT_SERVER_HOST = "0.0.0.0";
     int DEFAULT_SERVER_PORT = 8088;
-    String DEFAULT_RESOURCE_CONTENT_DIR = "content";
+    String DEFAULT_WEB_ROOT_DIR = "web";
     List<String> DEFAULT_STATICS = Arrays.asList("/favicon.ico", "/robots.txt", "/sitemap.xml");
     List<String> DEFAULT_INDEX_FILES = Arrays.asList("index.html", "index.htm");
     boolean DEFAULT_SSL_ENABLE = false;
@@ -63,7 +63,7 @@ public interface Constants {
     String ENV_KEY_SERVER_HOST = "razor.server.host";
     String ENV_KEY_SERVER_PORT = "razor.server.port";
     String ENV_KEY_SSL = "razor.server.ssl";
-    String ENV_KEY_RESOURCE_CONTENT_DIR = "razor.web.content";
+    String ENV_KEY_WEB_ROOT_DIR = "razor.web.root";
     String ENV_KEY_INDEX_FILES = "razor.web.indexs";
     String ENV_KEY_HTTP_CACHE_SECONDS = "razor.web.http.cache.seconds";
 }

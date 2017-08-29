@@ -1,7 +1,3 @@
-package com.razor.test;
-
-import com.razor.Razor;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -25,14 +21,28 @@ import com.razor.Razor;
  */
 
 
-public class MvcTest {
+package com.razor.mvc.renderer;
 
-    public static void main(String[] args) {
-        Razor razor = Razor.self();
+import com.razor.exception.RazorException;
+import com.razor.mvc.http.EContentType;
 
-        razor.webRoot("web");
-        razor.addStatic("/txt/");
-//        razor.addStatic("/images/");
-        razor.start(MvcTest.class, "127.0.0.1", 8090, args);
-    }
+import com.razor.mvc.http.Request;
+import com.razor.mvc.http.Response;
+import lombok.Getter;
+import lombok.Setter;
+
+/**
+ * Abstract renderer class
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+abstract class Renderer {
+
+    @Getter
+    @Setter
+    private EContentType contentType;
+
+    public abstract void render(Request request, Response response) throws RazorException;
+
 }

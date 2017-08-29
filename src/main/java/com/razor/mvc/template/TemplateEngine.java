@@ -1,7 +1,3 @@
-package com.razor.test;
-
-import com.razor.Razor;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -25,14 +21,27 @@ import com.razor.Razor;
  */
 
 
-public class MvcTest {
+package com.razor.mvc.template;
 
-    public static void main(String[] args) {
-        Razor razor = Razor.self();
+import java.util.Map;
 
-        razor.webRoot("web");
-        razor.addStatic("/txt/");
-//        razor.addStatic("/images/");
-        razor.start(MvcTest.class, "127.0.0.1", 8090, args);
-    }
+/**
+ * Template Engine interface
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public interface TemplateEngine {
+
+    String getName();
+
+    /**
+     * Render view
+     *
+     * @param templatePath full path of template file relative to classpath
+     * @param data data in Map format
+     * @return rendered view content
+     * @throws Exception exception when failed
+     */
+    String render(String templatePath, Map<String, Object> data) throws Exception;
 }

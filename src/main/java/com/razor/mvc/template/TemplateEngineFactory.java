@@ -1,7 +1,3 @@
-package com.razor.test;
-
-import com.razor.Razor;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -25,14 +21,44 @@ import com.razor.Razor;
  */
 
 
-public class MvcTest {
+package com.razor.mvc.template;
 
-    public static void main(String[] args) {
-        Razor razor = Razor.self();
+import lombok.extern.slf4j.Slf4j;
 
-        razor.webRoot("web");
-        razor.addStatic("/txt/");
-//        razor.addStatic("/images/");
-        razor.start(MvcTest.class, "127.0.0.1", 8090, args);
+/**
+ * Template engine factory
+ *
+ *
+ */
+@Slf4j
+public class TemplateEngineFactory {
+
+    private static TemplateEngine instance;
+
+    /**
+     * Set template engine
+     *
+     * @param templateEngine template engine instance
+     */
+    public static void setTemplateEngine(TemplateEngine templateEngine) {
+
+        instance = templateEngine;
+
+        log.info("Template engine is set to: {}", templateEngine.getName());
+    }
+
+    /**
+     * Get current template engine
+     *
+     * @return selected template engine instance
+     */
+    public static TemplateEngine getEngine() {
+
+        if (instance == null) {
+
+            instance = new JtwigTemplateEngine();
+        }
+
+        return instance;
     }
 }

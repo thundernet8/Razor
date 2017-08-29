@@ -34,7 +34,6 @@ import com.razor.util.MimeKit;
 import com.razor.env.Env;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -91,7 +90,7 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         }
 
         Env env = razor.getEnv();
-        String webRoot = CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_RESOURCE_CONTENT_DIR, DEFAULT_RESOURCE_CONTENT_DIR));
+        String webRoot = CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_WEB_ROOT_DIR, DEFAULT_WEB_ROOT_DIR));
         String absPath = webRoot.concat(path);
 
         File file = new File(absPath);

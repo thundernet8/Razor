@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import static io.netty.buffer.Unpooled.copiedBuffer;
 import static io.netty.handler.codec.http.HttpVersion.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
@@ -105,6 +106,15 @@ public class Response {
      * Http response status, include status code and cause message
      */
     private HttpResponseStatus status;
+
+    public HttpResponseStatus getStatus() {
+
+        if (status == null) {
+            return OK;
+        }
+
+        return status;
+    }
 
     private Response(ChannelHandlerContext cxt, Request req, FullHttpResponse res) {
 
@@ -239,6 +249,20 @@ public class Response {
     public void send() {
 
         // TODO
+    }
+
+    public void send(String view) {
+
+        // TODO
+        setDate();
+
+        setHttpResponse(new DefaultFullHttpResponse(
+                HttpVersion.HTTP_1_1,
+                getStatus(),
+                Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8)
+        ));
+
+        writeFlush(true);
     }
 
     /**

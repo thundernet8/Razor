@@ -23,8 +23,8 @@
 
 package com.razor.mvc.http;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.razor.Razor;
+
 
 /**
  * Http Context accessible for all actions
@@ -38,6 +38,8 @@ public class HttpContext {
 
     private Response response;
 
+    private Razor app;
+
     public Request request() {
 
         return request;
@@ -48,14 +50,20 @@ public class HttpContext {
         return response;
     }
 
-    private HttpContext(Request request, Response response) {
+    public Razor app() {
+
+        return app;
+    }
+
+    private HttpContext(Request request, Response response, Razor razor) {
 
         this.request = request;
         this.response = response;
+        this.app = razor;
     }
 
-    public static HttpContext build(Request request, Response response) {
+    public static HttpContext build(Request request, Response response, Razor razor) {
 
-        return new HttpContext(request, response);
+        return new HttpContext(request, response, razor);
     }
 }
