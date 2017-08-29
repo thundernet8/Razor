@@ -259,7 +259,7 @@ public class Response {
         setHttpResponse(new DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1,
                 getStatus(),
-                Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8)
+                Unpooled.copiedBuffer(view.toString(), CharsetUtil.UTF_8)
         ));
 
         writeFlush(true);
