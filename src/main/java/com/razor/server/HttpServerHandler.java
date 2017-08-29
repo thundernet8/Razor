@@ -74,7 +74,6 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
-        log.info("channelRead");
         if (msg instanceof FullHttpRequest) {
 
             final FullHttpRequest fullHttpRequest = (FullHttpRequest) msg;
@@ -115,7 +114,6 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
 
-        log.info("channelReadComplete");
         // TODO fix timeout issue, connection not close
         ctx.flush();
     }

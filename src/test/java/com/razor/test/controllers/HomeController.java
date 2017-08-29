@@ -31,7 +31,6 @@ public class HomeController extends Controller {
     @Route("")
     public void index() {
 
-        System.out.println("home controller");
         //return "Home page";
 
         Render("home.twig", "var", "home result using twig");
