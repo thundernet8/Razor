@@ -175,6 +175,40 @@ public class Response {
     }
 
     /**
+     * Search specified header field for response
+     *
+     * @param field http response header field
+     * @return field value
+     */
+    public String header(AsciiString field) {
+
+        if (httpResponse != null) {
+
+            return httpResponse.headers().get(field);
+        }
+
+        AsciiString value = headerQueue.get(field);
+
+        if (value != null && !value.isEmpty()) {
+
+            return value.toString();
+        }
+
+        return null;
+    }
+
+    /**
+     * Search specified header field for response
+     *
+     * @param field http response header field
+     * @return field value
+     */
+    public String header(String field) {
+
+        return header(new AsciiString(field));
+    }
+
+    /**
      * Set 304 response header
      */
     public void notModified() {
@@ -188,6 +222,12 @@ public class Response {
     public void setDate() {
 
         header(DATE, DateKit.getGmtDateString());
+    }
+
+    public void setPowerBy() {
+
+        header(SERVER, "Netty");
+        header("X-Power-By", "Razor");
     }
 
     /**
@@ -259,10 +299,28 @@ public class Response {
         setHttpResponse(new DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1,
                 getStatus(),
-                Unpooled.copiedBuffer(view.toString(), CharsetUtil.UTF_8)
+                Unpooled.copiedBuffer(view, CharsetUtil.UTF_8)
         ));
 
-        writeFlush(true);
+        header(CONTENT_LENGTH, Integer.toString(view.length()));
+
+        writeFlush(request == null || !request.keepAlive());
+    }
+
+    public void send(byte[] data) {
+
+        // TODO
+        setDate();
+
+        setHttpResponse(new DefaultFullHttpResponse(
+                HttpVersion.HTTP_1_1,
+                getStatus(),
+                Unpooled.copiedBuffer(data)
+        ));
+
+        header(CONTENT_LENGTH, Integer.toString(data.length));
+
+        writeFlush(request == null || !request.keepAlive());
     }
 
     /**
@@ -272,11 +330,14 @@ public class Response {
      */
     private void writeFlush(boolean close) {
 
+        setPowerBy();
+
         if (close) {
 
             channelCxt.writeAndFlush(httpResponse).addListener(ChannelFutureListener.CLOSE);
         } else {
 
+            header(CONNECTION, KEEP_ALIVE);
             channelCxt.writeAndFlush(httpResponse);
         }
 

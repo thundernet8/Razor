@@ -24,12 +24,15 @@
 package com.razor.mvc.renderer;
 
 import com.razor.exception.RazorException;
+import com.razor.mvc.http.EContentType;
 import com.razor.mvc.http.Request;
 import com.razor.mvc.http.Response;
 import com.razor.mvc.template.TemplateEngineFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static io.netty.handler.codec.http.HttpHeaderNames.*;
 
 /**
  * Renderer using template
@@ -50,6 +53,7 @@ public class TemplateRenderer extends Renderer {
 
         this.templatePath = path;
         this.model = new HashMap<>();
+
     }
 
     public TemplateRenderer(String path, Map<String, Object> model) {
@@ -73,6 +77,9 @@ public class TemplateRenderer extends Renderer {
             String view = TemplateEngineFactory.getEngine().render(templatePath, model);
 
             // TODO flush data, content-type and other headers
+            if (response.header(CONTENT_TYPE) == null) {
+                response.header(CONTENT_TYPE, getContentType().getMimeType());
+            }
             response.send(view);
 
         } catch (Exception e) {

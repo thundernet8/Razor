@@ -187,11 +187,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
                 return;
             }
 
-            ctx.writeAndFlush(new DefaultFullHttpResponse(
-                    HttpVersion.HTTP_1_1,
-                    response.getStatus(),
-                    copiedBuffer(ActionResult.build(result, returnType).getBytes())
-            )).addListener(ChannelFutureListener.CLOSE);
+            response.send(ActionResult.build(result, returnType).getBytes());
         } catch (Exception e) {
 
             log.error(e.getMessage());
