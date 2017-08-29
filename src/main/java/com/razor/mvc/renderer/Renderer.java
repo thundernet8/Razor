@@ -24,7 +24,7 @@
 package com.razor.mvc.renderer;
 
 import com.razor.exception.RazorException;
-import com.razor.mvc.http.EContentType;
+import com.razor.mvc.http.ContentType;
 
 import com.razor.mvc.http.Request;
 import com.razor.mvc.http.Response;
@@ -41,7 +41,7 @@ abstract class Renderer {
 
     @Getter
     @Setter
-    private EContentType contentType;
+    private ContentType contentType;
 
     public abstract void render(Request request, Response response) throws RazorException;
 

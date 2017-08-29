@@ -34,7 +34,7 @@ import java.util.Map;
  * @author Touchumind
  * @since 0.0.1
  */
-public enum EContentType {
+public enum ContentType {
 
     TEXT("text/plain", "text", true, "txt", "text"),
 
@@ -98,13 +98,13 @@ public enum EContentType {
 
     EMPTY("application/octet-stream", "other", true),;
 
-    private final static Map<String, EContentType> mimeTypeMap = new HashMap<>();
+    private final static Map<String, ContentType> mimeTypeMap = new HashMap<>();
 
-    private final static Map<String, EContentType> extensionMap = new HashMap<>();
+    private final static Map<String, ContentType> extensionMap = new HashMap<>();
 
     static {
 
-        for (EContentType type : values()) {
+        for (ContentType type : values()) {
 
             if (type.mimeType != null) {
 
@@ -141,7 +141,7 @@ public enum EContentType {
      * @param inline content-disposition property, true for `inline`, others such as `attachment` treat as false
      * @param extensions possible file extensions for this mime type
      */
-    EContentType(String mimeType, String shortName, boolean inline, String... extensions) {
+    ContentType(String mimeType, String shortName, boolean inline, String... extensions) {
 
         this.mimeType = mimeType;
         this.shortName = shortName;
@@ -149,12 +149,12 @@ public enum EContentType {
         this.extensions = extensions;
     }
 
-    public static EContentType fromMimeType(String mimeType) {
+    public static ContentType fromMimeType(String mimeType) {
 
         if (mimeType != null) {
             mimeType = mimeType.toLowerCase();
         }
-        EContentType type = mimeTypeMap.get(mimeType);
+        ContentType type = mimeTypeMap.get(mimeType);
 
         if (type == null) {
             return EMPTY;
@@ -163,12 +163,12 @@ public enum EContentType {
         return type;
     }
 
-    public static EContentType fromFileExtension(String extension) {
+    public static ContentType fromFileExtension(String extension) {
 
         if (extension.startsWith(".")) {
             extension = extension.substring(1);
         }
-        EContentType type = extensionMap.get(extension.toLowerCase());
+        ContentType type = extensionMap.get(extension.toLowerCase());
 
         if (type == null) {
             return EMPTY;

@@ -24,7 +24,6 @@
 package com.razor.mvc.renderer;
 
 import com.razor.exception.RazorException;
-import com.razor.mvc.http.EContentType;
 import com.razor.mvc.http.Request;
 import com.razor.mvc.http.Response;
 import com.razor.mvc.template.TemplateEngineFactory;

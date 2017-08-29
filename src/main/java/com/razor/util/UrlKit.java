@@ -23,7 +23,7 @@
 
 package com.razor.util;
 
-import com.razor.mvc.http.EContentType;
+import com.razor.mvc.http.ContentType;
 import com.razor.mvc.http.UrlQuery;
 
 import java.util.Optional;
@@ -80,7 +80,7 @@ public class UrlKit {
 
             String ext = url.substring(index + 1);
 
-            if (EContentType.fromFileExtension(ext) != EContentType.EMPTY) {
+            if (ContentType.fromFileExtension(ext) != ContentType.EMPTY) {
 
                 return true;
             }

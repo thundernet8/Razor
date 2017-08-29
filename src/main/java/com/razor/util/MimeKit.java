@@ -24,7 +24,7 @@
 package com.razor.util;
 
 import com.razor.exception.NotImplementException;
-import com.razor.mvc.http.EContentType;
+import com.razor.mvc.http.ContentType;
 
 import java.io.File;
 import java.io.InputStream;
@@ -48,9 +48,9 @@ public class MimeKit {
         name = name.toLowerCase();
 
         // whole name searching
-        EContentType type = EContentType.fromFileExtension(name);
+        ContentType type = ContentType.fromFileExtension(name);
 
-        if (type != EContentType.EMPTY) {
+        if (type != ContentType.EMPTY) {
 
             return type.getMimeType();
         }
@@ -72,14 +72,14 @@ public class MimeKit {
      * @param name file name
      * @return object including mime detail info
      */
-    public static EContentType detailOf(String name) {
+    public static ContentType detailOf(String name) {
 
         name = name.toLowerCase();
 
         // whole name searching
-        EContentType type = EContentType.fromFileExtension(name);
+        ContentType type = ContentType.fromFileExtension(name);
 
-        if (type != EContentType.EMPTY) {
+        if (type != ContentType.EMPTY) {
 
             return type;
         }
@@ -103,9 +103,9 @@ public class MimeKit {
      */
     public static String ofExt(String ext) {
 
-        EContentType type = EContentType.fromFileExtension(ext);
+        ContentType type = ContentType.fromFileExtension(ext);
 
-        if (type == EContentType.EMPTY) {
+        if (type == ContentType.EMPTY) {
 
             return null;
         } else {
@@ -120,11 +120,11 @@ public class MimeKit {
      * @param ext file extension, e.g `.jpg` or `jpg`
      * @return mime type
      */
-    public static EContentType detailOfExt(String ext) {
+    public static ContentType detailOfExt(String ext) {
 
-        EContentType type = EContentType.fromFileExtension(ext);
+        ContentType type = ContentType.fromFileExtension(ext);
 
-        if (type == EContentType.EMPTY) {
+        if (type == ContentType.EMPTY) {
 
             return null;
         } else {

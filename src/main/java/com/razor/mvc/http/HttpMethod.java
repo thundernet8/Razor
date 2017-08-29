@@ -29,7 +29,7 @@ package com.razor.mvc.http;
  * @author Touchumind
  * @since 0.0.1
  */
-public interface IHttpMethod {
+public interface HttpMethod {
 
     String ALL = "ALL";
 

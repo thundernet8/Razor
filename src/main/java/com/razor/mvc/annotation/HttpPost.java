@@ -23,7 +23,7 @@
 
 package com.razor.mvc.annotation;
 
-import com.razor.mvc.http.IHttpMethod;
+import com.razor.mvc.http.HttpMethod;
 
 import java.lang.annotation.*;
 
@@ -38,5 +38,5 @@ import java.lang.annotation.*;
 @Documented
 public @interface HttpPost {
 
-    String value() default IHttpMethod.POST;
+    String value() default HttpMethod.POST;
 }

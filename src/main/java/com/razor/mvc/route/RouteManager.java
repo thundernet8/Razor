@@ -25,8 +25,7 @@ package com.razor.mvc.route;
 
 import com.razor.mvc.Controller;
 import com.razor.mvc.annotation.*;
-import com.razor.mvc.http.IHttpMethod;
-import com.razor.util.UrlKit;
+import com.razor.mvc.http.HttpMethod;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
@@ -108,15 +107,15 @@ public class RouteManager {
             HttpDelete delAnnotation = action.getAnnotation(HttpDelete.class);
             String httpMethod;
             if (delAnnotation != null) {
-                httpMethod = IHttpMethod.DELETE;
+                httpMethod = HttpMethod.DELETE;
             } else if (putAnnotation != null) {
-                httpMethod = IHttpMethod.PUT;
+                httpMethod = HttpMethod.PUT;
             } else if (postAnnotation != null) {
-                httpMethod = IHttpMethod.POST;
+                httpMethod = HttpMethod.POST;
             } else if (getAnnotation != null) {
-                httpMethod = IHttpMethod.GET;
+                httpMethod = HttpMethod.GET;
             } else {
-                httpMethod = IHttpMethod.ALL;
+                httpMethod = HttpMethod.ALL;
             }
 
             addRoute(new Router(httpMethod, clazz, action, matcher));
@@ -139,7 +138,7 @@ public class RouteManager {
             return router;
         }
 
-        router = routerMap.get(path.concat("::").concat(IHttpMethod.ALL));
+        router = routerMap.get(path.concat("::").concat(HttpMethod.ALL));
         if (router != null) {
             return router;
         }
@@ -155,6 +154,6 @@ public class RouteManager {
 
     public Router findRoute(String path) {
 
-        return findRoute(path, IHttpMethod.GET);
+        return findRoute(path, HttpMethod.GET);
     }
 }

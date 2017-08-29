@@ -25,8 +25,8 @@ package com.razor.server;
 
 import com.razor.Razor;
 import com.razor.exception.RazorException;
-import com.razor.mvc.http.EContentType;
-import com.razor.mvc.http.IHttpMethod;
+import com.razor.mvc.http.ContentType;
+import com.razor.mvc.http.HttpMethod;
 import com.razor.mvc.http.Request;
 import com.razor.mvc.http.Response;
 import com.razor.util.DateKit;
@@ -67,7 +67,7 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
     @Override
     public Boolean handle(ChannelHandlerContext ctx, Request request, Response response) throws RazorException {
 
-        if (!request.method().equals(IHttpMethod.GET)) {
+        if (!request.method().equals(HttpMethod.GET)) {
 
             response.sendError(METHOD_NOT_ALLOWED);
             return false;
@@ -206,7 +206,7 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         String filename = file.getName();
         response.setDate();
 
-        EContentType contentType = MimeKit.detailOf(filename);
+        ContentType contentType = MimeKit.detailOf(filename);
 
         // content-type based on file mime
         response.header(CONTENT_TYPE, contentType.getMimeType());

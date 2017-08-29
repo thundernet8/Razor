@@ -25,7 +25,7 @@ package com.razor.mvc;
 
 import com.razor.exception.RazorException;
 import com.razor.mvc.annotation.RoutePrefix;
-import com.razor.mvc.http.EContentType;
+import com.razor.mvc.http.ContentType;
 import com.razor.mvc.http.HttpContext;
 import com.razor.mvc.renderer.TemplateRenderer;
 
@@ -70,7 +70,7 @@ public abstract class Controller {
     protected void Render(String templatePath, String dataKey, String dataValue) {
 
         TemplateRenderer renderer = new TemplateRenderer(templateFullPath(templatePath), dataKey, dataValue);
-        renderer.setContentType(EContentType.HTML);
+        renderer.setContentType(ContentType.HTML);
 
         proxyRender(renderer);
     }
