@@ -24,6 +24,7 @@
 package com.razor.util;
 
 import com.razor.exception.NotImplementException;
+import com.razor.mvc.Controller;
 import com.razor.mvc.http.ContentType;
 
 import java.io.File;
@@ -36,6 +37,33 @@ import java.io.InputStream;
  * @since 0.0.1
  */
 public class MimeKit {
+
+    /**
+     * Search mime string via ext or mime string
+     *
+     * @param extOrMime file extension or mime string
+     * @return mime string
+     */
+    public static String get(String extOrMime) {
+
+        extOrMime = extOrMime.toLowerCase();
+
+        // if mime
+        ContentType type = ContentType.fromMimeType(extOrMime);
+
+        if (type != ContentType.EMPTY) {
+
+            return type.getMimeType();
+        }
+
+        // if ext
+        if (extOrMime.startsWith(".")) {
+
+            extOrMime = extOrMime.substring(1);
+        }
+
+        return ofExt(extOrMime);
+    }
 
     /**
      * Search mime type through file name

@@ -152,11 +152,14 @@ public enum ContentType {
     public static ContentType fromMimeType(String mimeType) {
 
         if (mimeType != null) {
+
             mimeType = mimeType.toLowerCase();
         }
+
         ContentType type = mimeTypeMap.get(mimeType);
 
         if (type == null) {
+
             return EMPTY;
         }
 
@@ -166,11 +169,14 @@ public enum ContentType {
     public static ContentType fromFileExtension(String extension) {
 
         if (extension.startsWith(".")) {
+
             extension = extension.substring(1);
         }
+
         ContentType type = extensionMap.get(extension.toLowerCase());
 
         if (type == null) {
+
             return EMPTY;
         }
 

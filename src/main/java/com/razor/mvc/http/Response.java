@@ -23,6 +23,7 @@
 
 package com.razor.mvc.http;
 
+import com.razor.exception.NotImplementException;
 import com.razor.mvc.Constants;
 import com.razor.server.ProgressiveFutureListener;
 import com.razor.util.DateKit;
@@ -383,9 +384,9 @@ public class Response {
      *
      * @param path new path to visit
      */
-    public void location(String path) {
+    public void redirect(String path) {
 
-        location(path, 302);
+        redirect(path, 302);
     }
 
     /**
@@ -394,7 +395,7 @@ public class Response {
      * @param path new path to visit
      * @param code response code
      */
-    public void location(String path, int code) {
+    public void redirect(String path, int code) {
 
         keepAlive = false;
 
@@ -408,6 +409,66 @@ public class Response {
         status = HttpResponseStatus.valueOf(code);
 
         end();
+    }
+
+    public void location(String path) {
+
+        // TODO location to another path with refer header
+    }
+
+    /**
+     * Specify content-type
+     *
+     * @param type mime short name
+     * @return Response self
+     */
+    public Response type(String type) {
+
+        String mime = MimeKit.get(type);
+
+        if (mime != null) {
+
+            header(CONTENT_TYPE, mime);
+        }
+
+        return this;
+    }
+
+    /**
+     * Set vary response header
+     *
+     * @param field vary value
+     * @return Response self
+     */
+    public Response vary(String field) {
+
+        String vary = header(VARY);
+
+        if (vary != null) {
+
+            header(VARY, vary.concat(", ").concat(field));
+        } else {
+
+            header(VARY, field);
+        }
+
+        return this;
+    }
+
+    public void send(Object data) {
+
+        // TODO send multi-type data
+        throw new NotImplementException();
+    }
+
+    /**
+     * Send specified http response status and status code as response text
+     *
+     * @param code http status code
+     */
+    public void sendStatus(int code) {
+
+        status(code).end(Integer.toString(code));
     }
 
     /**
