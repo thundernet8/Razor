@@ -39,6 +39,7 @@ import lombok.Setter;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -185,6 +186,26 @@ public class Request {
     public UrlQuery[] queries() {
 
         return queries;
+    }
+
+    /**
+     * Store some data, useful for middleware
+     */
+    private Map<String, Object> locals;
+
+    public Map<String, Object> locals() {
+
+        return locals;
+    }
+
+    public void locals(String key, Object value) {
+
+        if (locals == null) {
+
+            locals = new HashMap<>();
+        }
+
+        locals.put(key, value);
     }
 
     /**
