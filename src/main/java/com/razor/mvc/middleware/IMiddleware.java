@@ -1,7 +1,3 @@
-package com.razor.test;
-
-import com.razor.Razor;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -25,18 +21,25 @@ import com.razor.Razor;
  */
 
 
-public class MvcTest {
+package com.razor.mvc.middleware;
 
-    public static void main(String[] args) {
-        Razor razor = Razor.self();
+import com.razor.exception.NotImplementException;
+import com.razor.mvc.http.Request;
+import com.razor.mvc.http.Response;
 
-        razor.webRoot("web");
-        razor.addStatic("/txt/");
-//        razor.addStatic("/images/");
+/**
+ * Request middleware functional interface
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+@FunctionalInterface
+public interface IMiddleware {
 
-        razor.use((req, res) -> {
-            System.out.println(req.path());
-        });
-        razor.start(MvcTest.class, "127.0.0.1", 8090, args);
+    default public void setPriority(int priority) {
+
+        throw new NotImplementException();
     }
+
+    public void apply(Request req, Response res);
 }

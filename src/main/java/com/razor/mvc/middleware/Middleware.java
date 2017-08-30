@@ -1,7 +1,3 @@
-package com.razor.test;
-
-import com.razor.Razor;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -25,18 +21,32 @@ import com.razor.Razor;
  */
 
 
-public class MvcTest {
+package com.razor.mvc.middleware;
 
-    public static void main(String[] args) {
-        Razor razor = Razor.self();
+import lombok.Getter;
 
-        razor.webRoot("web");
-        razor.addStatic("/txt/");
-//        razor.addStatic("/images/");
+/**
+ * Abstract middleware
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public abstract class Middleware implements IMiddleware, Comparable<Middleware> {
 
-        razor.use((req, res) -> {
-            System.out.println(req.path());
-        });
-        razor.start(MvcTest.class, "127.0.0.1", 8090, args);
+    /**
+     * priority of middleware, 0 means the highest priority, it affects the call order of this middleware in request middleware chains
+     */
+    @Getter
+    private int priority = 10;
+
+    public void setPriority(int priority) {
+
+        assert priority >=0 : "priority should not smaller than 0";
+        this.priority = priority;
+    }
+
+    public int compareTo(Middleware other) {
+
+        return priority - other.getPriority();
     }
 }

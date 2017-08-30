@@ -29,6 +29,7 @@ import com.razor.ioc.IContainerBuilder;
 import com.razor.env.Env;
 import com.razor.mvc.controller.APIController;
 import com.razor.mvc.controller.Controller;
+import com.razor.mvc.middleware.IMiddleware;
 import com.razor.mvc.route.RouteManager;
 import com.razor.server.NettyServer;
 
@@ -197,6 +198,35 @@ public class Razor {
 
             log.error(e.getMessage());
         }
+
+        return this;
+    }
+
+    /**
+     * Apply middleware to the request handler
+     *
+     * @param middleware middleware handler
+     * @return Razor self
+     */
+    public Razor use(IMiddleware middleware) {
+
+        // TODO
+
+        return this;
+    }
+
+    /**
+     * Apply middleware to the request handler and specified route
+     *
+     * @param path path the middleware apply to, support universal match
+     *             e.g `/books/novel/*`
+     *             note: must start with `/`
+     * @param middleware middleware handler
+     * @return Razor self
+     */
+    public Razor use(String path, IMiddleware middleware) {
+
+        // TODO
 
         return this;
     }
