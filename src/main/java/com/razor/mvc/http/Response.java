@@ -531,6 +531,11 @@ public class Response {
      */
     private void writeFlush(boolean close) {
 
+        if (flushed()) {
+
+            return;
+        }
+
         setDate();
         setPowerBy();
 

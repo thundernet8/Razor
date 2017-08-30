@@ -244,9 +244,9 @@ public class Request {
 
         HttpHeaders headers = fullHttpRequest.headers();
         host = headers.get("Host");
-        Matcher matcher = Pattern.compile("^([^:]+)(:(\\\\d+))?$").matcher(host);
+        Matcher matcher = Pattern.compile("^([^:]+)(:(\\d+))?$").matcher(host);
 
-        if (matcher.find()) {
+        if (matcher.matches()) {
 
             hostname = matcher.group(1);
             // port = matcher.group(3);

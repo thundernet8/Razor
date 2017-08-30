@@ -272,6 +272,11 @@ public class Razor {
             routePrefix = routePrefixAnnotation.value();
         }
 
+        if (!routePrefix.startsWith("/")) {
+
+            routePrefix = "/".concat(routePrefix);
+        }
+
         return use(routePrefix.concat("/*"), middleware);
     }
 

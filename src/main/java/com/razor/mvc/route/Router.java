@@ -130,14 +130,27 @@ public class Router {
         Pattern pattern = Pattern.compile("^(/[0-9a-zA-Z-_./]+)?(/[0-9a-zA-Z-_.]*\\{.+}.*)?((/\\*)(.*))?$");
         Matcher matcher = pattern.matcher(path);
 
-        if (matcher.matches()) {
+        if (matcher.matches() && !(matcher.group(1).equals(path))) {
 
             path = matcher.group(1).concat("/*");
         }
 
         for (String key : razor.getPathMiddlewares().keySet()) {
 
+            boolean match = false;
+
             if (key.equals(path)) {
+
+                match = true;
+            } else if (key.endsWith("/*")) {
+
+                if (path.startsWith(key.substring(0, key.length() - 1))) {
+
+                    match = true;
+                }
+            }
+
+            if (match) {
 
                 collection.addAll(razor.getPathMiddlewares().get(key));
             }

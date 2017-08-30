@@ -40,10 +40,18 @@ public class MvcTest {
         });
 
         razor.use((req, res) -> {
+            System.out.println(req.getHost());
             System.out.println(req.getHostname());
         });
 
-        razor.use(BookController.class, (req, res) -> {});
+        razor.use(BookController.class, (req, res) -> {
+
+            res.status(404);
+
+            System.out.println("BookController middleware call " + res.flushed());
+
+            res.end("haha");
+        });
         razor.start(MvcTest.class, "127.0.0.1", 8090, args);
     }
 }

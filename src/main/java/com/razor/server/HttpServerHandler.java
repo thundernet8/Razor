@@ -136,6 +136,8 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
     private void handleRoute(ChannelHandlerContext ctx, RouteSignature signature) throws RazorException {
 
+        applyMiddlewares(signature);
+
         IContainer ioc = razor.getIoc();
         Class<?> controllerClass = signature.getRouter().getTargetType();
         Class<?> superClass = controllerClass.getSuperclass();
@@ -195,5 +197,19 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
                     copiedBuffer(e.getMessage().getBytes())
             )).addListener(ChannelFutureListener.CLOSE);
         }
+    }
+
+    /**
+     * Apply registered middlewares before action execution
+     *
+     * @param signature RouteSignature
+     */
+    private void applyMiddlewares(RouteSignature signature) {
+
+        Router router = signature.getRouter();
+        router.getMiddlewares().forEach(middleware -> {
+
+            middleware.apply(signature.request(), signature.response());
+        });
     }
 }

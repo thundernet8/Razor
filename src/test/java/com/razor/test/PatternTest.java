@@ -45,6 +45,16 @@ public class PatternTest {
         String g1 = matcher.group(1);
         String g2 = matcher.group(2);
 
+        String host = "127.0.0.1:8090";
+        String hostname = "";
+        Matcher matcher2 = Pattern.compile("^([^:]+)(:(\\d+))?$").matcher(host);
+
+        if (matcher2.matches()) {
+
+            hostname = matcher2.group(1);
+            // port = matcher2.group(3);
+        }
+
         System.out.println("done");
     }
 }
