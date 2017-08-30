@@ -24,14 +24,13 @@
 package com.razor.mvc.route;
 
 import com.razor.Razor;
-import com.razor.mvc.middleware.IMiddleware;
+import com.razor.mvc.middleware.Middleware;
 import lombok.Getter;
 
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Router
@@ -66,7 +65,7 @@ public class Router {
     /**
      * Middlewares which will be applied to this route
      */
-    private List<IMiddleware> middlewares;
+    private List<Middleware> middlewares;
 
     Router(String httpMethod, Class<?> targetType, Method action, RouteMatcher routeMatcher) {
 
@@ -125,7 +124,7 @@ public class Router {
      */
     void collectMiddlewares(Razor razor) {
 
-        List<IMiddleware> collection = new ArrayList<>(razor.getRootMiddlewares());
+        List<Middleware> collection = new ArrayList<>(razor.getRootMiddlewares());
 
         String path = getFullPath();
         Pattern pattern = Pattern.compile("^(/[0-9a-zA-Z-_./]+)?(/[0-9a-zA-Z-_.]*\\{.+}.*)?((/\\*)(.*))?$");

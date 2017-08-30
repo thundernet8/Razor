@@ -27,12 +27,14 @@ import com.razor.exception.RazorException;
 import com.razor.mvc.annotation.RoutePrefix;
 import com.razor.mvc.http.ContentType;
 import com.razor.mvc.http.HttpContext;
+import com.razor.mvc.middleware.Middleware;
 import com.razor.mvc.renderer.TemplateRenderer;
 
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Set;
 
 import static com.razor.mvc.Constants.*;
 
@@ -51,6 +53,16 @@ public abstract class Controller implements IController {
     protected HttpContext Context() {
 
         return httpContext;
+    }
+
+    /**
+     * <del>Override</del> this method in your controller to register middlewares to the controller
+     *
+     * @return middlewares to register
+     */
+    public static Set<Middleware> registerMiddlewares() {
+
+        return null;
     }
 
     protected void Render(String templatePath) {

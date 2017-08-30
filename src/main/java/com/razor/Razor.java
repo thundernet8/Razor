@@ -27,9 +27,11 @@ import com.razor.ioc.ContainerBuilder;
 import com.razor.ioc.IContainer;
 import com.razor.ioc.IContainerBuilder;
 import com.razor.env.Env;
+import com.razor.mvc.annotation.RoutePrefix;
 import com.razor.mvc.controller.APIController;
 import com.razor.mvc.controller.Controller;
-import com.razor.mvc.middleware.IMiddleware;
+import com.razor.mvc.controller.IController;
+import com.razor.mvc.middleware.Middleware;
 import com.razor.mvc.route.RouteManager;
 import com.razor.server.NettyServer;
 
@@ -38,7 +40,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.reflections.Reflections;
 
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -70,9 +74,9 @@ public class Razor {
 
     private final Set<String> statics = new HashSet<>(DEFAULT_STATICS);
 
-    private final Set<IMiddleware> rootMiddlewares = new HashSet<>();
+    private final Set<Middleware> rootMiddlewares = new HashSet<>();
 
-    private final Map<String, Set<IMiddleware>> pathMiddlewares = new HashMap<>();
+    private final Map<String, Set<Middleware>> pathMiddlewares = new HashMap<>();
 
     public static Razor self() {
 
@@ -106,8 +110,7 @@ public class Razor {
             assert port >= 80 : "Port should be a positive value and greater or equal to 80";
             env.set(ENV_KEY_SERVER_PORT, port);
             this.appClass = appClass;
-            this.initIoc();
-            this.initRoutes();
+
             this.startUp();
 
             new Thread(() -> {
@@ -213,7 +216,7 @@ public class Razor {
      * @param middleware middleware handler
      * @return Razor self
      */
-    public Razor use(IMiddleware middleware) {
+    public Razor use(Middleware middleware) {
 
         // TODO add a response time calculating middleware
 
@@ -226,7 +229,7 @@ public class Razor {
     }
 
     /**
-     * Apply middleware to the request handler and specified route
+     * Register middleware to the request handler and specified route
      *
      * @param path path the middleware apply to, support universal match
      *             e.g `/books/novel/*`
@@ -234,9 +237,9 @@ public class Razor {
      * @param middleware middleware handler
      * @return Razor self
      */
-    public Razor use(@NonNull String path, IMiddleware middleware) {
+    public Razor use(@NonNull String path, Middleware middleware) {
 
-        Set<IMiddleware> exists = pathMiddlewares.get(path);
+        Set<Middleware> exists = pathMiddlewares.get(path);
 
         if (exists == null) {
 
@@ -250,6 +253,26 @@ public class Razor {
         pathMiddlewares.put(path, exists);
 
         return this;
+    }
+
+    /**
+     * Register middleware to the specified controller class
+     *
+     * @param controllerClass a controller class
+     * @param middleware middleware handler
+     * @return Razor self
+     */
+    public Razor use (@NonNull Class<? extends IController> controllerClass, Middleware middleware) {
+
+        String routePrefix = "/";
+        RoutePrefix routePrefixAnnotation = controllerClass.getAnnotation(RoutePrefix.class);
+
+        if (routePrefixAnnotation != null) {
+
+            routePrefix = routePrefixAnnotation.value();
+        }
+
+        return use(routePrefix.concat("/*"), middleware);
     }
 
     /**
@@ -267,6 +290,30 @@ public class Razor {
     }
 
     /**
+     * Initialize the middlewares
+     */
+    private void initMiddlewares() {
+
+        Set<Class<? extends IController>> controllers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(IController.class);
+        controllers.forEach(controller -> {
+
+            try {
+
+                Method method = controller.getMethod("registerMiddlewares", controller);
+
+                Set<Middleware> middlewares = (Set<Middleware>)method.invoke(null);
+                middlewares.forEach(middleware -> {
+
+                    use(controller, middleware);
+                });
+            } catch (Exception e) {
+
+                log.error(e.toString());
+            }
+        });
+    }
+
+    /**
      * Initialize the routes
      */
     private void initRoutes() {
@@ -275,10 +322,12 @@ public class Razor {
     }
 
     /**
-     * Other preparations
+     * Other preparations to be done at last
      */
     private void startUp() {
 
-
+        this.initIoc();
+        this.initMiddlewares();
+        this.initRoutes();
     }
 }

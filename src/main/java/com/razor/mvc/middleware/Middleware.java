@@ -23,25 +23,45 @@
 
 package com.razor.mvc.middleware;
 
-import lombok.Getter;
+import com.razor.mvc.http.Request;
+import com.razor.mvc.http.Response;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Abstract middleware
+ * Request middleware functional interface
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public abstract class Middleware implements IMiddleware {
+@FunctionalInterface
+public interface Middleware extends Comparable<Middleware> {
 
-    /**
-     * priority of middleware, 0 means the highest priority, it affects the call order of this middleware in request middleware chains
-     */
-    @Getter
-    private int priority = 10;
+    static Map<Middleware, Integer> priorities = new HashMap<>();
 
-    public void setPriority(int priority) {
+    default public int getPriority() {
+
+        try {
+
+            return priorities.get(this);
+        } catch (NullPointerException e) {
+
+            return -1;
+        }
+    }
+
+    default public void setPriority(int priority) {
 
         assert priority >=0 : "priority should not smaller than 0";
-        this.priority = priority;
+
+        priorities.put(this, priority);
+    }
+
+    public void apply(Request req, Response res);
+
+    default public int compareTo(Middleware other) {
+
+        return getPriority() - other.getPriority();
     }
 }

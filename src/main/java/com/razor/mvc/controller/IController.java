@@ -23,11 +23,6 @@
 
 package com.razor.mvc.controller;
 
-import com.razor.mvc.middleware.IMiddleware;
-
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Controller interface
  *
@@ -36,5 +31,5 @@ import java.util.Set;
  */
 public interface IController {
 
-    public static Set<IMiddleware> middlewares = new HashSet<>();
+
 }

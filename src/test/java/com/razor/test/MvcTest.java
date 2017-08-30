@@ -1,6 +1,7 @@
 package com.razor.test;
 
 import com.razor.Razor;
+import com.razor.test.controllers.BookController;
 
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
@@ -41,6 +42,8 @@ public class MvcTest {
         razor.use((req, res) -> {
             System.out.println(req.getHostname());
         });
+
+        razor.use(BookController.class, (req, res) -> {});
         razor.start(MvcTest.class, "127.0.0.1", 8090, args);
     }
 }
