@@ -26,7 +26,8 @@ package com.razor.server;
 import com.razor.Razor;
 import com.razor.exception.RazorException;
 import com.razor.ioc.IContainer;
-import com.razor.mvc.Controller;
+import com.razor.mvc.controller.APIController;
+import com.razor.mvc.controller.Controller;
 import com.razor.mvc.http.ActionResult;
 import com.razor.mvc.http.HttpContext;
 import com.razor.mvc.http.Request;
@@ -35,7 +36,6 @@ import com.razor.mvc.route.RouteSignature;
 import com.razor.mvc.route.Router;
 import com.razor.mvc.route.RouteParameter;
 
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -140,12 +140,12 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
         Class<?> controllerClass = signature.getRouter().getTargetType();
         Class<?> superClass = controllerClass.getSuperclass();
 
-        if (superClass != Controller.class) {
+        if (superClass != Controller.class && superClass != APIController.class) {
 
-            throw new RazorException(controllerClass.getName() + " is not a controller");
+            throw new RazorException(controllerClass.getName() + " is not a controller or api controller");
         }
 
-        Controller controller = (Controller)ioc.resolve(controllerClass);
+        Object controller = ioc.resolve(controllerClass);
 
         // inject httpContext
         try {

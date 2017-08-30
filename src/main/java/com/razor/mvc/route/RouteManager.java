@@ -23,7 +23,8 @@
 
 package com.razor.mvc.route;
 
-import com.razor.mvc.Controller;
+import com.razor.mvc.controller.APIController;
+import com.razor.mvc.controller.Controller;
 import com.razor.mvc.annotation.*;
 import com.razor.mvc.http.HttpMethod;
 import lombok.extern.slf4j.Slf4j;
@@ -78,7 +79,9 @@ public class RouteManager {
     public void registerRoutes() {
 
         Set<Class<? extends Controller>> controllers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(Controller.class);
+        Set<Class<? extends APIController>> apiControllers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(APIController.class);
         controllers.forEach(this::parseControllerRoutes);
+        apiControllers.forEach(this::parseControllerRoutes);
     }
 
     private void parseControllerRoutes(Class<?> clazz) {

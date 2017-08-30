@@ -24,7 +24,6 @@
 package com.razor.util;
 
 import com.razor.exception.NotImplementException;
-import com.razor.mvc.Controller;
 import com.razor.mvc.http.ContentType;
 
 import java.io.File;

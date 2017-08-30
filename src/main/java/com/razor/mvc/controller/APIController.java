@@ -1,8 +1,3 @@
-package com.razor.test.controllers;
-
-import com.razor.mvc.controller.Controller;
-import com.razor.mvc.annotation.Route;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -26,31 +21,43 @@ import com.razor.mvc.annotation.Route;
  */
 
 
-public class HomeController extends Controller {
+package com.razor.mvc.controller;
 
-    @Route("")
-    public void index() {
+import com.razor.exception.RazorException;
+import com.razor.mvc.annotation.RoutePrefix;
+import com.razor.mvc.http.ActionResult;
+import com.razor.mvc.http.ContentType;
+import com.razor.mvc.http.HttpContext;
 
-        //return "Home page";
+import com.razor.mvc.http.Response;
+import com.razor.util.MimeKit;
+import lombok.extern.slf4j.Slf4j;
 
-        Render("home.twig", "var", "home result using twig");
+import static com.razor.mvc.http.HttpHeaderNames.CONTENT_TYPE;
+
+/**
+ * Abstract controller specified for API actions
+ */
+@Slf4j
+@RoutePrefix
+public class APIController {
+
+    private HttpContext httpContext;
+
+    protected HttpContext Context() {
+
+        return httpContext;
     }
 
-    @Route("redirect")
-    public void redirect() {
+    /**
+     * Send a json response immediately
+     *
+     * @param data data to send
+     */
+    protected void JSON(Object data) {
 
-        Context().response().location("http://www.baidu.com/");
-    }
-
-    @Route("redirect-local")
-    public void redirectLocal() {
-
-        Context().response().location("/local");
-    }
-
-    @Route("local")
-    public String local() {
-
-        return "local";
+        Response response = Context().response();
+        response.header(CONTENT_TYPE, ContentType.JSON.getMimeType());
+        response.end(ActionResult.build(data, data.getClass()).getBytes());
     }
 }

@@ -25,7 +25,8 @@ package com.razor.test.controllers;
 
 
 import com.razor.ioc.annotation.FromService;
-import com.razor.mvc.Controller;
+import com.razor.mvc.controller.APIController;
+import com.razor.mvc.controller.Controller;
 import com.razor.mvc.annotation.HttpGet;
 import com.razor.mvc.annotation.HttpPost;
 import com.razor.mvc.annotation.Route;
@@ -34,8 +35,8 @@ import com.razor.mvc.http.HttpContext;
 import com.razor.mvc.http.Request;
 import com.razor.test.IService;
 
-@RoutePrefix("shop")
-public class BookController extends Controller {
+@RoutePrefix("api")
+public class BookController extends APIController {
 
     public String defaultName = "book";
 
@@ -46,37 +47,54 @@ public class BookController extends Controller {
 
     }
 
-    public void out() {
-        System.out.println(service.getName());
-        System.out.println(service.getDate());
-    }
 
     @HttpGet
-    @Route("books/{int:id}.html")
-    public String getBookDetail(int id) {
+    @Route("books/{int:id}")
+    public void getBookDetail(int id) {
 
-        return "Book ".concat(Integer.toString(id)).concat(" detail");
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\"action\": \"get\", \"id\":");
+        sb.append(id);
+        sb.append("}");
+        JSON(sb.toString());
     }
 
     @HttpPost
-    @Route("books/{int:id}.html")
-    public String updateBookDetail(int id) {
+    @Route("books/{int:id}")
+    public void updateBookDetail(int id) {
 
-        return "Book ".concat(Integer.toString(id)).concat(" update");
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\"action\": \"update\", \"id\":");
+        sb.append(id);
+        sb.append("}");
+        JSON(sb.toString());
     }
 
     @HttpGet
     @Route("books/{string:category}/list")
-    public String getCategoriedBooks(String category) {
+    public void getCategoriedBooks(String category) {
 
-        return "Books list of category ".concat(category);
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\"action\": \"getlist\", \"category\":");
+        sb.append("\"");
+        sb.append(category);
+        sb.append("\"");
+        sb.append("}");
+        JSON(sb.toString());
+    }
+
+    @HttpGet
+    @Route("books/{string:name}")
+    public void getBook(String name) {
+
+        JSON("\"" + name + "\"");
     }
 
     @HttpGet
     @Route("books/list")
     public String getBooks() {
 
-        HttpContext context = context();
+        HttpContext context = Context();
 
         if (context == null) {
             return "null context";

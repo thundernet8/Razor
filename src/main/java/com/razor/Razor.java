@@ -27,7 +27,8 @@ import com.razor.ioc.ContainerBuilder;
 import com.razor.ioc.IContainer;
 import com.razor.ioc.IContainerBuilder;
 import com.razor.env.Env;
-import com.razor.mvc.Controller;
+import com.razor.mvc.controller.APIController;
+import com.razor.mvc.controller.Controller;
 import com.razor.mvc.route.RouteManager;
 import com.razor.server.NettyServer;
 
@@ -79,7 +80,7 @@ public class Razor {
      * @param port port
      * @return Razor
      */
-    public Razor listen(@NonNull String host, @NonNull int port) {
+    public Razor listen(@NonNull String host, int port) {
 
         env.set(ENV_KEY_SERVER_HOST, host);
         env.set(ENV_KEY_SERVER_PORT, port);
@@ -92,7 +93,7 @@ public class Razor {
         start(appClass, DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT, args);
     }
 
-    public void start(@NonNull Class<?> appClass, @NonNull String host, @NonNull int port, String[] args) {
+    public void start(@NonNull Class<?> appClass, @NonNull String host, int port, String[] args) {
 
         try {
 
@@ -207,6 +208,7 @@ public class Razor {
 
         // register controllers
         iocBuilder.autoRegister(Controller.class);
+        iocBuilder.autoRegister(APIController.class);
 
         ioc = iocBuilder.build();
     }

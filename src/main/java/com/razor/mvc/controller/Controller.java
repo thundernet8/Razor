@@ -21,7 +21,7 @@
  */
 
 
-package com.razor.mvc;
+package com.razor.mvc.controller;
 
 import com.razor.exception.RazorException;
 import com.razor.mvc.annotation.RoutePrefix;
@@ -48,7 +48,7 @@ public abstract class Controller {
 
     private HttpContext httpContext;
 
-    protected HttpContext context() {
+    protected HttpContext Context() {
 
         return httpContext;
     }
