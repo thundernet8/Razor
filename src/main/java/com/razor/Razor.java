@@ -59,25 +59,51 @@ import static com.razor.mvc.Constants.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Razor {
 
+    /**
+     * App environments
+     */
     private Env env = Env.defaults();
 
-    // Application class
+    /**
+     * Current entry application class
+     */
     private Class<?> appClass;
 
-    // Ioc container builder
+    /**
+     * Services container builder
+     */
     private IContainerBuilder iocBuilder;
 
-    // Ioc container
+    /**
+     * Services container
+     */
     private IContainer ioc;
 
+    /**
+     * Netty server
+     */
     private NettyServer nettyServer = new NettyServer();
 
+    /**
+     * Path rules of static resource directory
+     */
     private final Set<String> statics = new HashSet<>(DEFAULT_STATICS);
 
+    /**
+     * Middlewares registered to all routes
+     */
     private final Set<Middleware> rootMiddlewares = new HashSet<>();
 
+    /**
+     * Middlewares registered to specified route
+     */
     private final Map<String, Set<Middleware>> pathMiddlewares = new HashMap<>();
 
+    /**
+     * Initialize razor instance
+     *
+     * @return Razor instance
+     */
     public static Razor self() {
 
         return new Razor();
@@ -85,6 +111,7 @@ public class Razor {
 
     /**
      * Specify the host and port for server listening
+     *
      * @param host remote address
      * @param port port
      * @return Razor
@@ -97,11 +124,25 @@ public class Razor {
         return this;
     }
 
+    /**
+     * Start the app server
+     *
+     * @param appClass app class
+     * @param args other args
+     */
     public void start(@NonNull Class<?> appClass, String[] args) {
 
         start(appClass, DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT, args);
     }
 
+    /**
+     * Start the app server
+     *
+     * @param appClass app class
+     * @param host server binding host
+     * @param port server binding port
+     * @param args other args
+     */
     public void start(@NonNull Class<?> appClass, @NonNull String host, int port, String[] args) {
 
         try {
@@ -129,6 +170,9 @@ public class Razor {
     }
 
 
+    /**
+     * Shutdown app and server
+     */
     public void stop() {
 
         // TODO calculate run time
@@ -161,6 +205,7 @@ public class Razor {
 
             return this;
         }
+
         try {
 
             env.set(ENV_KEY_WEB_ROOT_DIR, webDir);
@@ -221,8 +266,10 @@ public class Razor {
         // TODO add a response time calculating middleware
 
         if (middleware.getPriority() < 0) {
+
             middleware.setPriority(rootMiddlewares.size());
         }
+
         rootMiddlewares.add(middleware);
 
         return this;
@@ -247,6 +294,7 @@ public class Razor {
         }
 
         if (middleware.getPriority() < 0) {
+
             middleware.setPriority(rootMiddlewares.size() + exists.size());
         }
         exists.add(middleware);
