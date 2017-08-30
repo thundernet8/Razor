@@ -23,9 +23,15 @@
 
 package com.razor.mvc.route;
 
+import com.razor.Razor;
+import com.razor.mvc.middleware.IMiddleware;
 import lombok.Getter;
 
 import java.lang.reflect.Method;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Router
@@ -57,6 +63,10 @@ public class Router {
     private Method action;
 
 
+    /**
+     * Middlewares which will be applied to this route
+     */
+    private List<IMiddleware> middlewares;
 
     Router(String httpMethod, Class<?> targetType, Method action, RouteMatcher routeMatcher) {
 
@@ -64,6 +74,7 @@ public class Router {
         this.targetType = targetType;
         this.action = action;
         this.routeMatcher = routeMatcher;
+
     }
 
     boolean match (String url) {
@@ -107,5 +118,34 @@ public class Router {
     boolean isGeneric() {
 
         return routeMatcher.isUniversal();
+    }
+
+    /**
+     * Collect registered middlewares these are valid for this route
+     */
+    void collectMiddlewares(Razor razor) {
+
+        List<IMiddleware> collection = new ArrayList<>(razor.getRootMiddlewares());
+
+        String path = getFullPath();
+        Pattern pattern = Pattern.compile("^(/[0-9a-zA-Z-_./]+)?(/[0-9a-zA-Z-_.]*\\{.+}.*)?((/\\*)(.*))?$");
+        Matcher matcher = pattern.matcher(path);
+
+        if (matcher.matches()) {
+
+            path = matcher.group(1).concat("/*");
+        }
+
+        for (String key : razor.getPathMiddlewares().keySet()) {
+
+            if (key.equals(path)) {
+
+                collection.addAll(razor.getPathMiddlewares().get(key));
+            }
+        }
+
+        Collections.sort(collection);
+
+        middlewares = collection;
     }
 }

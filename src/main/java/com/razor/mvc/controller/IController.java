@@ -21,48 +21,20 @@
  */
 
 
-package com.razor.mvc.middleware;
+package com.razor.mvc.controller;
 
-import com.razor.exception.NotImplementException;
-import com.razor.mvc.http.Request;
-import com.razor.mvc.http.Response;
+import com.razor.mvc.middleware.IMiddleware;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Request middleware functional interface
+ * Controller interface
  *
  * @author Touchumind
  * @since 0.0.1
  */
-@FunctionalInterface
-public interface IMiddleware extends Comparable<IMiddleware> {
+public interface IController {
 
-    static Map<IMiddleware, Integer> priorities = new HashMap<>();
-
-    default public int getPriority() {
-
-        try {
-
-            return priorities.get(this);
-        } catch (NullPointerException e) {
-
-            return -1;
-        }
-    }
-
-    default public void setPriority(int priority) {
-
-        assert priority >=0 : "priority should not smaller than 0";
-
-        priorities.put(this, priority);
-    }
-
-    public void apply(Request req, Response res);
-
-    default public int compareTo(IMiddleware other) {
-
-        return getPriority() - other.getPriority();
-    }
+    public static Set<IMiddleware> middlewares = new HashSet<>();
 }

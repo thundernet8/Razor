@@ -44,7 +44,7 @@ import static com.razor.mvc.Constants.*;
  */
 @Slf4j
 @RoutePrefix
-public abstract class Controller {
+public abstract class Controller implements IController {
 
     private HttpContext httpContext;
 

@@ -70,6 +70,10 @@ public class Razor {
 
     private final Set<String> statics = new HashSet<>(DEFAULT_STATICS);
 
+    private final Set<IMiddleware> rootMiddlewares = new HashSet<>();
+
+    private final Map<String, Set<IMiddleware>> pathMiddlewares = new HashMap<>();
+
     public static Razor self() {
 
         return new Razor();
@@ -124,6 +128,7 @@ public class Razor {
 
     public void stop() {
 
+        // TODO calculate run time
         nettyServer.shutdown();
     }
 
@@ -210,7 +215,12 @@ public class Razor {
      */
     public Razor use(IMiddleware middleware) {
 
-        // TODO
+        // TODO add a response time calculating middleware
+
+        if (middleware.getPriority() < 0) {
+            middleware.setPriority(rootMiddlewares.size());
+        }
+        rootMiddlewares.add(middleware);
 
         return this;
     }
@@ -224,14 +234,27 @@ public class Razor {
      * @param middleware middleware handler
      * @return Razor self
      */
-    public Razor use(String path, IMiddleware middleware) {
+    public Razor use(@NonNull String path, IMiddleware middleware) {
 
-        // TODO
+        Set<IMiddleware> exists = pathMiddlewares.get(path);
+
+        if (exists == null) {
+
+            exists = new HashSet<>();
+        }
+
+        if (middleware.getPriority() < 0) {
+            middleware.setPriority(rootMiddlewares.size() + exists.size());
+        }
+        exists.add(middleware);
+        pathMiddlewares.put(path, exists);
 
         return this;
     }
 
-    // IOC
+    /**
+     * Initialize the container
+     */
     private void initIoc() {
 
         iocBuilder = ContainerBuilder.getInstance(appClass);
@@ -243,10 +266,12 @@ public class Razor {
         ioc = iocBuilder.build();
     }
 
-    // Routes
+    /**
+     * Initialize the routes
+     */
     private void initRoutes() {
 
-        RouteManager.getInstance(appClass).registerRoutes();
+        RouteManager.getInstance(this).registerRoutes();
     }
 
     /**

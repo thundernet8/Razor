@@ -23,6 +23,7 @@
 
 package com.razor.mvc.route;
 
+import com.razor.Razor;
 import com.razor.mvc.controller.APIController;
 import com.razor.mvc.controller.Controller;
 import com.razor.mvc.annotation.*;
@@ -48,27 +49,34 @@ public class RouteManager {
 
     private static RouteManager instance;
 
+    private Razor razor;
+
     private Class<?> appClass;
 
     /**
      * Routers with fixed path
      */
-    private final Map<String, Router> routerMap = new HashMap();
+    private final Map<String, Router> routerMap = new HashMap<>();
 
     /**
      * Routers with regex type path
      */
     private final Set<Router> routerSet = new HashSet<>();
 
-    private RouteManager(Class<?> appClass) {
-        this.appClass = appClass;
+    private RouteManager(Razor razor) {
+
+        this.razor = razor;
+        this.appClass = razor.getAppClass();
     }
 
-    public static RouteManager getInstance(Class<?> appClass) {
+    public static RouteManager getInstance(Razor razor) {
+
         if (instance == null) {
             synchronized (RouteManager.class) {
+
                 if (instance == null) {
-                    instance = new RouteManager(appClass);
+
+                    instance = new RouteManager(razor);
                 }
             }
         }
@@ -88,15 +96,20 @@ public class RouteManager {
 
         String routePrefix = "";
         RoutePrefix rpAnnotation = clazz.getAnnotation(RoutePrefix.class);
+
         if (rpAnnotation != null) {
+
             routePrefix = rpAnnotation.value();
         }
 
         Method[] actions = clazz.getDeclaredMethods();
 
         for (Method action : actions) {
+
             Route rtAnnotation = action.getAnnotation(Route.class);
+
             if (rtAnnotation == null) {
+
                 continue;
             }
 
@@ -110,14 +123,19 @@ public class RouteManager {
             HttpDelete delAnnotation = action.getAnnotation(HttpDelete.class);
             String httpMethod;
             if (delAnnotation != null) {
+
                 httpMethod = HttpMethod.DELETE;
             } else if (putAnnotation != null) {
+
                 httpMethod = HttpMethod.PUT;
             } else if (postAnnotation != null) {
+
                 httpMethod = HttpMethod.POST;
             } else if (getAnnotation != null) {
+
                 httpMethod = HttpMethod.GET;
             } else {
+
                 httpMethod = HttpMethod.ALL;
             }
 
@@ -126,6 +144,8 @@ public class RouteManager {
     }
 
     public void addRoute(Router router) {
+
+        router.collectMiddlewares(razor);
 
         if (router.isGeneric()) {
             routerSet.add(router);

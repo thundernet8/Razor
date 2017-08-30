@@ -31,7 +31,7 @@ import lombok.Getter;
  * @author Touchumind
  * @since 0.0.1
  */
-public abstract class Middleware implements IMiddleware, Comparable<Middleware> {
+public abstract class Middleware implements IMiddleware {
 
     /**
      * priority of middleware, 0 means the highest priority, it affects the call order of this middleware in request middleware chains
@@ -43,10 +43,5 @@ public abstract class Middleware implements IMiddleware, Comparable<Middleware> 
 
         assert priority >=0 : "priority should not smaller than 0";
         this.priority = priority;
-    }
-
-    public int compareTo(Middleware other) {
-
-        return priority - other.getPriority();
     }
 }

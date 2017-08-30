@@ -33,11 +33,17 @@ public class PatternTest {
 
     public static void main(String[] args) {
 
-        String str = "/generic/*/123.html";
+        String str = "/generic/egs{int:ad}/*";
 
-        Pattern pattern = Pattern.compile("^/generic/([0-9a-zA-Z-_./]+)?");
+        Pattern pattern = Pattern.compile("^(/[0-9a-zA-Z-_./]+)?(/[0-9a-zA-Z-_.]*\\{.+}.*)?((/\\*)(.*))?$");
 
-        boolean match = pattern.matcher(str).find();
+        Matcher matcher = pattern.matcher(str);
+
+        boolean match = matcher.matches();
+
+        String g0 = matcher.group(0);
+        String g1 = matcher.group(1);
+        String g2 = matcher.group(2);
 
         System.out.println("done");
     }

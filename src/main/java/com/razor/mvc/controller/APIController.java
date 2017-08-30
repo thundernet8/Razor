@@ -23,14 +23,12 @@
 
 package com.razor.mvc.controller;
 
-import com.razor.exception.RazorException;
 import com.razor.mvc.annotation.RoutePrefix;
 import com.razor.mvc.http.ActionResult;
 import com.razor.mvc.http.ContentType;
 import com.razor.mvc.http.HttpContext;
 
 import com.razor.mvc.http.Response;
-import com.razor.util.MimeKit;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.razor.mvc.http.HttpHeaderNames.CONTENT_TYPE;
@@ -40,7 +38,7 @@ import static com.razor.mvc.http.HttpHeaderNames.CONTENT_TYPE;
  */
 @Slf4j
 @RoutePrefix
-public class APIController {
+public class APIController implements IController {
 
     private HttpContext httpContext;
 

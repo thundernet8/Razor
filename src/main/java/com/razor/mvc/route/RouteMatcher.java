@@ -143,7 +143,7 @@ public class RouteMatcher {
         return params.toArray(new RouteParameter[0]);
     }
 
-    public Pattern getPattern() {
+    Pattern getPattern() {
 
         return pattern;
     }

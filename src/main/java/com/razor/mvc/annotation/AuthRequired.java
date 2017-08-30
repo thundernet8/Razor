@@ -36,5 +36,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface AuthRequired {
 
+    // TODO implement
+
     boolean value() default true;
 }

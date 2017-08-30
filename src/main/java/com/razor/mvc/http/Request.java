@@ -279,7 +279,7 @@ public class Request {
         }
 
         // below for non static requests
-        Router router = RouteManager.getInstance(app.getAppClass()).findRoute(path, method);
+        Router router = RouteManager.getInstance(app).findRoute(path, method);
         if (router != null) {
 
             matchRoute = true;

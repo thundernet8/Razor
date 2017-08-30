@@ -37,6 +37,10 @@ public class MvcTest {
         razor.use((req, res) -> {
             System.out.println(req.path());
         });
+
+        razor.use((req, res) -> {
+            System.out.println(req.getHostname());
+        });
         razor.start(MvcTest.class, "127.0.0.1", 8090, args);
     }
 }
