@@ -106,6 +106,6 @@ public class Router {
      */
     boolean isGeneric() {
 
-        return routeMatcher.getParamTypes().length > 0;
+        return routeMatcher.isUniversal();
     }
 }

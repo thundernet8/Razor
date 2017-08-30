@@ -53,4 +53,10 @@ public class HomeController extends Controller {
 
         return "local";
     }
+
+    @Route("generic/*")
+    public String genericRoute() {
+
+        return "generic";
+    }
 }

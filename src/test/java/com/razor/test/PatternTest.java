@@ -32,77 +32,12 @@ import java.util.regex.Pattern;
 public class PatternTest {
 
     public static void main(String[] args) {
-        String routePrefix = "shop";
-        String route = "books/{int:id}/{name}.html";
 
-        Pattern pattern = Pattern.compile("^([^/])([0-9a-zA-Z-_/{}:.]+)([^/])$");
-        Matcher matcher = pattern.matcher(route);
-        if (matcher.matches()) {
-            String a = matcher.group(2);
-            System.out.println("matches");
-        } else {
-            System.out.println("not match");
-        }
+        String str = "/generic/*/123.html";
 
+        Pattern pattern = Pattern.compile("^/generic/([0-9a-zA-Z-_./]+)?");
 
-        // find '{type:param}' pairs
-        int start = 0;
-        boolean inPair = false;
-        boolean inName = false;
-        ArrayList<String> pairs = new ArrayList<>();
-        ArrayList<String> types = new ArrayList<>();
-        ArrayList<String> names = new ArrayList<>();
-        StringBuilder currentPair = new StringBuilder();
-        StringBuilder currentParamType = new StringBuilder();
-        StringBuilder currentParamName = new StringBuilder();
-        StringBuilder patternBuilder = new StringBuilder("^");
-        patternBuilder.append(routePrefix);
-        patternBuilder.append("/");
-        while (start < route.length()) {
-            String ch = route.substring(start, start + 1);
-            if (StringUtils.equals(ch, "{")) {
-                inPair = true;
-                inName = false;
-                currentPair.setLength(0);
-                currentParamType.setLength(0);
-                currentParamName.setLength(0);
-            } else if (StringUtils.equals(ch, "}")) {
-                inPair = false;
-                inName = false;
-                pairs.add(currentPair.toString());
-                if (StringUtils.isEmpty(currentParamName.toString())) {
-                    types.add("String");
-                    names.add(currentParamType.toString());
-                    patternBuilder.append("([0-9a-zA-Z-_]+)");
-                } else {
-                    boolean isNumber = StringUtils.equals(currentParamType.toString().toLowerCase(), "int");
-                    types.add(isNumber ? "int" : "String");
-                    names.add(currentParamName.toString());
-                    patternBuilder.append(isNumber ? "([0-9]+)" : "([0-9a-zA-Z-_]+)");
-                }
-            } else if (StringUtils.equals(ch, ":")) {
-                inName = true;
-                currentPair.append(ch);
-            } else if (inPair) {
-                currentPair.append(ch);
-                if (inName) {
-                    currentParamName.append(ch);
-                } else {
-                    currentParamType.append(ch);
-                }
-            } else {
-                patternBuilder.append(ch);
-            }
-            start++;
-        }
-
-        patternBuilder.append("$");
-
-        Matcher mc = Pattern.compile(patternBuilder.toString()).matcher("shop/books/10/hao.html");
-        boolean test = mc.matches();
-        String t1 = mc.group(0);
-        String t2 = mc.group(1);
-        String t3 = mc.group(2);
+        boolean match = pattern.matcher(str).find();
 
         System.out.println("done");
     }

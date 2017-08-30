@@ -73,6 +73,16 @@ public class RouteMatcher {
         return isValid;
     }
 
+    /**
+     * Indicate the route has a universal match or not
+     */
+    private boolean isUniversal = false;
+
+    public boolean isUniversal() {
+
+        return isUniversal;
+    }
+
     public String getRoutePrefix() {
 
         return routePrefix;
@@ -101,6 +111,13 @@ public class RouteMatcher {
      */
     public RouteParameter[] getParams(String path) {
 
+        int paramCount = Math.min(paramTypes.length, paramNames.length);
+
+        if (paramCount < 1) {
+
+            return null;
+        }
+
         Matcher matcher = pattern.matcher(path);
 
         if (!matcher.find()) {
@@ -110,7 +127,7 @@ public class RouteMatcher {
 
         Set<RouteParameter> params = new HashSet<>();
 
-        for (int i = 0; i < Math.min(paramTypes.length, paramNames.length); i++) {
+        for (int i = 0; i < paramCount; i++) {
 
             String value = matcher.group(i + 1);
 
@@ -137,6 +154,8 @@ public class RouteMatcher {
         // books/{string:category}/{int:id}.html
         this.route = route;
 
+        isUniversal = route.contains("/*") || Pattern.compile("/\\{([0-9a-zA-Z]+)?:?([0-9a-zA-Z_]+)}/").matcher(route).find();
+
         if (!this.validateRoutes()) {
             isValid = false;
             return;
@@ -152,7 +171,10 @@ public class RouteMatcher {
         StringBuilder currentParamName = new StringBuilder();
         StringBuilder patternBuilder = new StringBuilder("^");
         patternBuilder.append(this.routePrefix);
-        patternBuilder.append("/");
+
+        if (!this.routePrefix.endsWith("/")) {
+            patternBuilder.append("/");
+        }
 
         while (start < route.length()) {
 
@@ -195,7 +217,7 @@ public class RouteMatcher {
                 }
             } else {
 
-                patternBuilder.append(ch);
+                patternBuilder.append(ch.equals("*") ? "([0-9a-zA-Z-_./]+)?" : ch);
             }
 
             start++;
