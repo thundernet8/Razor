@@ -76,7 +76,7 @@ public class TemplateRenderer extends Renderer {
             String view = TemplateEngineFactory.getEngine().render(templatePath, model);
 
             // TODO flush data, content-type and other headers
-            if (response.header(CONTENT_TYPE) == null) {
+            if (response.get(CONTENT_TYPE) == null) {
                 response.header(CONTENT_TYPE, getContentType().getMimeType());
             }
             response.end(view);

@@ -198,7 +198,7 @@ public class Response {
      * @param field http response header field
      * @return field value
      */
-    public String header(AsciiString field) {
+    public String get(AsciiString field) {
 
         if (httpResponse != null) {
 
@@ -221,9 +221,9 @@ public class Response {
      * @param field http response header field
      * @return field value
      */
-    public String header(String field) {
+    public String get(String field) {
 
-        return header(new AsciiString(field));
+        return get(new AsciiString(field));
     }
 
     /**
@@ -442,7 +442,7 @@ public class Response {
      */
     public Response vary(String field) {
 
-        String vary = header(VARY);
+        String vary = get(VARY);
 
         if (vary != null) {
 
