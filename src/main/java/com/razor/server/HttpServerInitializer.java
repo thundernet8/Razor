@@ -60,8 +60,8 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
         pl.addLast("aggregator", new HttpObjectAggregator(512*1024));
         pl.addLast("chunk", new ChunkedWriteHandler());
 //        pl.addLast("cors", new CorsHandler())
-        pl.addLast("readTimeout", new ReadTimeoutHandler(120));
-        pl.addLast("writeTimeout", new WriteTimeoutHandler(120));
+//        pl.addLast("readTimeout", new ReadTimeoutHandler(120));
+//        pl.addLast("writeTimeout", new WriteTimeoutHandler(120));
         pl.addLast("request", new HttpServerHandler(razor));
     }
 }

@@ -32,16 +32,18 @@ import com.razor.mvc.http.ActionResult;
 import com.razor.mvc.http.HttpContext;
 import com.razor.mvc.http.Request;
 import com.razor.mvc.http.Response;
+import com.razor.mvc.route.RouteParameter;
 import com.razor.mvc.route.RouteSignature;
 import com.razor.mvc.route.Router;
-import com.razor.mvc.route.RouteParameter;
 
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.*;
-import io.netty.channel.ChannelHandler.Sharable;
-import io.netty.util.ReferenceCountUtil;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
@@ -49,17 +51,17 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import static io.netty.buffer.Unpooled.copiedBuffer;
-import static io.netty.handler.codec.http.HttpResponseStatus.*;
+import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 
 /**
- * Default ChannelInboundHandler
+ * Default http server handler
  *
  * @author Touchumind
  * @since 0.0.1
  */
 @Slf4j
-@Sharable
-public class HttpServerHandler extends ChannelInboundHandlerAdapter {
+@ChannelHandler.Sharable
+public class HttpServerHandler extends SimpleChannelInboundHandler {
 
     private Razor razor;
 
@@ -71,8 +73,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
         this.staticFileHandler = new StaticFileHandler(razor);
     }
 
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
 
         if (msg instanceof FullHttpRequest) {
 
@@ -104,7 +105,6 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
                 response.sendError(NOT_FOUND);
             }
 
-            ReferenceCountUtil.release(msg);
         } else {
 
             super.channelRead(ctx, msg);
@@ -114,12 +114,15 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
 
+        super.channelReadComplete(ctx);
         // TODO fix timeout issue, connection not close
         ctx.flush();
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+
+        super.exceptionCaught(ctx, cause);
 
         ctx.writeAndFlush(new DefaultFullHttpResponse(
 
