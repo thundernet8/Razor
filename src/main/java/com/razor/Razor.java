@@ -255,6 +255,15 @@ public class Razor {
         return this;
     }
 
+
+    // TODO 403 500 502
+    public Razor set404(String template) {
+
+        env.set(ENV_KEY_404_PAGE_TEMPLATE, template);
+
+        return this;
+    }
+
     /**
      * Apply middleware to the request handler
      *

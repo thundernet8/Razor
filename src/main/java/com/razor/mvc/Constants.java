@@ -47,7 +47,8 @@ public interface Constants {
     // Server default constants
     String DEFAULT_SERVER_HOST = "0.0.0.0";
     int DEFAULT_SERVER_PORT = 8088;
-    String DEFAULT_WEB_ROOT_DIR = "web";
+    String DEFAULT_WEB_ROOT_DIR = "web"; // relative to classpath
+    String DEFAULT_TEMPLATE_ROOT_DIR = "WEB-INF/templates"; // relative to classpath
     List<String> DEFAULT_STATICS = Arrays.asList("/favicon.ico", "/robots.txt", "/sitemap.xml");
     List<String> DEFAULT_INDEX_FILES = Arrays.asList("index.html", "index.htm");
     boolean DEFAULT_SSL_ENABLE = false;
@@ -64,6 +65,11 @@ public interface Constants {
     String ENV_KEY_SERVER_PORT = "razor.server.port";
     String ENV_KEY_SSL = "razor.server.ssl";
     String ENV_KEY_WEB_ROOT_DIR = "razor.web.root";
+    String ENV_KEY_TEMPLATE_ROOT_DIR = "razor.web.template.root";
     String ENV_KEY_INDEX_FILES = "razor.web.indexs";
     String ENV_KEY_HTTP_CACHE_SECONDS = "razor.web.http.cache.seconds";
+    String ENV_KEY_403_PAGE_TEMPLATE = "razor.web.template.403";
+    String ENV_KEY_404_PAGE_TEMPLATE = "razor.web.template.404";
+    String ENV_KEY_500_PAGE_TEMPLATE = "razor.web.template.500";
+    String ENV_KEY_502_PAGE_TEMPLATE = "razor.web.template.502";
 }

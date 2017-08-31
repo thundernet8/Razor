@@ -24,14 +24,12 @@
 package com.razor.server;
 
 import com.razor.Razor;
+import com.razor.env.Env;
 import com.razor.exception.RazorException;
 import com.razor.ioc.IContainer;
 import com.razor.mvc.controller.APIController;
 import com.razor.mvc.controller.Controller;
-import com.razor.mvc.http.ActionResult;
-import com.razor.mvc.http.HttpContext;
-import com.razor.mvc.http.Request;
-import com.razor.mvc.http.Response;
+import com.razor.mvc.http.*;
 import com.razor.mvc.route.RouteParameter;
 import com.razor.mvc.route.RouteSignature;
 import com.razor.mvc.route.Router;
@@ -46,12 +44,19 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Optional;
 
+import static com.razor.mvc.http.HttpHeaderNames.CONTENT_LENGTH;
+import static com.razor.mvc.http.HttpHeaderNames.CONTENT_TYPE;
 import static io.netty.buffer.Unpooled.copiedBuffer;
-import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
+import static io.netty.handler.codec.http.HttpResponseStatus.*;
+import static com.razor.mvc.Constants.*;
+
 
 /**
  * Default http server handler
@@ -96,13 +101,13 @@ public class HttpServerHandler extends SimpleChannelInboundHandler {
             RouteSignature routeSignature = RouteSignature.builder().request(request).response(response).build();
             Router router = request.router();
 
-            if (router != null) {
+            if (router == null) {
 
                 routeSignature.setRouter(router);
                 this.handleRoute(ctx, routeSignature);
             } else {
 
-                response.sendError(NOT_FOUND);
+                sendError(routeSignature, NOT_FOUND);
             }
 
         } else {
@@ -214,5 +219,59 @@ public class HttpServerHandler extends SimpleChannelInboundHandler {
 
             middleware.apply(signature.request(), signature.response());
         });
+    }
+
+    /**
+     * Handle error response
+     *
+     * @param signature RouteSignature
+     * @param status Http response status
+     */
+    private void sendError(RouteSignature signature, HttpResponseStatus status) {
+
+        Response response = signature.response();
+        Env env = razor.getEnv();
+        String templateKey = "";
+
+        switch (status.code()) {
+
+            case 403:
+                templateKey = ENV_KEY_403_PAGE_TEMPLATE;
+                break;
+            case 404:
+                templateKey = ENV_KEY_404_PAGE_TEMPLATE;
+                break;
+            case 500:
+                templateKey = ENV_KEY_500_PAGE_TEMPLATE;
+                break;
+            case 502:
+                templateKey = ENV_KEY_502_PAGE_TEMPLATE;
+                break;
+        }
+
+        Optional<String> templatePath = env.get(templateKey);
+        if (templatePath.isPresent()) {
+
+            String absPath = CLASS_PATH.concat(File.separator).concat(templatePath.get());
+            File file = new File(absPath);
+            if (file.exists() && file.isFile() && !file.isHidden()) {
+                RandomAccessFile raf;
+                try {
+
+                    raf = new RandomAccessFile(file, "r");
+                    long length = raf.length();
+                    response.header(CONTENT_TYPE, ContentType.HTML.getMimeType());
+
+                    response.sendFile(raf, length);
+
+                } catch (Exception e) {
+
+                    log.error(e.toString());
+                    response.sendError(status);
+                }
+            }
+        }
+
+        response.sendError(status);
     }
 }

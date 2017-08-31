@@ -33,6 +33,7 @@ public class MvcTest {
 
         razor.webRoot("web");
         razor.addStatic("/txt/");
+        razor.set404("404.htm");
 //        razor.addStatic("/images/");
 
 //        razor.use((req, res) -> {
