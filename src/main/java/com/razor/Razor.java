@@ -92,6 +92,11 @@ public class Razor {
     private final Set<String> statics = new HashSet<>(DEFAULT_STATICS);
 
     /**
+     * Static route prefix map with server directory
+     */
+    private final Map<String, String> staticsMap = new HashMap<>();
+
+    /**
      * Middlewares registered to all routes
      */
     private final Set<Middleware> rootMiddlewares = new HashSet<>();
@@ -182,13 +187,38 @@ public class Razor {
     }
 
     /**
-     * Add static path rule
+     * Add static path rules
+     *
      * @param rules static path rule, a full path or path prefix or file extension, e.g `/favicon.png`, `/statics/`, `.png`
      * @return Razor
      */
     public Razor addStatic(String... rules) {
 
         statics.addAll(Arrays.asList(rules));
+
+        return this;
+    }
+
+    /**
+     * Map a static route prefix to binding a specified server directory
+     *
+     * @param routePrefix route prefix
+     * @param folder server directory
+     * @return Razor self
+     */
+    public Razor mapStatic(String routePrefix, String folder) {
+
+        if (!routePrefix.startsWith("/")) {
+
+            routePrefix = "/".concat(routePrefix);
+        }
+
+        if (!folder.startsWith("/")) {
+
+            folder = "/".concat(folder);
+        }
+
+        staticsMap.put(routePrefix, folder);
 
         return this;
     }
@@ -245,7 +275,7 @@ public class Razor {
      * @return Razor
      */
     public Razor ssl(boolean ssl) {
-
+        // TODO support
         try {
 
             env.set(ENV_KEY_SSL, ssl);
@@ -258,7 +288,12 @@ public class Razor {
     }
 
 
-    // TODO 403 500 502
+    /**
+     * Customize 404 page
+     *
+     * @param template 404 page template file path, relative templates root path
+     * @return Razor self
+     */
     public Razor set404(String template) {
 
         env.set(ENV_KEY_404_PAGE_TEMPLATE, template);

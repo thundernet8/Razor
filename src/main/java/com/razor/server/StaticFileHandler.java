@@ -75,6 +75,18 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
 
         String path = request.path();
 
+        // resolve statics map
+        Map<String, String> staticsMap = razor.getStaticsMap();
+        for (String routePrefix : staticsMap.keySet()) {
+
+            if (path.startsWith(routePrefix)) {
+
+                path = staticsMap.get(routePrefix).concat(path.substring(routePrefix.length()));
+                break;
+            }
+        }
+
+
         if (path.toUpperCase().startsWith("/WEB-INF")) {
 
             response.sendError(FORBIDDEN);

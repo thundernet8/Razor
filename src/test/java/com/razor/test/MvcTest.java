@@ -53,6 +53,9 @@ public class MvcTest {
 //
 //            res.end("haha");
 //        });
+
+        razor.mapStatic("abc", "images/abc");
+
         razor.start(MvcTest.class, "127.0.0.1", 8090, args);
     }
 }

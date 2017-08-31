@@ -114,7 +114,6 @@ public abstract class Controller implements IController {
         }
 
         String templateDir = httpContext.app().getEnv().get(ENV_KEY_TEMPLATE_ROOT_DIR, DEFAULT_TEMPLATE_ROOT_DIR);
-        // TODO cache this variable
         return templateDir.concat("/").concat(path);
     }
 }
