@@ -37,7 +37,7 @@ import com.razor.mvc.route.RouteSignature;
 import com.razor.mvc.route.Router;
 
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -60,7 +60,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
  * @since 0.0.1
  */
 @Slf4j
-@ChannelHandler.Sharable
+@Sharable
 public class HttpServerHandler extends SimpleChannelInboundHandler {
 
     private Razor razor;
@@ -80,7 +80,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler {
             final FullHttpRequest fullHttpRequest = (FullHttpRequest) msg;
 
             // TODO
-            // HEAD request
+            // HEAD request support
 
             Request request = Request.build(ctx, fullHttpRequest);
             Response response = Response.build(ctx, request);

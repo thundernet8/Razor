@@ -33,8 +33,8 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
 //import io.netty.handler.codec.http.cors.CorsHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.handler.timeout.WriteTimeoutHandler;
+//import io.netty.handler.timeout.ReadTimeoutHandler;
+//import io.netty.handler.timeout.WriteTimeoutHandler;
 
 /**
  * Netty channel initializer
@@ -46,7 +46,7 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private Razor razor;
 
-    public HttpServerInitializer(Razor razor) {
+    HttpServerInitializer(Razor razor) {
 
         this.razor = razor;
     }
