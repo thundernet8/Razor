@@ -33,6 +33,10 @@ import com.razor.mvc.controller.Controller;
 import com.razor.mvc.controller.IController;
 import com.razor.mvc.middleware.Middleware;
 import com.razor.mvc.route.RouteManager;
+import com.razor.mvc.template.BeetlTemplateEngine;
+import com.razor.mvc.template.JtwigTemplateEngine;
+import com.razor.mvc.template.TemplateEngine;
+import com.razor.mvc.template.TemplateEngineFactory;
 import com.razor.server.NettyServer;
 
 import com.razor.util.FileKit;
@@ -345,6 +349,39 @@ public class Razor {
         }
         exists.add(middleware);
         pathMiddlewares.put(path, exists);
+
+        return this;
+    }
+
+    /**
+     * Set template engine
+     *
+     * @param templateEngine template engine that implement {@link TemplateEngine}
+     * @return Razor self
+     */
+    public Razor useTemplateEngine(TemplateEngine templateEngine) {
+
+        TemplateEngineFactory.setTemplateEngine(templateEngine);
+
+        return this;
+    }
+
+    /**
+     * Select pre-defined template engine
+     *
+     * @param name template engine name
+     * @return Razor self
+     */
+    public Razor useTemplateEngine(String name) {
+
+        switch (name) {
+
+            case "Jtwig":
+                useTemplateEngine(new JtwigTemplateEngine());
+                break;
+            default:
+                useTemplateEngine(new BeetlTemplateEngine());
+        }
 
         return this;
     }

@@ -56,6 +56,8 @@ public class MvcTest {
 
         razor.mapStatic("abc", "images/abc");
 
+        //razor.useTemplateEngine("Jtwig");
+
         razor.start(MvcTest.class, "127.0.0.1", 8090, args);
     }
 }
