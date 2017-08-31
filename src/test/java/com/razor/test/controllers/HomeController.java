@@ -33,7 +33,7 @@ public class HomeController extends Controller {
 
         //return "Home page";
 
-        Render("home.twig", "var", "home result using twig");
+        Render("home.htm", "var1", "home result using twig");
     }
 
     @Route("redirect")

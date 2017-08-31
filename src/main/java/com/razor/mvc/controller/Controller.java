@@ -113,9 +113,9 @@ public abstract class Controller implements IController {
             path = path.substring(1);
         }
 
-        String webDir = httpContext.app().getEnv().get(ENV_KEY_WEB_ROOT_DIR, DEFAULT_WEB_ROOT_DIR);
+//        String webDir = httpContext.app().getEnv().get(ENV_KEY_WEB_ROOT_DIR, DEFAULT_WEB_ROOT_DIR);
 
         // TODO the value is fixed after app start, should cache it, do not query env every time.
-        return webDir.concat("/templates/").concat(path);
+        return ("WEB-INF/templates/").concat(path);
     }
 }

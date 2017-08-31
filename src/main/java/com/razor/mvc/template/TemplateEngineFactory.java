@@ -56,7 +56,7 @@ public class TemplateEngineFactory {
 
         if (instance == null) {
 
-            instance = new JtwigTemplateEngine();
+            instance = new BeetlTemplateEngine();
         }
 
         return instance;

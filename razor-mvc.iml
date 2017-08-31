@@ -12,16 +12,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: org.jtwig:jtwig-core:5.86.0.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.jtwig:jtwig-reflection:5.86.0.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.6" level="project" />
-    <orderEntry type="library" name="Maven: org.parboiled:parboiled-java:1.1.7" level="project" />
-    <orderEntry type="library" name="Maven: org.parboiled:parboiled-core:1.1.7" level="project" />
-    <orderEntry type="library" name="Maven: org.ow2.asm:asm:5.0.3" level="project" />
-    <orderEntry type="library" name="Maven: org.ow2.asm:asm-tree:5.0.3" level="project" />
-    <orderEntry type="library" name="Maven: org.ow2.asm:asm-analysis:5.0.3" level="project" />
-    <orderEntry type="library" name="Maven: org.ow2.asm:asm-util:5.0.3" level="project" />
-    <orderEntry type="library" name="Maven: com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru:1.4.2" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-simple:1.7.25" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.12" level="project" />
@@ -86,5 +76,9 @@
     <orderEntry type="library" name="Maven: org.ow2.asm:asm-analysis:5.0.3" level="project" />
     <orderEntry type="library" name="Maven: org.ow2.asm:asm-util:5.0.3" level="project" />
     <orderEntry type="library" name="Maven: com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru:1.4.2" level="project" />
+    <orderEntry type="library" name="Maven: com.ibeetl:beetl:2.7.21" level="project" />
+    <orderEntry type="library" name="Maven: org.antlr:antlr4-runtime:4.2" level="project" />
+    <orderEntry type="library" name="Maven: org.abego.treelayout:org.abego.treelayout.core:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.antlr:antlr4-annotations:4.2" level="project" />
   </component>
 </module>
