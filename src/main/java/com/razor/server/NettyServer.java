@@ -62,7 +62,6 @@ public class NettyServer {
 
         this.razor = razor;
         this.env = razor.getEnv();
-        Request.app = razor;
 
         this.startServer();
     }
@@ -90,8 +89,6 @@ public class NettyServer {
     }
 
     public void shutdown() {
-
-        Request.app = null;
 
         slaveGroup.shutdownGracefully();
         masterGroup.shutdownGracefully();

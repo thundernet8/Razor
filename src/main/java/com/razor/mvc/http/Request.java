@@ -24,6 +24,7 @@
 package com.razor.mvc.http;
 
 import com.razor.Razor;
+import com.razor.env.Env;
 import com.razor.mvc.route.RouteManager;
 import com.razor.mvc.route.Router;
 import com.razor.mvc.route.RouteParameter;
@@ -61,7 +62,7 @@ public class Request {
 
     private FullHttpRequest fullHttpRequest;
 
-    public static Razor app;
+    private Razor app;
 
     /**
      * Full url including query strings
@@ -237,10 +238,11 @@ public class Request {
         return HttpUtil.isKeepAlive(fullHttpRequest);
     }
 
-    private Request(ChannelHandlerContext channelCxt, FullHttpRequest fullHttpRequest) {
+    private Request(ChannelHandlerContext channelCxt, FullHttpRequest fullHttpRequest, Razor razor) {
 
         this.channelCxt = channelCxt;
         this.fullHttpRequest = fullHttpRequest;
+        this.app = razor;
 
         HttpHeaders headers = fullHttpRequest.headers();
         host = headers.get("Host");
@@ -288,9 +290,9 @@ public class Request {
         }
     }
 
-    public static Request build(ChannelHandlerContext cxt, FullHttpRequest req) {
+    public static Request build(ChannelHandlerContext cxt, FullHttpRequest req, Razor razor) {
 
-        return new Request(cxt, req);
+        return new Request(cxt, req, razor);
     }
 
 

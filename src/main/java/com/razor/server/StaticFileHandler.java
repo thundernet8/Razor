@@ -150,7 +150,6 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
             raf = new RandomAccessFile(file, "r");
             long length = raf.length();
 
-            response.header(CONTENT_LENGTH, Long.toString(length));
             setHeaders(file, request, response);
 
             response.sendFile(raf, length);

@@ -35,6 +35,7 @@ import com.razor.mvc.middleware.Middleware;
 import com.razor.mvc.route.RouteManager;
 import com.razor.server.NettyServer;
 
+import com.razor.util.FileKit;
 import lombok.extern.slf4j.Slf4j;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -42,6 +43,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.reflections.Reflections;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -368,6 +370,9 @@ public class Razor {
 
                     use(controller, middleware);
                 });
+            } catch (NoSuchMethodException e) {
+
+                log.info(e.toString());
             } catch (Exception e) {
 
                 log.error(e.toString());
@@ -384,6 +389,40 @@ public class Razor {
     }
 
     /**
+     * Initialize runtime constants
+     */
+    private void initRuntime() {
+
+        String webAbsPath = CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_WEB_ROOT_DIR, DEFAULT_WEB_ROOT_DIR)).concat(File.separator);
+        env.set(ENV_RT_KEY_WEB_ROOT_ABS_PATH, webAbsPath);
+
+        String templateAbsPath = CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_TEMPLATE_ROOT_DIR, DEFAULT_TEMPLATE_ROOT_DIR)).concat(File.separator);
+        env.set(ENV_RT_KEY_TEMPLATE_ROOT_ABS_PATH, templateAbsPath);
+
+        String[] templates = new String[]{ENV_KEY_403_PAGE_TEMPLATE, ENV_KEY_404_PAGE_TEMPLATE, ENV_KEY_500_PAGE_TEMPLATE, ENV_KEY_502_PAGE_TEMPLATE};
+        String[] keys = new String[]{ENV_RT_KEY_403_HTML, ENV_RT_KEY_404_HTML, ENV_RT_KEY_500_HTML, ENV_RT_KEY_502_HTML};
+
+        for (int i=0; i<templates.length; i++) {
+
+            if (env.get(templates[i]).isPresent()) {
+
+                String html = FileKit.read(templateAbsPath.concat(env.get(templates[i]).get()));
+
+                if (html != null) {
+
+                    env.set(keys[i], html);
+                }
+            } else {
+
+                env.set(keys[i], "");
+            }
+        }
+
+        // TODO more
+
+    }
+
+    /**
      * Other preparations to be done at last
      */
     private void startUp() {
@@ -391,5 +430,6 @@ public class Razor {
         this.initIoc();
         this.initMiddlewares();
         this.initRoutes();
+        this.initRuntime();
     }
 }

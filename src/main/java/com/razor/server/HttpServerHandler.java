@@ -34,6 +34,7 @@ import com.razor.mvc.route.RouteParameter;
 import com.razor.mvc.route.RouteSignature;
 import com.razor.mvc.route.Router;
 
+import com.razor.util.FileKit;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
@@ -87,8 +88,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler {
             // TODO
             // HEAD request support
 
-            Request request = Request.build(ctx, fullHttpRequest);
-            Response response = Response.build(ctx, request);
+            Request request = Request.build(ctx, fullHttpRequest, razor);
+            Response response = Response.build(ctx, request, razor);
 
             if (request.isStatic()) {
 
@@ -101,13 +102,13 @@ public class HttpServerHandler extends SimpleChannelInboundHandler {
             RouteSignature routeSignature = RouteSignature.builder().request(request).response(response).build();
             Router router = request.router();
 
-            if (router == null) {
+            if (router != null) {
 
                 routeSignature.setRouter(router);
                 this.handleRoute(ctx, routeSignature);
             } else {
 
-                sendError(routeSignature, NOT_FOUND);
+                response.notFound();
             }
 
         } else {
@@ -219,59 +220,5 @@ public class HttpServerHandler extends SimpleChannelInboundHandler {
 
             middleware.apply(signature.request(), signature.response());
         });
-    }
-
-    /**
-     * Handle error response
-     *
-     * @param signature RouteSignature
-     * @param status Http response status
-     */
-    private void sendError(RouteSignature signature, HttpResponseStatus status) {
-
-        Response response = signature.response();
-        Env env = razor.getEnv();
-        String templateKey = "";
-
-        switch (status.code()) {
-
-            case 403:
-                templateKey = ENV_KEY_403_PAGE_TEMPLATE;
-                break;
-            case 404:
-                templateKey = ENV_KEY_404_PAGE_TEMPLATE;
-                break;
-            case 500:
-                templateKey = ENV_KEY_500_PAGE_TEMPLATE;
-                break;
-            case 502:
-                templateKey = ENV_KEY_502_PAGE_TEMPLATE;
-                break;
-        }
-
-        Optional<String> templatePath = env.get(templateKey);
-        if (templatePath.isPresent()) {
-
-            String absPath = CLASS_PATH.concat(File.separator).concat(templatePath.get());
-            File file = new File(absPath);
-            if (file.exists() && file.isFile() && !file.isHidden()) {
-                RandomAccessFile raf;
-                try {
-
-                    raf = new RandomAccessFile(file, "r");
-                    long length = raf.length();
-                    response.header(CONTENT_TYPE, ContentType.HTML.getMimeType());
-
-                    response.sendFile(raf, length);
-
-                } catch (Exception e) {
-
-                    log.error(e.toString());
-                    response.sendError(status);
-                }
-            }
-        }
-
-        response.sendError(status);
     }
 }

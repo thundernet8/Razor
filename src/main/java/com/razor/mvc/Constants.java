@@ -72,4 +72,12 @@ public interface Constants {
     String ENV_KEY_404_PAGE_TEMPLATE = "razor.web.template.404";
     String ENV_KEY_500_PAGE_TEMPLATE = "razor.web.template.500";
     String ENV_KEY_502_PAGE_TEMPLATE = "razor.web.template.502";
+
+    // Env keys for runtime
+    String ENV_RT_KEY_403_HTML = "razor.runtime.web.html.403";
+    String ENV_RT_KEY_404_HTML = "razor.runtime.web.html.404";
+    String ENV_RT_KEY_500_HTML = "razor.runtime.web.html.500";
+    String ENV_RT_KEY_502_HTML = "razor.runtime.web.html.502";
+    String ENV_RT_KEY_WEB_ROOT_ABS_PATH = "razor.runtime.web.root.path";
+    String ENV_RT_KEY_TEMPLATE_ROOT_ABS_PATH = "razor.runtime.web.template.root.path";
 }

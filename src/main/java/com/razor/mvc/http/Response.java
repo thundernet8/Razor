@@ -23,8 +23,9 @@
 
 package com.razor.mvc.http;
 
+import com.razor.Razor;
+import com.razor.env.Env;
 import com.razor.exception.NotImplementException;
-import com.razor.mvc.Constants;
 import com.razor.server.ProgressiveFutureListener;
 import com.razor.util.DateKit;
 
@@ -47,6 +48,7 @@ import java.util.Map;
 import static io.netty.handler.codec.http.HttpVersion.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static com.razor.mvc.http.HttpHeaderNames.*;
+import static com.razor.mvc.Constants.*;
 
 /**
  * Http Request
@@ -55,6 +57,8 @@ import static com.razor.mvc.http.HttpHeaderNames.*;
  * @since 0.0.1
  */
 public class Response {
+
+    private Razor app;
 
     private ChannelHandlerContext channelCxt;
 
@@ -125,11 +129,12 @@ public class Response {
         return status;
     }
 
-    private Response(ChannelHandlerContext cxt, Request req, FullHttpResponse res) {
+    private Response(ChannelHandlerContext cxt, Request req, FullHttpResponse res, Razor razor) {
 
         this.channelCxt = cxt;
         this.request = req;
         this.httpResponse = res;
+        this.app = razor;
 
         if (req != null && !req.keepAlive()) {
 
@@ -139,14 +144,14 @@ public class Response {
 
     }
 
-    public static Response build(ChannelHandlerContext cxt, Request req, FullHttpResponse res) {
+    public static Response build(ChannelHandlerContext cxt, Request req, FullHttpResponse res,  Razor razor) {
 
-        return new Response(cxt, req, res);
+        return new Response(cxt, req, res, razor);
     }
 
-    public static Response build(ChannelHandlerContext cxt, Request req) {
+    public static Response build(ChannelHandlerContext cxt, Request req,  Razor razor) {
 
-        return new Response(cxt, req, null);
+        return new Response(cxt, req, null, razor);
     }
 
     /**
@@ -480,9 +485,77 @@ public class Response {
         this.status = status;
 
         setHttpResponse(new DefaultFullHttpResponse(HTTP_1_1, status, Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8)));
-        header(CONTENT_TYPE, Constants.CONTENT_TYPE_TEXT);
+        header(CONTENT_TYPE, CONTENT_TYPE_TEXT);
 
         writeFlush(true);
+    }
+
+    /**
+     * Send customized 403 page
+     */
+    public void forbidden() {
+
+        String html = app.getEnv().get(ENV_RT_KEY_403_HTML).orElse("");
+        keepAlive = false;
+
+        if (!html.equals("")) {
+
+            header(CONTENT_TYPE, ContentType.HTML.getMimeType()).status(403).end(html);
+        } else {
+
+            sendStatus(403);
+        }
+    }
+
+    /**
+     * Send customized 404 page
+     */
+    public void notFound() {
+
+        String html = app.getEnv().get(ENV_RT_KEY_404_HTML).orElse("");
+        keepAlive = false;
+
+        if (!html.equals("")) {
+
+            header(CONTENT_TYPE, ContentType.HTML.getMimeType()).status(404).end(html);
+        } else {
+
+            sendStatus(404);
+        }
+    }
+
+    /**
+     * Send customized 500 page
+     */
+    public void interanlError() {
+
+        String html = app.getEnv().get(ENV_RT_KEY_500_HTML).orElse("");
+        keepAlive = false;
+
+        if (!html.equals("")) {
+
+            header(CONTENT_TYPE, ContentType.HTML.getMimeType()).status(500).end(html);
+        } else {
+
+            sendStatus(500);
+        }
+    }
+
+    /**
+     * Send customized 502 page
+     */
+    public void badGateway() {
+
+        String html = app.getEnv().get(ENV_RT_KEY_502_HTML).orElse("");
+        keepAlive = false;
+
+        if (!html.equals("")) {
+
+            header(CONTENT_TYPE, ContentType.HTML.getMimeType()).status(502).end(html);
+        } else {
+
+            sendStatus(502);
+        }
     }
 
     /**
@@ -491,12 +564,11 @@ public class Response {
      */
     public void sendFile(RandomAccessFile raf, long length) {
 
-        this.status = HttpResponseStatus.OK;
-
         setDate();
         setPowerBy();
+        header(CONTENT_LENGTH, Long.toString(length));
 
-        setHttpResponse(new DefaultHttpResponse(HTTP_1_1, status, true));
+        setHttpResponse(new DefaultHttpResponse(HTTP_1_1, getStatus(), true));
 
         // Write initial line and headers
         channelCxt.write(httpResponse);
