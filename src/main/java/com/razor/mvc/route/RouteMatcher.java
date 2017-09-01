@@ -154,7 +154,7 @@ public class RouteMatcher {
         // books/{string:category}/{int:id}.html
         this.route = route;
 
-        isUniversal = route.contains("/*") || Pattern.compile("/\\{([0-9a-zA-Z]+)?:?([0-9a-zA-Z_]+)}/").matcher(route).find();
+        isUniversal = route.contains("/*") || Pattern.compile("\\{([0-9a-zA-Z]+)?:?([0-9a-zA-Z_]+)}").matcher(route).find();
 
         if (!this.validateRoutes()) {
             isValid = false;
