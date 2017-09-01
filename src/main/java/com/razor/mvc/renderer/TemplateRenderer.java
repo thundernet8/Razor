@@ -77,7 +77,7 @@ public class TemplateRenderer extends Renderer {
 
             // TODO flush data, content-type and other headers
             if (response.get(CONTENT_TYPE) == null) {
-                response.header(CONTENT_TYPE, getContentType().getMimeType());
+                response.header(CONTENT_TYPE, getContentType().getMimeTypeWithCharset());
             }
             response.end(view);
 

@@ -54,7 +54,7 @@ public interface Constants {
     boolean DEFAULT_SSL_ENABLE = false;
 
     // Http constants
-    String DEFAULT_CHARSET = "UTF-8";
+    String DEFAULT_CHARSET = "utf-8";
     Integer DEFAULT_HTTP_CACHE_SECONDS = 3600;
     String CONTENT_TYPE_HTML = "text/html; charset=" + DEFAULT_CHARSET;
     String CONTENT_TYPE_JSON = "application/json; charset=" + DEFAULT_CHARSET;

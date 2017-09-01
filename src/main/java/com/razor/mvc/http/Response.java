@@ -25,6 +25,7 @@ package com.razor.mvc.http;
 
 import com.razor.Razor;
 import com.razor.exception.NotImplementException;
+import com.razor.mvc.Constants;
 import com.razor.server.ProgressiveFutureListener;
 import com.razor.util.DateKit;
 
@@ -250,7 +251,7 @@ public class Response {
 
         int index = filePath.lastIndexOf("/");
         String filename = index > -1 ? filePath.substring(index+1) : filePath;
-        String mime = MimeKit.of(filename);
+        String mime = MimeKit.detailOf(filename).getMimeTypeWithCharset();
 
         header(CONTENT_DISPOSITION, "attachment; filename=".concat(filename));
         header(CONTENT_TYPE, mime);
@@ -432,7 +433,7 @@ public class Response {
 
         if (mime != null) {
 
-            header(CONTENT_TYPE, mime);
+            header(CONTENT_TYPE, mime.concat("; charset=").concat(Constants.DEFAULT_CHARSET));
         }
 
         return this;
@@ -499,7 +500,7 @@ public class Response {
 
         if (!html.equals("")) {
 
-            header(CONTENT_TYPE, ContentType.HTML.getMimeType()).status(403).end(html);
+            header(CONTENT_TYPE, ContentType.HTML.getMimeTypeWithCharset()).status(403).end(html);
         } else {
 
             sendStatus(403);
@@ -516,7 +517,7 @@ public class Response {
 
         if (!html.equals("")) {
 
-            header(CONTENT_TYPE, ContentType.HTML.getMimeType()).status(404).end(html);
+            header(CONTENT_TYPE, ContentType.HTML.getMimeTypeWithCharset()).status(404).end(html);
         } else {
 
             sendStatus(404);
@@ -533,7 +534,7 @@ public class Response {
 
         if (!html.equals("")) {
 
-            header(CONTENT_TYPE, ContentType.HTML.getMimeType()).status(500).end(html);
+            header(CONTENT_TYPE, ContentType.HTML.getMimeTypeWithCharset()).status(500).end(html);
         } else {
 
             sendStatus(500);
@@ -550,7 +551,7 @@ public class Response {
 
         if (!html.equals("")) {
 
-            header(CONTENT_TYPE, ContentType.HTML.getMimeType()).status(502).end(html);
+            header(CONTENT_TYPE, ContentType.HTML.getMimeTypeWithCharset()).status(502).end(html);
         } else {
 
             sendStatus(502);

@@ -23,6 +23,7 @@
 
 package com.razor.mvc.http;
 
+import com.razor.mvc.Constants;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -123,6 +124,11 @@ public enum ContentType {
 
     @Getter
     private final String mimeType;
+
+    public String getMimeTypeWithCharset() {
+
+        return mimeType.concat("; charset=").concat(Constants.DEFAULT_CHARSET);
+    }
 
     @Getter
     private final String shortName;
