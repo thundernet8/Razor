@@ -24,7 +24,6 @@
 package com.razor.server;
 
 import com.razor.Razor;
-import com.razor.env.Env;
 import com.razor.exception.RazorException;
 import com.razor.ioc.IContainer;
 import com.razor.mvc.controller.APIController;
@@ -34,7 +33,6 @@ import com.razor.mvc.route.RouteParameter;
 import com.razor.mvc.route.RouteSignature;
 import com.razor.mvc.route.Router;
 
-import com.razor.util.FileKit;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
@@ -45,15 +43,10 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
-import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Optional;
 
-import static com.razor.mvc.http.HttpHeaderNames.CONTENT_LENGTH;
-import static com.razor.mvc.http.HttpHeaderNames.CONTENT_TYPE;
 import static io.netty.buffer.Unpooled.copiedBuffer;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static com.razor.mvc.Constants.*;
@@ -86,6 +79,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler {
             final FullHttpRequest fullHttpRequest = (FullHttpRequest) msg;
 
             // TODO
+            // OPTIONS request support
             // HEAD request support
 
             Request request = Request.build(ctx, fullHttpRequest, razor);
@@ -145,7 +139,17 @@ public class HttpServerHandler extends SimpleChannelInboundHandler {
 
     private void handleRoute(ChannelHandlerContext ctx, RouteSignature signature) throws RazorException {
 
+        Request request = signature.request();
+        Response response = signature.response();
+
         applyMiddlewares(signature);
+
+        // default cors action
+        if (request.method().equals(HttpMethod.OPTIONS) && !response.flushed() && request.origin() != null) {
+
+            response.sendStatus(405);
+            return;
+        }
 
         IContainer ioc = razor.getIoc();
         Class<?> controllerClass = signature.getRouter().getTargetType();
@@ -189,7 +193,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler {
             }
 
             Class<?> returnType = action.getReturnType();
-            Response response = signature.response();
 
             if (returnType == Void.TYPE || response.flushed()) {
                 // mostly a view renderer happened

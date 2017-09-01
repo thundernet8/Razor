@@ -84,7 +84,7 @@ public class BookController extends APIController {
     }
 
     @HttpGet
-    @Route("books/{string:name}")
+    @Route("books/list/{string:name}")
     public void getBook(String name) {
 
         JSON("\"" + name + "\"");

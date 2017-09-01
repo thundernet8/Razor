@@ -143,7 +143,7 @@ public class RouteManager {
         }
     }
 
-    public void addRoute(Router router) {
+    private void addRoute(Router router) {
 
         router.collectMiddlewares(razor);
 

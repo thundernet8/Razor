@@ -190,7 +190,7 @@ public final class HttpHeaderNames {
 
     public static final AsciiString X_FRAME_OPTIONS = new AsciiString("X-Frame-Options");
 
-    public static final AsciiString X_POWER_BY = new AsciiString("X-Power-By");
+    public static final AsciiString X_POWERED_BY = new AsciiString("X-Powered-By");
 
     public static final AsciiString X_FORWARDED_FOR = new AsciiString("X-Forwarded-For");
 

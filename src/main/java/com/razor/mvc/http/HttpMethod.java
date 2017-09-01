@@ -42,4 +42,6 @@ public interface HttpMethod {
     String DELETE = "DELETE";
 
     String HEAD= "HEAD";
+
+    String OPTIONS = "OPTIONS";
 }

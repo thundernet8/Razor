@@ -24,7 +24,6 @@
 package com.razor.mvc.http;
 
 import com.razor.Razor;
-import com.razor.env.Env;
 import com.razor.exception.NotImplementException;
 import com.razor.server.ProgressiveFutureListener;
 import com.razor.util.DateKit;
@@ -371,7 +370,7 @@ public class Response {
     public void setPowerBy() {
 
         header(SERVER, "Netty");
-        header(X_POWER_BY, "Razor");
+        header(X_POWERED_BY, "Razor");
     }
 
     /**
@@ -473,7 +472,7 @@ public class Response {
      */
     public void sendStatus(int code) {
 
-        status(code).end(Integer.toString(code));
+        status(code).end(HttpResponseStatus.valueOf(code).reasonPhrase());
     }
 
     /**

@@ -24,7 +24,6 @@
 package com.razor.mvc.http;
 
 import com.razor.Razor;
-import com.razor.env.Env;
 import com.razor.mvc.route.RouteManager;
 import com.razor.mvc.route.Router;
 import com.razor.mvc.route.RouteParameter;
@@ -44,6 +43,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.razor.mvc.http.HttpHeaderNames.*;
 
 /**
  * Http Request
@@ -147,6 +148,21 @@ public class Request {
     public String method() {
 
         return method;
+    }
+
+    /**
+     * Origin http method, useful for OPTIONS request
+     */
+    private String originMethod;
+
+    /**
+     * Request origin header
+     */
+    private String origin;
+
+    public String origin() {
+
+        return origin;
     }
 
     /**
@@ -261,6 +277,16 @@ public class Request {
 
         method = fullHttpRequest.method().name().toUpperCase();
 
+        if (method.equals(HttpMethod.OPTIONS)) {
+
+            originMethod = headers.get(ACCESS_CONTROL_REQUEST_METHOD);
+        } else {
+
+            originMethod = method;
+        }
+
+        origin = headers.get(ORIGIN);
+
 //        protocol = fullHttpRequest.protocolVersion() // TODO
 
         secure = StringUtils.equals(protocol, "https");
@@ -281,7 +307,7 @@ public class Request {
         }
 
         // below for non static requests
-        Router router = RouteManager.getInstance(app).findRoute(path, method);
+        Router router = RouteManager.getInstance(app).findRoute(path, originMethod);
         if (router != null) {
 
             matchRoute = true;
