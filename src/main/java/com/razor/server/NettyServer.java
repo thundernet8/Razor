@@ -25,7 +25,6 @@ package com.razor.server;
 
 import com.razor.Razor;
 import com.razor.env.Env;
-import com.razor.mvc.http.Request;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelOption;
