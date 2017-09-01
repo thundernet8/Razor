@@ -25,16 +25,22 @@ package com.razor.mvc.route;
 
 import com.razor.exception.RazorException;
 import com.razor.mvc.annotation.FromBody;
+import com.razor.mvc.http.ContentType;
 import com.razor.mvc.http.Request;
 import com.razor.mvc.http.Response;
 
 import com.razor.mvc.json.GsonFactory;
+import io.netty.util.CharsetUtil;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static com.razor.mvc.http.HttpHeaderNames.*;
 
 /**
  * Signature for route matching of one request
@@ -82,7 +88,6 @@ public class RouteSignature {
     }
 
     private void initParams() throws RazorException {
-        // TODO
 
         if (request == null) {
 
@@ -102,7 +107,7 @@ public class RouteSignature {
             return;
         }
 
-        RouteParameter[] routeParams = request.params();
+        RouteParameter[] routeParams = request.pathParams();
         Parameter[] actionParams = action.getParameters();
         Object[] paramValues = new Object[actionParamCount];
 
@@ -114,11 +119,42 @@ public class RouteSignature {
                 paramValues[i] = routeParams[i].getValue();
             } else if (parameter.getAnnotation(FromBody.class) != null) {
 
-                String rawBody = request.getRawBody();
-                Object value = GsonFactory.getGson().fromJson(rawBody, parameter.getType());
+                if (request.get(CONTENT_TYPE).toLowerCase().equals(ContentType.JSON.getMimeType())) {
 
-                paramValues[i] = value;
-                request.setBody(value);
+                    String rawBody = request.getRawBody().toString(CharsetUtil.UTF_8);
+                    Object value = GsonFactory.getGson().fromJson(rawBody, parameter.getType());
+
+                    paramValues[i] = value;
+                    request.setBody(value);
+                } else {
+
+                    if (request.formParams() != null) {
+                        Map<String, List<String>> formParams = request.formParams();
+                        Map<String, Object> formatFormParams = new HashMap<>();
+
+                        for (String key : formParams.keySet()) {
+
+                            List<String> valueList = formParams.get(key);
+                            if (valueList != null && valueList.size() == 1) {
+
+                                formatFormParams.put(key, valueList.get(0));
+                            } else {
+
+                                formatFormParams.put(key, valueList);
+                            }
+                        }
+
+                        String json = GsonFactory.getGson().toJson(formatFormParams);
+                        Object value = GsonFactory.getGson().fromJson(json, parameter.getType());
+                        paramValues[i] = value;
+                    } else {
+
+                        paramValues[i] = null;
+                    }
+                }
+            } else {
+
+                paramValues[i] = null;
             }
 
             i++;

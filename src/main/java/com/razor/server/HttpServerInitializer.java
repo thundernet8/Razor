@@ -59,10 +59,11 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
 
         // TODO ssl handler
 
+        pl.addLast("codec", new HttpServerCodec());
+
         // enable gzip
         pl.addLast("gzip", new HttpContentCompressor());
 
-        pl.addLast("codec", new HttpServerCodec());
         pl.addLast("continue", new HttpServerExpectContinueHandler());
         pl.addLast("aggregator", new HttpObjectAggregator(512*1024));
         pl.addLast("chunk", new ChunkedWriteHandler());

@@ -28,22 +28,29 @@ import com.razor.mvc.route.RouteManager;
 import com.razor.mvc.route.Router;
 import com.razor.mvc.route.RouteParameter;
 import com.razor.util.HttpKit;
+import com.razor.util.MimeKit;
 import com.razor.util.UrlKit;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpUtil;
+import io.netty.handler.codec.http.multipart.*;
 import io.netty.util.AsciiString;
 import io.netty.util.CharsetUtil;
 import lombok.Setter;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,7 +62,10 @@ import static com.razor.mvc.http.HttpHeaderNames.*;
  * @author Touchumind
  * @since 0.0.1
  */
+@Slf4j
 public class Request {
+
+    private static final HttpDataFactory HTTP_DATA_FACTORY = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
 
     private ChannelHandlerContext channelCxt;
 
@@ -95,7 +105,7 @@ public class Request {
      * Raw body content
      */
     @Getter
-    private String rawBody;
+    private ByteBuf rawBody;
 
     @Getter
     private String rawCookie;
@@ -193,11 +203,21 @@ public class Request {
     /**
      * url match route properties, e.g you have a route /book/:name, the `name` would be one url parameter
      */
-    private RouteParameter[] params;
+    private RouteParameter[] pathParams;
 
-    public RouteParameter[] params() {
+    public RouteParameter[] pathParams() {
 
-        return params;
+        return pathParams;
+    }
+
+    /**
+     * data items from form body
+     */
+    private Map<String, List<String>> formParams;
+
+    public Map<String, List<String>> formParams() {
+
+        return formParams;
     }
 
     /**
@@ -313,7 +333,7 @@ public class Request {
 
         baseUrl = fullHttpRequest.uri();
 
-        rawBody = fullHttpRequest.content().toString(CharsetUtil.UTF_8);
+        rawBody = fullHttpRequest.content().copy();
 
         path = UrlKit.purgeUrlQueries(baseUrl);
 
@@ -327,12 +347,19 @@ public class Request {
         }
 
         // below for non static requests
+
+        if (!method.equals(HttpMethod.GET)) {
+
+            HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(HTTP_DATA_FACTORY, fullHttpRequest);
+            decoder.getBodyHttpDatas().forEach(this::parseBodyData);
+        }
+
         Router router = RouteManager.getInstance(app).findRoute(path, originMethod);
         if (router != null) {
 
             matchRoute = true;
             this.router = router;
-            params = router.getRouteMatcher().getParams(path);
+            pathParams = router.getRouteMatcher().getParams(path);
         }
     }
 
@@ -382,5 +409,59 @@ public class Request {
     public String get(AsciiString field) {
 
         return fullHttpRequest.headers().get(field);
+    }
+
+
+    private void parseBodyData(InterfaceHttpData data) {
+
+        try {
+            switch (data.getHttpDataType()) {
+
+                case Attribute:
+                    Attribute attribute = (Attribute)data;
+
+                    if (this.formParams == null) {
+
+                        this.formParams = new HashMap<>();
+                    }
+                    this.formParams.put(attribute.getName(), Arrays.asList(attribute.getValue()));
+                    break;
+                case FileUpload:
+                    FileUpload fileUpload = (FileUpload)data;
+                    handleFileUpload(fileUpload);
+                    break;
+                default:
+                    break;
+            }
+        } catch (IOException e) {
+
+            log.error("Parse request form data with error", e);
+        } finally {
+
+            data.release();
+        }
+    }
+
+
+    private void handleFileUpload(FileUpload fileUpload) throws IOException {
+
+        // TODO
+        if (fileUpload.isCompleted()) {
+
+            String contentType = MimeKit.of(fileUpload.getFilename());
+
+            if (contentType == null) {
+
+                contentType = URLConnection.guessContentTypeFromName(fileUpload.getFilename());
+            }
+
+            if (fileUpload.isInMemory()) {
+
+                // TODO
+            } else {
+
+                // TODO
+            }
+        }
     }
 }

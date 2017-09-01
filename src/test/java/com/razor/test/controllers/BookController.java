@@ -109,6 +109,7 @@ public class BookController extends APIController {
     public void multiParamsTest(Integer id, @FromBody Book book) {
 
         // curl -H "Content-Type: application/json" -X POST -d '{"name":"xyz","id":123,"isbn":xxx}' http://127.0.0.1:8090/api/books/199/update?sort=asc
+        // curl -H "Content-Type:application/x-www-form-urlencoded" -X POST -d "name=xyz&id=123&isbn=xxx" http://127.0.0.1:8090/api/books/199/update?sort=asc
         System.out.println(Context().request().queries().get("sort"));
         System.out.println(book);
         System.out.println(id);

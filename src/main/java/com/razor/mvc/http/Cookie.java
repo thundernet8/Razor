@@ -84,16 +84,6 @@ public class Cookie {
         sameSite = value;
     }
 
-    public Cookie() {
-
-    }
-
-    public Cookie(String name, String value) {
-
-        this.name = name;
-        this.value = value;
-    }
-
     @Override
     public String toString() {
 
