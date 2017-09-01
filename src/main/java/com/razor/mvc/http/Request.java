@@ -35,6 +35,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.util.AsciiString;
+import io.netty.util.CharsetUtil;
 import lombok.Setter;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -84,6 +85,12 @@ public class Request {
     @Getter
     @Setter
     private Object body;
+
+    /**
+     * Raw body content
+     */
+    @Getter
+    private String rawBody;
 
     @Getter
     private String originCookie;
@@ -150,20 +157,13 @@ public class Request {
         return method;
     }
 
-    /**
-     * Origin http method, useful for OPTIONS request
-     */
-    private String originMethod;
 
     /**
      * Request origin header
      */
+    @Getter
     private String origin;
 
-    public String origin() {
-
-        return origin;
-    }
 
     /**
      * Request match a controller action
@@ -277,6 +277,8 @@ public class Request {
 
         method = fullHttpRequest.method().name().toUpperCase();
 
+        String originMethod;
+
         if (method.equals(HttpMethod.OPTIONS)) {
 
             originMethod = headers.get(ACCESS_CONTROL_REQUEST_METHOD);
@@ -294,6 +296,8 @@ public class Request {
         originCookie = fullHttpRequest.headers().get("Cookie");
 
         baseUrl = fullHttpRequest.uri();
+
+        rawBody = fullHttpRequest.content().toString(CharsetUtil.UTF_8);
 
         path = UrlKit.purgeUrlQueries(baseUrl);
 
