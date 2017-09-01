@@ -93,7 +93,7 @@ public class Request {
     private String rawBody;
 
     @Getter
-    private String originCookie;
+    private String rawCookie;
 
     /**
      * Parsed cookie key-value pairs, default to null, use cookie-parse middleware to set it
@@ -293,7 +293,7 @@ public class Request {
 
         secure = StringUtils.equals(protocol, "https");
 
-        originCookie = fullHttpRequest.headers().get("Cookie");
+        rawCookie = fullHttpRequest.headers().get("Cookie");
 
         baseUrl = fullHttpRequest.uri();
 
