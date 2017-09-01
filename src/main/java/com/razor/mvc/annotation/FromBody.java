@@ -21,20 +21,15 @@
  */
 
 
-package com.razor.mvc.http;
-
-import lombok.AllArgsConstructor;
+package com.razor.mvc.annotation;
 
 /**
- * Url query key-value pair
+ * Mark a parameter is from a request body
  *
  * @author Touchumind
  * @since 0.0.1
  */
-@AllArgsConstructor
-public class UrlQuery {
+public @interface FromBody {
 
-    public String name;
-
-    public Object value;
+    String value() default "";
 }

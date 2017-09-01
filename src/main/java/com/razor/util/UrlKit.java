@@ -24,8 +24,10 @@
 package com.razor.util;
 
 import com.razor.mvc.http.ContentType;
-import com.razor.mvc.http.UrlQuery;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -54,9 +56,9 @@ public class UrlKit {
      * @param url url
      * @return url queries
      */
-    public static UrlQuery[] parseQueries(String url) {
-        // TODO
-        return null;
+    public static Map<String, List<String>> parseQueries(String url) {
+
+        return new QueryStringDecoder(url).parameters();
     }
 
     public static boolean isStaticFile(Set<String> statics, String url) {

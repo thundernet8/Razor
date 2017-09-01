@@ -42,6 +42,7 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -97,7 +98,7 @@ public class Request {
     private String rawCookie;
 
     /**
-     * Parsed cookie key-value pairs, default to null, use cookie-parse middleware to set it
+     * Parsed cookie key-value pairs, default to null, use cookie-parser middleware to set it
      */
     @Getter
     @Setter
@@ -197,11 +198,11 @@ public class Request {
     }
 
     /**
-     * Url query key-value pairs
+     * Url queries
      */
-    private UrlQuery[] queries;
+    private Map<String, List<String>> queries;
 
-    public UrlQuery[] queries() {
+    public Map<String, List<String>> queries() {
 
         return queries;
     }
