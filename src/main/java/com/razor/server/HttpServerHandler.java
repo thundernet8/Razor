@@ -194,9 +194,14 @@ public class HttpServerHandler extends SimpleChannelInboundHandler {
 
             Class<?> returnType = action.getReturnType();
 
-            if (returnType == Void.TYPE || response.flushed()) {
+            if (response.flushed()) {
                 // mostly a view renderer happened
                 return;
+            }
+
+            if (returnType == Void.TYPE) {
+
+                result = "";
             }
 
             response.end(ActionResult.build(result, returnType).getBytes());
