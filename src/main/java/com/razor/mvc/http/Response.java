@@ -594,6 +594,14 @@ public class Response {
         flush();
     }
 
+    /**
+     * Send file download response
+     */
+    public void download() {
+        // TODO
+        throw new NotImplementException();
+    }
+
 
     /**
      * Write and flush channel context

@@ -194,6 +194,8 @@ public final class HttpHeaderNames {
 
     public static final AsciiString X_FORWARDED_FOR = new AsciiString("X-Forwarded-For");
 
+    public static final AsciiString X_FORWARDED_PROTO = new AsciiString("X-Forwarded-Proto");
+
     public static final AsciiString X_REAL_IP = new AsciiString("X-Real-IP");
 
     private HttpHeaderNames() { }

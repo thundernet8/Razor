@@ -48,8 +48,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import static io.netty.buffer.Unpooled.copiedBuffer;
-import static io.netty.handler.codec.http.HttpResponseStatus.*;
-import static com.razor.mvc.Constants.*;
 
 
 /**
@@ -147,7 +145,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler {
         // default cors action
         if (request.method().equals(HttpMethod.OPTIONS)) {
 
-            if (!response.flushed() && request.origin() != null) {
+            if (!response.flushed() && request.getOrigin() != null) {
 
                 response.sendStatus(405);
             } else {

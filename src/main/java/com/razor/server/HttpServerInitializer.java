@@ -28,13 +28,14 @@ import com.razor.Razor;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
+//import io.netty.handler.codec.http.cors.CorsConfig;
+//import io.netty.handler.codec.http.cors.CorsConfigBuilder;
 //import io.netty.handler.codec.http.cors.CorsHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
-//import io.netty.handler.timeout.ReadTimeoutHandler;
-//import io.netty.handler.timeout.WriteTimeoutHandler;
 
 /**
  * Netty channel initializer
@@ -55,13 +56,21 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
     public void initChannel(final SocketChannel socketChannel) throws Exception {
 
         ChannelPipeline pl = socketChannel.pipeline();
+
+        // TODO ssl handler
+
+        // enable gzip
+        pl.addLast("gzip", new HttpContentCompressor());
+
         pl.addLast("codec", new HttpServerCodec());
         pl.addLast("continue", new HttpServerExpectContinueHandler());
         pl.addLast("aggregator", new HttpObjectAggregator(512*1024));
         pl.addLast("chunk", new ChunkedWriteHandler());
-//        pl.addLast("cors", new CorsHandler())
-//        pl.addLast("readTimeout", new ReadTimeoutHandler(120));
-//        pl.addLast("writeTimeout", new WriteTimeoutHandler(120));
+
+        // cors
+//        CorsConfig corsConfig = CorsConfigBuilder.forAnyOrigin().allowNullOrigin().allowCredentials().maxAge(60l).build();
+//        pl.addLast("cors", new CorsHandler(corsConfig));
+
         pl.addLast("request", new HttpServerHandler(razor));
     }
 }

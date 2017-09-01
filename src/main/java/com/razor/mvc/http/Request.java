@@ -31,6 +31,7 @@ import com.razor.util.HttpKit;
 import com.razor.util.UrlKit;
 
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpUtil;
@@ -282,6 +283,10 @@ public class Request {
         if (method.equals(HttpMethod.OPTIONS)) {
 
             originMethod = headers.get(ACCESS_CONTROL_REQUEST_METHOD);
+            if (originMethod == null) {
+
+                originMethod = HttpMethod.POST;
+            }
         } else {
 
             originMethod = method;
@@ -289,7 +294,14 @@ public class Request {
 
         origin = headers.get(ORIGIN);
 
-//        protocol = fullHttpRequest.protocolVersion() // TODO
+        // netty server do not implement https, use nginx forward request and implement https
+        if (headers.get(X_FORWARDED_PROTO) != null && headers.get(X_FORWARDED_PROTO).toLowerCase().equals("https")) {
+
+            protocol = "https";
+        } else {
+
+            protocol = "http";
+        }
 
         secure = StringUtils.equals(protocol, "https");
 
