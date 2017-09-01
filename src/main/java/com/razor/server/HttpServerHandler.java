@@ -145,9 +145,16 @@ public class HttpServerHandler extends SimpleChannelInboundHandler {
         applyMiddlewares(signature);
 
         // default cors action
-        if (request.method().equals(HttpMethod.OPTIONS) && !response.flushed() && request.origin() != null) {
+        if (request.method().equals(HttpMethod.OPTIONS)) {
 
-            response.sendStatus(405);
+            if (!response.flushed() && request.origin() != null) {
+
+                response.sendStatus(405);
+            } else {
+
+                response.sendStatus(200);
+            }
+
             return;
         }
 
