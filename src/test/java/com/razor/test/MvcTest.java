@@ -1,6 +1,7 @@
 package com.razor.test;
 
 import com.razor.Razor;
+import com.razor.mvc.middleware.CookieParserMiddleware;
 import com.razor.mvc.middleware.CorsMiddleware;
 import com.razor.test.controllers.BookController;
 
@@ -58,6 +59,8 @@ public class MvcTest {
         razor.mapStatic("abc", "images/abc");
 
         razor.use(new CorsMiddleware("http://localhost"));
+
+        razor.use(new CookieParserMiddleware());
 
         //razor.useTemplateEngine("Jtwig");
 

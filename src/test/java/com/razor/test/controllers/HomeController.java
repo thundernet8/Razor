@@ -32,6 +32,7 @@ public class HomeController extends Controller {
     public void index() {
 
         //return "Home page";
+        Object cookies = Context().request().getCookies();
 
         Render("home.htm", "var1", "home result using beetl");
     }

@@ -101,7 +101,7 @@ public class Request {
      */
     @Getter
     @Setter
-    public Map<String, String> cookies;
+    private Map<String, String> cookies;
 
     // TODO basic auth infos in header
 

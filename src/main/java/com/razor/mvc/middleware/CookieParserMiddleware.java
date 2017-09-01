@@ -21,40 +21,48 @@
  */
 
 
-package com.razor.mvc.controller;
+package com.razor.mvc.middleware;
 
-import com.razor.mvc.annotation.RoutePrefix;
-import com.razor.mvc.http.ContentType;
-import com.razor.mvc.http.HttpContext;
 
+import com.razor.mvc.http.Request;
 import com.razor.mvc.http.Response;
-import lombok.extern.slf4j.Slf4j;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
-import static com.razor.mvc.http.HttpHeaderNames.CONTENT_TYPE;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Abstract controller specified for API actions
+ * Parse cookie string to map object for request
+ *
+ * @author Touchumind
+ * @since 0.0.1
  */
-@Slf4j
-@RoutePrefix
-public class APIController implements IController {
+public class CookieParserMiddleware implements Middleware{
 
-    private HttpContext httpContext;
+    @Override
+    public void apply(Request req, Response res) {
 
-    protected HttpContext Context() {
+        String cookie = req.getRawCookie();
 
-        return httpContext;
-    }
+        if (cookie != null && !cookie.isEmpty()) {
 
-    /**
-     * Send a json response immediately
-     *
-     * @param json data to send
-     */
-    protected void JSON(String json) {
+            Map<String, String> cookieMap = new HashMap<>();
 
-        Response response = Context().response();
-        response.header(CONTENT_TYPE, ContentType.JSON.getMimeTypeWithCharset());
-        response.end(json);
+            QueryStringDecoder decoder = new QueryStringDecoder(cookie, false);
+            for (String key : decoder.parameters().keySet()) {
+                List<String> values = decoder.parameters().get(key);
+
+                if (values != null && values.get(0) != null) {
+
+                    cookieMap.put(key, values.get(0));
+                } else {
+
+                    cookieMap.put(key, "");
+                }
+            }
+
+            req.setCookies(cookieMap);
+        }
     }
 }
