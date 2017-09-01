@@ -26,9 +26,7 @@ package com.razor.mvc.route;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -125,7 +123,7 @@ public class RouteMatcher {
             return null;
         }
 
-        Set<RouteParameter> params = new HashSet<>();
+        RouteParameter[] params = new RouteParameter[paramCount];
 
         for (int i = 0; i < paramCount; i++) {
 
@@ -133,14 +131,14 @@ public class RouteMatcher {
 
             if (StringUtils.equals(paramTypes[i], "int")) {
 
-                params.add(new RouteParameter(paramNames[i], Integer.parseInt(value)));
+                params[i] = new RouteParameter(paramNames[i], Integer.parseInt(value));
             } else {
 
-                params.add(new RouteParameter(paramNames[i], value));
+                params[i] = new RouteParameter(paramNames[i], value);
             }
         }
 
-        return params.toArray(new RouteParameter[0]);
+        return params;
     }
 
     Pattern getPattern() {

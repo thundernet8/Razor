@@ -25,15 +25,14 @@ package com.razor.test.controllers;
 
 
 import com.razor.ioc.annotation.FromService;
+import com.razor.mvc.annotation.*;
 import com.razor.mvc.controller.APIController;
 import com.razor.mvc.controller.Controller;
-import com.razor.mvc.annotation.HttpGet;
-import com.razor.mvc.annotation.HttpPost;
-import com.razor.mvc.annotation.Route;
-import com.razor.mvc.annotation.RoutePrefix;
 import com.razor.mvc.http.HttpContext;
 import com.razor.mvc.http.Request;
+import com.razor.mvc.json.GsonFactory;
 import com.razor.test.IService;
+import com.razor.test.model.Book;
 
 @RoutePrefix("api")
 public class BookController extends APIController {
@@ -105,5 +104,15 @@ public class BookController extends APIController {
 //        return "Books list ";
     }
 
+    @HttpPost
+    @Route("books/{int:id}/update")
+    public void multiParamsTest(Integer id, @FromBody Book book) {
+
+        // curl -H "Content-Type: application/json" -X POST -d '{"name":"xyz","id":123,"isbn":xxx}' http://127.0.0.1:8090/api/books/199/update?sort=asc
+        System.out.println(Context().request().queries().get("sort"));
+        System.out.println(book);
+        System.out.println(id);
+        JSON(GsonFactory.getGson().toJson(book));
+    }
 
 }

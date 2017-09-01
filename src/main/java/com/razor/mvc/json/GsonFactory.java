@@ -21,20 +21,33 @@
  */
 
 
-package com.razor.mvc.annotation;
+package com.razor.mvc.json;
 
-import java.lang.annotation.*;
+import com.google.gson.Gson;
 
 /**
- * Mark a parameter is from a request body
+ * Gson instance factory
  *
  * @author Touchumind
  * @since 0.0.1
  */
-@Target(ElementType.PARAMETER)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface FromBody {
+public class GsonFactory {
 
-    String value() default "";
+    private static Gson gsonInstance;
+
+    public static Gson getGson() {
+
+        if (gsonInstance == null) {
+
+            synchronized (GsonFactory.class) {
+
+                if (gsonInstance == null) {
+
+                    gsonInstance = new Gson();
+                }
+            }
+        }
+
+        return gsonInstance;
+    }
 }

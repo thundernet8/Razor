@@ -46,8 +46,15 @@ public class UrlKit {
      * @return url without queries
      */
     public static String purgeUrlQueries(String url) {
-        // TODO
-        return url;
+
+        int index = url.indexOf("?");
+
+        if (index < 0) {
+
+            return url;
+        }
+
+        return url.substring(0, index);
     }
 
     /**

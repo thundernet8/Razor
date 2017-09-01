@@ -36,7 +36,7 @@ import lombok.Getter;
 @Getter
 public class RouteParameter {
 
-    String name;
+    private String name;
 
-    Object value;
+    private Object value;
 }

@@ -82,7 +82,10 @@ public class Request {
     }
 
     /**
-     * Parsed body data, default to null, use body-parse middleware to set it
+     * Parsed body data, default to null
+     * if Content-Type is application/json, use {@link com.razor.mvc.annotation.FromBody} deserialize rawBody to a certain type
+     * if Content-Type is application/x-www-form-urlencoded // TODO
+     * if Content-Type is multipart/form-data // TODO
      */
     @Getter
     @Setter

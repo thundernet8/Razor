@@ -276,7 +276,7 @@ public class Response {
      *
      * @param name cookie name
      * @param value cookie value
-     * @param options cookie options (options key now support `domain`, `expires`, `httpOnly`, `maxAge`, `path`, `secure`, `sameSite`)
+     * @param options cookie options (options key now support `domain`, `httpOnly`, `maxAge`, `path`, `secure`, `sameSite`)
      * @return Response self
      */
     public Response cookie(String name, String value, Map<String, Object> options) {
@@ -290,12 +290,6 @@ public class Response {
             if (domain != null) {
 
                 sb.append(" Domain=").append(domain.toString()).append(";");
-            }
-
-            Object expires = options.get("expires");
-            if (expires != null) {
-
-                sb.append(" Expires=").append(expires.toString()).append(";");
             }
 
             Object maxAge = options.get("maxAge");
@@ -330,6 +324,20 @@ public class Response {
         }
 
         header(SET_COOKIE, sb.toString());
+
+        return this;
+    }
+
+
+    /**
+     * Set cookie
+     *
+     * @param cookie Cookie object
+     * @return Response self
+     */
+    public Response cookie(Cookie cookie) {
+
+        header(SET_COOKIE, cookie.toString());
 
         return this;
     }

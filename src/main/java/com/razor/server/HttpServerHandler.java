@@ -192,8 +192,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler {
                 result = action.invoke(controller);
             } else {
 
-                RouteParameter[] params = signature.getRouter().getRouteMatcher().getParams(signature.request().path());
-                Object[] args = params == null ? new Object[0] : Arrays.stream(params).map(RouteParameter::getValue).toArray(Object[]::new);
+                Object[] args = signature.getParameters();
                 result = action.invoke(controller, args);
             }
 

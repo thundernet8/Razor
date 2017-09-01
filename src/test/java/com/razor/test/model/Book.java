@@ -1,3 +1,5 @@
+package com.razor.test.model;
+
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -21,15 +23,11 @@
  */
 
 
-package com.razor.mvc.annotation;
+public class Book {
 
-/**
- * Mark a parameter is from url queries
- *
- * @author Touchumind
- * @since 0.0.1
- */
-public @interface FromUrlQuery {
+    public String name;
 
-    String value() default "";
+    public int id;
+
+    public String isbn;
 }

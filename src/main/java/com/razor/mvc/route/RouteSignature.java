@@ -24,12 +24,17 @@
 package com.razor.mvc.route;
 
 import com.razor.exception.RazorException;
+import com.razor.mvc.annotation.FromBody;
 import com.razor.mvc.http.Request;
 import com.razor.mvc.http.Response;
 
+import com.razor.mvc.json.GsonFactory;
 import lombok.Builder;
+import lombok.Getter;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.Map;
 
 /**
  * Signature for route matching of one request
@@ -40,6 +45,7 @@ import java.lang.reflect.Method;
 @Builder
 public class RouteSignature {
 
+    @Getter
     private Router router;
 
     private Method action;
@@ -47,16 +53,12 @@ public class RouteSignature {
     /**
      * parameters are these applied to the action, including 0 or multi parameters from url
      */
+    @Getter
     private Object[] parameters;
 
     private Request request;
 
     private Response response;
-
-    public Router getRouter() {
-
-        return router;
-    }
 
     public Request request() {
 
@@ -87,8 +89,41 @@ public class RouteSignature {
             throw new RazorException("Empty request error");
         }
 
-        RouteParameter[] urlParams = this.router.getRouteMatcher().getParams(request.path());
+        if (action == null) {
 
-        // TODO
+            throw new RazorException("Null route action error");
+        }
+
+        int actionParamCount = action.getParameterCount();
+        if (actionParamCount == 0) {
+
+            parameters = new Object[0];
+
+            return;
+        }
+
+        RouteParameter[] routeParams = request.params();
+        Parameter[] actionParams = action.getParameters();
+        Object[] paramValues = new Object[actionParamCount];
+
+        int i = 0;
+        for (Parameter parameter : actionParams) {
+
+            if (i < routeParams.length) {
+
+                paramValues[i] = routeParams[i].getValue();
+            } else if (parameter.getAnnotation(FromBody.class) != null) {
+
+                String rawBody = request.getRawBody();
+                Object value = GsonFactory.getGson().fromJson(rawBody, parameter.getType());
+
+                paramValues[i] = value;
+                request.setBody(value);
+            }
+
+            i++;
+        }
+
+        parameters = paramValues;
     }
 }
