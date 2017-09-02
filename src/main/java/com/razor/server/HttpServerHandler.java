@@ -29,6 +29,7 @@ import com.razor.ioc.IContainer;
 import com.razor.mvc.controller.APIController;
 import com.razor.mvc.controller.Controller;
 import com.razor.mvc.http.*;
+import com.razor.mvc.middleware.CookieParserMiddleware;
 import com.razor.mvc.route.RouteSignature;
 import com.razor.mvc.route.Router;
 
@@ -56,55 +57,58 @@ import static io.netty.buffer.Unpooled.copiedBuffer;
  */
 @Slf4j
 @Sharable
-public class HttpServerHandler extends SimpleChannelInboundHandler {
+public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     private Razor razor;
 
     private StaticFileHandler staticFileHandler;
 
+    private SessionHandler sessionHandler;
+
     HttpServerHandler(Razor razor) {
 
         this.razor = razor;
         this.staticFileHandler = new StaticFileHandler(razor);
+        this.sessionHandler = razor.getSessionManager() != null ? new SessionHandler(razor) : null;
     }
 
-    public void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) throws Exception {
 
-        if (msg instanceof FullHttpRequest) {
+        // TODO
+        // OPTIONS request support
+        // HEAD request support
 
-            final FullHttpRequest fullHttpRequest = (FullHttpRequest) msg;
+        Request request = Request.build(ctx, fullHttpRequest, sessionHandler);
+        Response response = Response.build(ctx);
 
-            // TODO
-            // OPTIONS request support
-            // HEAD request support
+        HttpContext.set(new HttpContext(request, response));
 
-            Request request = Request.build(ctx, fullHttpRequest, razor);
-            Response response = Response.build(ctx, request, razor);
+        if (request.isStatic()) {
 
-            if (request.isStatic()) {
+            staticFileHandler.handle(ctx, request, response);
+            return;
+        }
 
-                staticFileHandler.handle(ctx, request, response);
-                return;
-            }
+        // prepare cookies for session
+        new CookieParserMiddleware().apply(request, response);
 
+        // check session
+        request.session();
 
-            // TODO complete RouteSignature
-            RouteSignature routeSignature = RouteSignature.builder().request(request).response(response).build();
-            Router router = request.router();
+        // TODO complete RouteSignature
+        RouteSignature routeSignature = RouteSignature.builder().request(request).response(response).build();
+        Router router = request.router();
 
-            if (router != null) {
+        if (router != null) {
 
-                routeSignature.setRouter(router);
-                this.handleRoute(ctx, routeSignature);
-            } else {
-
-                response.notFound();
-            }
-
+            routeSignature.setRouter(router);
+            this.handleRoute(ctx, routeSignature);
         } else {
 
-            super.channelRead(ctx, msg);
+            response.notFound();
         }
+
+        HttpContext.remove();
     }
 
     @Override
@@ -127,7 +131,9 @@ public class HttpServerHandler extends SimpleChannelInboundHandler {
                 copiedBuffer(cause.getMessage().getBytes())
         ));
 
+        // TODO dev usage
         cause.printStackTrace();
+
         ctx.close();
 
         log.error(cause.getMessage());
@@ -166,19 +172,19 @@ public class HttpServerHandler extends SimpleChannelInboundHandler {
         Object controller = ioc.resolve(controllerClass);
 
         // inject httpContext
-        try {
-
-            Field contextField = superClass.getDeclaredField("httpContext");
-            contextField.setAccessible(true);
-            contextField.set(controller, HttpContext.build(signature.request(), signature.response(), razor));
-            contextField.setAccessible(false);
-        } catch (NoSuchFieldException e) {
-
-            log.error("{} has no httpContext field, it's not a controller", superClass.getName());
-        } catch (IllegalAccessException e) {
-
-            log.error("{} httpContext field is unaccessible", superClass.getName());
-        }
+//        try {
+//
+//            Field contextField = superClass.getDeclaredField("httpContext");
+//            contextField.setAccessible(true);
+//            contextField.set(controller, HttpContext.get());
+//            contextField.setAccessible(false);
+//        } catch (NoSuchFieldException e) {
+//
+//            log.error("{} has no httpContext field, it's not a controller", superClass.getName());
+//        } catch (IllegalAccessException e) {
+//
+//            log.error("{} httpContext field is unaccessible", superClass.getName());
+//        }
 
         Method action = signature.getRouter().getAction();
 

@@ -28,9 +28,13 @@ import com.razor.ioc.IContainer;
 import com.razor.ioc.IContainerBuilder;
 import com.razor.env.Env;
 import com.razor.mvc.annotation.RoutePrefix;
+import com.razor.mvc.cache.Ehcache;
 import com.razor.mvc.controller.APIController;
 import com.razor.mvc.controller.Controller;
 import com.razor.mvc.controller.IController;
+import com.razor.mvc.http.HttpContext;
+import com.razor.mvc.http.HttpSessionManager;
+import com.razor.mvc.http.SessionManager;
 import com.razor.mvc.middleware.Middleware;
 import com.razor.mvc.route.RouteManager;
 import com.razor.mvc.template.BeetlTemplateEngine;
@@ -38,7 +42,6 @@ import com.razor.mvc.template.JtwigTemplateEngine;
 import com.razor.mvc.template.TemplateEngine;
 import com.razor.mvc.template.TemplateEngineFactory;
 import com.razor.server.NettyServer;
-
 import com.razor.util.FileKit;
 import lombok.extern.slf4j.Slf4j;
 import lombok.AccessLevel;
@@ -109,6 +112,11 @@ public class Razor {
      * Middlewares registered to specified route
      */
     private final Map<String, Set<Middleware>> pathMiddlewares = new HashMap<>();
+
+    /**
+     * Session manager
+     */
+    private final SessionManager sessionManager = new HttpSessionManager(Ehcache.newInstance("_SESSION_"), this);
 
     /**
      * Initialize razor instance
@@ -188,6 +196,8 @@ public class Razor {
 
         // TODO calculate run time
         nettyServer.shutdown();
+
+        // TODO event manager, shut down other systems, e.g cache
     }
 
     /**
@@ -498,6 +508,8 @@ public class Razor {
      * Other preparations to be done at last
      */
     private void startUp() {
+
+        HttpContext.init(this);
 
         this.initIoc();
         this.initMiddlewares();

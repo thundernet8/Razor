@@ -55,6 +55,8 @@
         <reflections.version>0.9.11</reflections.version>
         <jtwig.version>5.86.0.RELEASE</jtwig.version>
         <beetl.version>2.7.21</beetl.version>
+        <locality.uuid.version>1.1.1</locality.uuid.version>
+        <ehcache.core.version>2.10.4</ehcache.core.version>
     </properties>
 
     <build>
@@ -157,6 +159,18 @@
             <groupId>com.ibeetl</groupId>
             <artifactId>beetl</artifactId>
             <version>${beetl.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.groupon/locality-uuid -->
+        <dependency>
+            <groupId>com.groupon</groupId>
+            <artifactId>locality-uuid</artifactId>
+            <version>${locality.uuid.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/net.sf.ehcache.internal/ehcache-core -->
+        <dependency>
+            <groupId>net.sf.ehcache.internal</groupId>
+            <artifactId>ehcache-core</artifactId>
+            <version>${ehcache.core.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
         <dependency>

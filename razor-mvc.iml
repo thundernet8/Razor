@@ -39,6 +39,9 @@
     <orderEntry type="library" name="Maven: org.antlr:antlr4-runtime:4.2" level="project" />
     <orderEntry type="library" name="Maven: org.abego.treelayout:org.abego.treelayout.core:1.0.1" level="project" />
     <orderEntry type="library" name="Maven: org.antlr:antlr4-annotations:4.2" level="project" />
+    <orderEntry type="library" name="Maven: com.groupon:locality-uuid:1.1.1" level="project" />
+    <orderEntry type="library" name="Maven: net.sf.ehcache.internal:ehcache-core:2.10.4" level="project" />
+    <orderEntry type="library" name="Maven: org.terracotta.internal:statistics:1.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.plugins:maven-surefire-plugin:2.20" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven:maven-plugin-api:2.2.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.surefire:maven-surefire-common:2.20" level="project" />

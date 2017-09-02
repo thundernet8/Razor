@@ -24,77 +24,55 @@
 package com.razor.mvc.http;
 
 import com.razor.Razor;
-import io.netty.util.concurrent.FastThreadLocal;
+import com.razor.mvc.cache.Cache;
 
+import static com.razor.mvc.Constants.*;
 
 /**
- * Http Context accessible for all actions
+ * Session manager implement
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public class HttpContext {
+public class HttpSessionManager implements SessionManager {
 
-    private static final FastThreadLocal<HttpContext> fastThreadLocal = new FastThreadLocal<>();
+    private static final String SESSION_CACHE_GROUP = "_SESSION_";
 
-    private static Razor app;
+    private Cache cache;
 
-    private Request request;
+    private int sessionTimeout;
 
-    private Response response;
+    public HttpSessionManager(Cache cache, Razor razor) {
 
-    public static Request request() {
-
-        HttpContext context = get();
-
-        if (context != null) {
-
-            return context.request;
-        }
-
-        return null;
+        this.cache = cache;
+        this.sessionTimeout = razor.getEnv().getInt(ENV_KEY_SESSION_TIMEOUT, DEFAULT_SESSION_TIMEOUT);
     }
 
-    public static Response response() {
+    @Override
+    public void add(Session session) {
 
-        HttpContext context = get();
-
-        if (context != null) {
-
-            return context.response;
-        }
-
-        return null;
+        cache.add(session.id(), session, sessionTimeout, SESSION_CACHE_GROUP);
     }
 
-    public static Razor app() {
+    @Override
+    public void remove(String id) {
 
-        return app;
+        cache.delete(id, SESSION_CACHE_GROUP);
     }
 
-    public static void init(Razor razor) {
+    @Override
+    public Session get(String id) {
 
-        app = razor;
+        return (Session)cache.get(id, SESSION_CACHE_GROUP, null);
     }
 
-    public HttpContext(Request request, Response response) {
-
-        this.request = request;
-        this.response = response;
+    @Override
+    public void persist() {
+        // TODO
     }
 
-    public static void set(HttpContext context) {
-
-        fastThreadLocal.set(context);
-    }
-
-    public static HttpContext get() {
-
-        return fastThreadLocal.get();
-    }
-
-    public static void remove() {
-
-        fastThreadLocal.remove();
+    @Override
+    public void restore() {
+        // TODO
     }
 }

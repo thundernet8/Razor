@@ -23,78 +23,78 @@
 
 package com.razor.mvc.http;
 
-import com.razor.Razor;
-import io.netty.util.concurrent.FastThreadLocal;
-
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Http Context accessible for all actions
+ * Session object implement
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public class HttpContext {
+public class HttpSession implements Session {
 
-    private static final FastThreadLocal<HttpContext> fastThreadLocal = new FastThreadLocal<>();
+    private String id = null;
 
-    private static Razor app;
+    private long createAt = -1;
 
-    private Request request;
+    private long expireAt = -1;
 
-    private Response response;
+    private Map<String, Object> attrubutes = new HashMap<>();
 
-    public static Request request() {
+    public HttpSession(String id, long createAt, long expireAt) {
 
-        HttpContext context = get();
+        this.id = id;
+        this.createAt = createAt;
+        this.expireAt = expireAt;
+    }
 
-        if (context != null) {
+    @Override
+    public String id() {
 
-            return context.request;
+        return id;
+    }
+
+    @Override
+    public long createAt() {
+
+        return createAt;
+    }
+
+    @Override
+    public long expireAt() {
+
+        return expireAt;
+    }
+
+    @Override
+    public Map<String, Object> attributes() {
+
+        return attrubutes;
+    }
+
+    @Override
+    public <T> T attribute(String name) {
+
+        Object value = attrubutes.get(name);
+
+        if (value != null) {
+
+            return (T)value;
         }
 
         return null;
     }
 
-    public static Response response() {
+    @Override
+    public void addAttribute(String name, Object value) {
 
-        HttpContext context = get();
-
-        if (context != null) {
-
-            return context.response;
-        }
-
-        return null;
+        this.attrubutes.put(name, value);
     }
 
-    public static Razor app() {
+    @Override
+    public void removeAttribute(String name) {
 
-        return app;
-    }
-
-    public static void init(Razor razor) {
-
-        app = razor;
-    }
-
-    public HttpContext(Request request, Response response) {
-
-        this.request = request;
-        this.response = response;
-    }
-
-    public static void set(HttpContext context) {
-
-        fastThreadLocal.set(context);
-    }
-
-    public static HttpContext get() {
-
-        return fastThreadLocal.get();
-    }
-
-    public static void remove() {
-
-        fastThreadLocal.remove();
+        this.attrubutes.remove(name);
     }
 }

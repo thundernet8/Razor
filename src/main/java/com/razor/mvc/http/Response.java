@@ -58,8 +58,6 @@ import static com.razor.mvc.Constants.*;
  */
 public class Response {
 
-    private Razor app;
-
     private ChannelHandlerContext channelCxt;
 
     private boolean keepAlive = true;
@@ -129,14 +127,13 @@ public class Response {
         return status;
     }
 
-    private Response(ChannelHandlerContext cxt, Request req, FullHttpResponse res, Razor razor) {
+    private Response(ChannelHandlerContext cxt, FullHttpResponse res) {
 
         this.channelCxt = cxt;
-        this.request = req;
+        this.request = HttpContext.request();
         this.httpResponse = res;
-        this.app = razor;
 
-        if (req != null && !req.keepAlive()) {
+        if (request != null && !request.keepAlive()) {
 
             keepAlive = false;
         }
@@ -144,14 +141,14 @@ public class Response {
 
     }
 
-    public static Response build(ChannelHandlerContext cxt, Request req, FullHttpResponse res,  Razor razor) {
+    public static Response build(ChannelHandlerContext cxt, FullHttpResponse res) {
 
-        return new Response(cxt, req, res, razor);
+        return new Response(cxt, res);
     }
 
-    public static Response build(ChannelHandlerContext cxt, Request req,  Razor razor) {
+    public static Response build(ChannelHandlerContext cxt) {
 
-        return new Response(cxt, req, null, razor);
+        return new Response(cxt, null);
     }
 
     /**
@@ -503,7 +500,7 @@ public class Response {
      */
     public void forbidden() {
 
-        String html = app.getEnv().get(ENV_RT_KEY_403_HTML).orElse("");
+        String html = HttpContext.app().getEnv().get(ENV_RT_KEY_403_HTML).orElse("");
         keepAlive = false;
 
         if (!html.equals("")) {
@@ -520,7 +517,7 @@ public class Response {
      */
     public void notFound() {
 
-        String html = app.getEnv().get(ENV_RT_KEY_404_HTML).orElse("");
+        String html = HttpContext.app().getEnv().get(ENV_RT_KEY_404_HTML).orElse("");
         keepAlive = false;
 
         if (!html.equals("")) {
@@ -537,7 +534,7 @@ public class Response {
      */
     public void interanlError() {
 
-        String html = app.getEnv().get(ENV_RT_KEY_500_HTML).orElse("");
+        String html = HttpContext.app().getEnv().get(ENV_RT_KEY_500_HTML).orElse("");
         keepAlive = false;
 
         if (!html.equals("")) {
@@ -554,7 +551,7 @@ public class Response {
      */
     public void badGateway() {
 
-        String html = app.getEnv().get(ENV_RT_KEY_502_HTML).orElse("");
+        String html = HttpContext.app().getEnv().get(ENV_RT_KEY_502_HTML).orElse("");
         keepAlive = false;
 
         if (!html.equals("")) {

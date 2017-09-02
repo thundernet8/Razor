@@ -21,41 +21,49 @@
  */
 
 
-package com.razor.mvc.controller;
+package com.razor.mvc.cache;
 
-import com.razor.mvc.annotation.RoutePrefix;
-import com.razor.mvc.http.ActionResult;
-import com.razor.mvc.http.ContentType;
-import com.razor.mvc.http.HttpContext;
-
-import com.razor.mvc.http.Response;
-import lombok.extern.slf4j.Slf4j;
-
-import static com.razor.mvc.http.HttpHeaderNames.CONTENT_TYPE;
+import java.util.Optional;
 
 /**
- * Abstract controller specified for API actions
+ * Cache interface
+ *
+ * @author Touchumind
+ * @since 0.0.1
  */
-@Slf4j
-@RoutePrefix
-public class APIController implements IController {
+public interface Cache {
 
-//    private HttpContext httpContext;
+    void add(String key, Object value, int expires);
 
-    protected HttpContext Context() {
+    void add(String key, Object value, int expires, String group);
 
-        return HttpContext.get();
-    }
+    boolean safeAdd(String key, Object value, int expires);
 
-    /**
-     * Send a json response immediately
-     *
-     * @param json data to send
-     */
-    protected void JSON(Object json) {
+    boolean safeAdd(String key, Object value, int expires, String group);
 
-        Response response = Context().response();
-        response.header(CONTENT_TYPE, ContentType.JSON.getMimeTypeWithCharset());
-        response.end(ActionResult.build(json, json.getClass()).getBytes());
-    }
+    void delete(String key);
+
+    void delete(String key, String group);
+
+    void clear();
+
+    void clear(String group);
+
+    Optional<Object> get(String key);
+
+    Optional<Object> get(String key, String group);
+
+    Object get(String key, Object defaultValue);
+
+    Object get(String key, String group, Object defaultValue);
+
+    long incr(String key, int by);
+
+    long incr(String key, String group, int by);
+
+    long decr(String key, int by);
+
+    long decr(String key, String group, int by);
+
+    void shutdown();
 }

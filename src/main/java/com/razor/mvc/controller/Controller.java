@@ -48,11 +48,11 @@ import static com.razor.mvc.Constants.*;
 @RoutePrefix
 public abstract class Controller implements IController {
 
-    private HttpContext httpContext;
+//    private HttpContext httpContext;
 
     protected HttpContext Context() {
 
-        return httpContext;
+        return HttpContext.get();
     }
 
     /**
@@ -91,7 +91,7 @@ public abstract class Controller implements IController {
 
         try {
 
-            renderer.render(httpContext.request(), httpContext.response());
+            renderer.render(HttpContext.request(), HttpContext.response());
         } catch (RazorException e) {
 
             // TODO
@@ -113,7 +113,7 @@ public abstract class Controller implements IController {
             path = path.substring(1);
         }
 
-        String templateDir = httpContext.app().getEnv().get(ENV_KEY_TEMPLATE_ROOT_DIR, DEFAULT_TEMPLATE_ROOT_DIR);
+        String templateDir = HttpContext.app().getEnv().get(ENV_KEY_TEMPLATE_ROOT_DIR, DEFAULT_TEMPLATE_ROOT_DIR);
         return templateDir.concat("/").concat(path);
     }
 }

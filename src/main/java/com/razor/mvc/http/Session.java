@@ -23,78 +23,30 @@
 
 package com.razor.mvc.http;
 
-import com.razor.Razor;
-import io.netty.util.concurrent.FastThreadLocal;
-
+import java.io.Serializable;
+import java.util.Map;
 
 /**
- * Http Context accessible for all actions
+ * Session interface
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public class HttpContext {
+public interface Session extends Serializable {
 
-    private static final FastThreadLocal<HttpContext> fastThreadLocal = new FastThreadLocal<>();
+    // TODO Serializable
 
-    private static Razor app;
+    String id();
 
-    private Request request;
+    long createAt();
 
-    private Response response;
+    long expireAt();
 
-    public static Request request() {
+    Map<String, Object> attributes();
 
-        HttpContext context = get();
+    void addAttribute(String name, Object value);
 
-        if (context != null) {
+    void removeAttribute(String name);
 
-            return context.request;
-        }
-
-        return null;
-    }
-
-    public static Response response() {
-
-        HttpContext context = get();
-
-        if (context != null) {
-
-            return context.response;
-        }
-
-        return null;
-    }
-
-    public static Razor app() {
-
-        return app;
-    }
-
-    public static void init(Razor razor) {
-
-        app = razor;
-    }
-
-    public HttpContext(Request request, Response response) {
-
-        this.request = request;
-        this.response = response;
-    }
-
-    public static void set(HttpContext context) {
-
-        fastThreadLocal.set(context);
-    }
-
-    public static HttpContext get() {
-
-        return fastThreadLocal.get();
-    }
-
-    public static void remove() {
-
-        fastThreadLocal.remove();
-    }
+    <T> T attribute(String name);
 }

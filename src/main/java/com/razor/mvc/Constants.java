@@ -70,6 +70,10 @@ public interface Constants {
 
     String CONTENT_TYPE_TEXT = "text/plain; charset=" + DEFAULT_CHARSET;
 
+    String DEFAULT_SESSION_KEY = "SESSION";
+
+    int DEFAULT_SESSION_TIMEOUT = 3600;
+
     // Env keys
     String ENV_KEY_SERVER_HOST = "razor.server.host";
 
@@ -92,6 +96,10 @@ public interface Constants {
     String ENV_KEY_500_PAGE_TEMPLATE = "razor.web.template.500";
 
     String ENV_KEY_502_PAGE_TEMPLATE = "razor.web.template.502";
+
+    String ENV_KEY_SESSION_KEY = "razor.web.http.session.key";
+
+    String ENV_KEY_SESSION_TIMEOUT = "razor.web.http.session.timeout";
 
 
     // Env keys for runtime

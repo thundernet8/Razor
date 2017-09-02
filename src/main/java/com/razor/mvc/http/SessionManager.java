@@ -23,78 +23,21 @@
 
 package com.razor.mvc.http;
 
-import com.razor.Razor;
-import io.netty.util.concurrent.FastThreadLocal;
-
-
 /**
- * Http Context accessible for all actions
+ * Session manager interface
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public class HttpContext {
+public interface SessionManager {
 
-    private static final FastThreadLocal<HttpContext> fastThreadLocal = new FastThreadLocal<>();
+    Session get(String id);
 
-    private static Razor app;
+    void add(Session session);
 
-    private Request request;
+    void remove(String id);
 
-    private Response response;
+    void persist();
 
-    public static Request request() {
-
-        HttpContext context = get();
-
-        if (context != null) {
-
-            return context.request;
-        }
-
-        return null;
-    }
-
-    public static Response response() {
-
-        HttpContext context = get();
-
-        if (context != null) {
-
-            return context.response;
-        }
-
-        return null;
-    }
-
-    public static Razor app() {
-
-        return app;
-    }
-
-    public static void init(Razor razor) {
-
-        app = razor;
-    }
-
-    public HttpContext(Request request, Response response) {
-
-        this.request = request;
-        this.response = response;
-    }
-
-    public static void set(HttpContext context) {
-
-        fastThreadLocal.set(context);
-    }
-
-    public static HttpContext get() {
-
-        return fastThreadLocal.get();
-    }
-
-    public static void remove() {
-
-        fastThreadLocal.remove();
-    }
+    void restore();
 }

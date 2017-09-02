@@ -27,6 +27,7 @@ import com.razor.Razor;
 import com.razor.mvc.route.RouteManager;
 import com.razor.mvc.route.Router;
 import com.razor.mvc.route.RouteParameter;
+import com.razor.server.SessionHandler;
 import com.razor.util.HttpKit;
 import com.razor.util.MimeKit;
 import com.razor.util.UrlKit;
@@ -73,7 +74,7 @@ public class Request {
 
     private FullHttpRequest fullHttpRequest;
 
-    private Razor app;
+    private SessionHandler sessionHandler;
 
     /**
      * Full url including query strings
@@ -113,6 +114,42 @@ public class Request {
     @Getter
     @Setter
     private Map<String, String> cookies;
+
+    /**
+     * Get specified cookie value
+     *
+     * @param name cookie name
+     * @return cookie value
+     */
+    public Optional<String> cookie(String name) {
+
+        if (cookies == null) {
+
+            return  Optional.empty();
+        }
+
+        return Optional.ofNullable(cookies.get(name));
+    }
+
+    /**
+     * Add cookie
+     *
+     * @param cookie {@link Cookie} object
+     */
+    public void cookie(Cookie cookie) {
+
+        if (cookies == null) {
+
+            cookies = new HashMap<>();
+        }
+
+        cookies.put(cookie.getName(), cookie.getValue());
+    }
+
+    public Session session() {
+
+        return sessionHandler.getSession(this);
+    }
 
     // TODO basic auth infos in header
 
@@ -297,11 +334,10 @@ public class Request {
         return HttpUtil.isKeepAlive(fullHttpRequest);
     }
 
-    private Request(ChannelHandlerContext channelCxt, FullHttpRequest fullHttpRequest, Razor razor) {
+    private Request(ChannelHandlerContext channelCxt, FullHttpRequest fullHttpRequest) {
 
         this.channelCxt = channelCxt;
         this.fullHttpRequest = fullHttpRequest;
-        this.app = razor;
 
         HttpHeaders headers = fullHttpRequest.headers();
         host = headers.get("Host");
@@ -357,7 +393,7 @@ public class Request {
 
         queries = UrlKit.parseQueries(baseUrl);
 
-        isStatic = UrlKit.isStaticFile(app.getStatics(), path);
+        isStatic = UrlKit.isStaticFile(HttpContext.app().getStatics(), path);
 
         if (isStatic) {
 
@@ -372,7 +408,7 @@ public class Request {
             decoder.getBodyHttpDatas().forEach(this::parseBodyData);
         }
 
-        Router router = RouteManager.getInstance(app).findRoute(path, originMethod);
+        Router router = RouteManager.getInstance(HttpContext.app()).findRoute(path, originMethod);
         if (router != null) {
 
             matchRoute = true;
@@ -381,9 +417,12 @@ public class Request {
         }
     }
 
-    public static Request build(ChannelHandlerContext cxt, FullHttpRequest req, Razor razor) {
+    public static Request build(ChannelHandlerContext cxt, FullHttpRequest req, SessionHandler sessionHandler) {
 
-        return new Request(cxt, req, razor);
+        Request request = new Request(cxt, req);
+        request.sessionHandler = sessionHandler;
+
+        return request;
     }
 
 
