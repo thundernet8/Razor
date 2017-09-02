@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Razor</title>
+</head>
+<body>
+{{var1}}
+${var1}
+<button id="btn">fetch</button>
+<script>
+    var btn = document.getElementById("btn");
+    btn.onclick = function () {
+        fetch("http://127.0.0.1:8090");
+    }
+</script>
+</body>
+</html>
