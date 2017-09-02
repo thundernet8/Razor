@@ -72,9 +72,14 @@ public class FormFile {
         sb.append("', fileName='");
         sb.append(fileName);
         sb.append("', contentType='");
+        sb.append(contentType);
         sb.append("', size=");
 
-        if (length < 1024*1024) {
+        if (length < 1024) {
+
+            sb.append(length);
+            sb.append("Bytes");
+        } else if (length < 1024*1024) {
 
             sb.append(length / 1024);
             sb.append("Kb");

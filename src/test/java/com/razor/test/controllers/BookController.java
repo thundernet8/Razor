@@ -28,11 +28,17 @@ import com.razor.ioc.annotation.FromService;
 import com.razor.mvc.annotation.*;
 import com.razor.mvc.controller.APIController;
 import com.razor.mvc.controller.Controller;
+import com.razor.mvc.http.FormFile;
 import com.razor.mvc.http.HttpContext;
 import com.razor.mvc.http.Request;
+import com.razor.mvc.http.Response;
 import com.razor.mvc.json.GsonFactory;
 import com.razor.test.IService;
 import com.razor.test.model.Book;
+
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 
 @RoutePrefix("api")
 public class BookController extends APIController {
@@ -114,6 +120,28 @@ public class BookController extends APIController {
         System.out.println(book);
         System.out.println(id);
         JSON(GsonFactory.getGson().toJson(book));
+    }
+
+    @HttpPost
+    @Route("books/upload")
+    public void upload() {
+
+        // curl -F "key=key1" -F "comment=this is an txt file" -F "file1=@/Users/WXQ/Desktop/filetest.txt" http://127.0.0.1:8090/api/books/upload
+
+        Request request = Context().request();
+        Response response = Context().response();
+
+        Map<String, List<String>> params = request.formParams();
+        System.out.println(GsonFactory.getGson().toJson(params));
+
+        FormFile file = request.getFile("file1").orElse(null);
+        if (file != null) {
+            String data = new String(file.getData(), StandardCharsets.UTF_8);
+            response.end(data);
+        } else {
+
+            response.end("get form file failed");
+        }
     }
 
 }

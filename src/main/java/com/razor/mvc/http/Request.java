@@ -482,6 +482,11 @@ public class Request {
                 formFile.setData(Files.readAllBytes(fileUpload.getFile().toPath()));
             }
 
+            if (files == null) {
+
+                files = new HashMap<>();
+            }
+
             files.put(fileUpload.getName(), formFile);
         }
     }
