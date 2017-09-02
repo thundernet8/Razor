@@ -38,6 +38,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.multipart.*;
 import io.netty.util.AsciiString;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -45,10 +46,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.URLConnection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Arrays;
+import java.nio.file.Files;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -92,8 +91,8 @@ public class Request {
     /**
      * Parsed body data, default to null
      * if Content-Type is application/json, use {@link com.razor.mvc.annotation.FromBody} deserialize rawBody to a certain type
-     * if Content-Type is application/x-www-form-urlencoded // TODO
-     * if Content-Type is multipart/form-data // TODO
+     * if Content-Type is application/x-www-form-urlencoded {@see Request.formParams}
+     * if Content-Type is multipart/form-data {@see Request.formParams Request.files}
      */
     @Getter
     @Setter
@@ -226,6 +225,27 @@ public class Request {
     public Map<String, List<String>> queries() {
 
         return queries;
+    }
+
+    /**
+     * Form upload files
+     */
+    private Map<String, FormFile> files;
+
+    public Map<String, FormFile> files() {
+
+        return files;
+    }
+
+    /**
+     * Get form file by form part name
+     *
+     * @param name form part name
+     * @return FormFile or null
+     */
+    public Optional<FormFile> getFile(@NonNull String name) {
+
+        return Optional.ofNullable(files.get(name));
     }
 
     /**
@@ -443,7 +463,6 @@ public class Request {
 
     private void handleFileUpload(FileUpload fileUpload) throws IOException {
 
-        // TODO
         if (fileUpload.isCompleted()) {
 
             String contentType = MimeKit.of(fileUpload.getFilename());
@@ -453,13 +472,17 @@ public class Request {
                 contentType = URLConnection.guessContentTypeFromName(fileUpload.getFilename());
             }
 
+            FormFile formFile = new FormFile(fileUpload.getName(), fileUpload.getFilename(), contentType, fileUpload.length());
+
             if (fileUpload.isInMemory()) {
 
-                // TODO
+                formFile.setData(fileUpload.getByteBuf().array());
             } else {
 
-                // TODO
+                formFile.setData(Files.readAllBytes(fileUpload.getFile().toPath()));
             }
+
+            files.put(fileUpload.getName(), formFile);
         }
     }
 }

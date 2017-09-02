@@ -23,9 +23,7 @@
 
 package com.razor.mvc.http;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
+import lombok.*;
 
 /**
  * Cookie wrapper
@@ -34,6 +32,7 @@ import lombok.Builder;
  * @since 0.0.1
  */
 @Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Cookie {
 
     @Getter

@@ -23,59 +23,67 @@
 
 package com.razor.mvc.http;
 
-import com.google.gson.Gson;
-import com.razor.mvc.json.GsonFactory;
+import com.google.gson.annotations.Expose;
+import lombok.Setter;
+import lombok.Getter;
 
 /**
- * Action execute result wrapper
+ * File from multipart/form-data request
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public class ActionResult {
+public class FormFile {
 
-    private Object origin;
+    @Getter
+    private String name;
 
-    private Class<?> originType;
+    @Getter
+    private String fileName;
 
-    private String text;
+    @Getter
+    private String contentType;
 
-    private ActionResult() {
+    @Getter
+    private long length;
 
-        // TODO
+    @Setter
+    @Getter
+    @Expose(serialize = false)
+    private byte[] data;
+
+    public FormFile(String name, String fileName, String contentType, long length) {
+
+        this.name = name;
+        this.fileName = fileName;
+        this.contentType = contentType;
+        this.length = length;
     }
 
-    public static ActionResult build(Object result, Class<?> type) {
+    @Override
+    public String toString() {
 
-        ActionResult actionResult = new ActionResult();
-        actionResult.origin = result;
-        actionResult.originType = type;
+        StringBuilder sb = new StringBuilder();
 
-        actionResult.cast();
+        sb.append(FormFile.class.getPackage().getName());
+        sb.append(".FormFile(");
+        sb.append("name='");
+        sb.append(name);
+        sb.append("', fileName='");
+        sb.append(fileName);
+        sb.append("', contentType='");
+        sb.append("', size=");
 
-        return actionResult;
-    }
+        if (length < 1024*1024) {
 
-    /**
-     * Core cast method
-     */
-    private void cast() {
+            sb.append(length / 1024);
+            sb.append("Kb");
+        } else {
 
-        // void
-        if (originType == Void.TYPE) {
-
-            text = "";
-            return;
+            sb.append(length / (1024*1024));
+            sb.append("Mb");
         }
 
-        Gson gson = GsonFactory.getGson();
-
-        text = gson.toJson(origin);
-    }
-
-
-    public byte[] getBytes() {
-
-        return text.getBytes();
+        return sb.toString();
     }
 }

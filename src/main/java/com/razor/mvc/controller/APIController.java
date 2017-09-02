@@ -24,6 +24,7 @@
 package com.razor.mvc.controller;
 
 import com.razor.mvc.annotation.RoutePrefix;
+import com.razor.mvc.http.ActionResult;
 import com.razor.mvc.http.ContentType;
 import com.razor.mvc.http.HttpContext;
 
@@ -51,10 +52,10 @@ public class APIController implements IController {
      *
      * @param json data to send
      */
-    protected void JSON(String json) {
+    protected void JSON(Object json) {
 
         Response response = Context().response();
         response.header(CONTENT_TYPE, ContentType.JSON.getMimeTypeWithCharset());
-        response.end(json);
+        response.end(ActionResult.build(json, json.getClass()).getBytes());
     }
 }
