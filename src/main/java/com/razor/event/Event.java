@@ -1,5 +1,3 @@
-package com.razor.server;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -23,5 +21,38 @@ package com.razor.server;
  */
 
 
-public class GeneralExceptionHandler {
+package com.razor.event;
+
+import com.razor.Razor;
+
+import lombok.Getter;
+
+/**
+ * Event
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public final class Event {
+
+    @Getter
+    private EventType type;
+
+    private Razor app;
+
+    public Razor app() {
+
+        return app;
+    }
+
+    public Event(EventType type) {
+
+        this.type = type;
+    }
+
+    public Event(EventType type, Razor razor) {
+
+        this.type = type;
+        this.app = razor;
+    }
 }

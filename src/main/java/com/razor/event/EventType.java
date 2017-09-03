@@ -21,58 +21,16 @@
  */
 
 
-package com.razor.mvc.http;
-
-import com.razor.Razor;
-import com.razor.cache.Cache;
-
-import static com.razor.mvc.Constants.*;
+package com.razor.event;
 
 /**
- * Session manager implement
+ * Event type
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public class HttpSessionManager implements SessionManager {
+public enum EventType {
 
-    private static final String SESSION_CACHE_GROUP = "_SESSION_";
-
-    private Cache cache;
-
-    private int sessionTimeout;
-
-    public HttpSessionManager(Cache cache, Razor razor) {
-
-        this.cache = cache;
-        this.sessionTimeout = razor.getEnv().getInt(ENV_KEY_SESSION_TIMEOUT, DEFAULT_SESSION_TIMEOUT);
-    }
-
-    @Override
-    public void add(Session session) {
-
-        cache.add(session.id(), session, sessionTimeout, SESSION_CACHE_GROUP);
-    }
-
-    @Override
-    public void remove(String id) {
-
-        cache.delete(id, SESSION_CACHE_GROUP);
-    }
-
-    @Override
-    public Session get(String id) {
-
-        return (Session)cache.get(id, SESSION_CACHE_GROUP, null);
-    }
-
-    @Override
-    public void persist() {
-        // TODO
-    }
-
-    @Override
-    public void restore() {
-        // TODO
-    }
+    APP_START,
+    APP_STOP
 }

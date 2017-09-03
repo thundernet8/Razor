@@ -21,49 +21,62 @@
  */
 
 
-package com.razor.mvc.cache;
+package com.razor.event;
 
-import java.util.Optional;
+import com.razor.Razor;
+
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * Cache interface
+ * Global events register and trigger
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public interface Cache {
+public final class EventEmitter {
 
-    void add(String key, Object value, int expires);
+    private static EventEmitter instance;
 
-    void add(String key, Object value, int expires, String group);
+    private Map<EventType, List<EventListener>> listeners;
 
-    boolean safeAdd(String key, Object value, int expires);
+    private EventEmitter() {
 
-    boolean safeAdd(String key, Object value, int expires, String group);
+        listeners = Stream.of(EventType.values()).collect(Collectors.toMap(key -> key, value -> new LinkedList<>()));
+    }
 
-    void delete(String key);
+    public static EventEmitter newInstance() {
 
-    void delete(String key, String group);
+        if(instance == null) {
 
-    void clear();
+            synchronized (EventEmitter.class) {
 
-    void clear(String group);
+                if (instance == null) {
 
-    Optional<Object> get(String key);
+                    instance = new EventEmitter();
+                }
+            }
+        }
 
-    Optional<Object> get(String key, String group);
+        return instance;
+    }
 
-    Object get(String key, Object defaultValue);
+    public void on(EventType eventType, EventListener listener) {
 
-    Object get(String key, String group, Object defaultValue);
+        listeners.get(eventType).add(listener);
+    }
 
-    long incr(String key, int by);
+    public void emit(EventType eventType) {
 
-    long incr(String key, String group, int by);
 
-    long decr(String key, int by);
+        emit(eventType, null);
+    }
 
-    long decr(String key, String group, int by);
+    public void emit(EventType eventType, Razor razor) {
 
-    void shutdown();
+        listeners.get(eventType).forEach(listener -> listener.call(new Event(eventType, razor)));
+    }
 }

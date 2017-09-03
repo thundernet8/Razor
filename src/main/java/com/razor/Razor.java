@@ -23,17 +23,22 @@
 
 package com.razor;
 
+import com.razor.event.EventEmitter;
+import com.razor.event.EventType;
+import com.razor.exception.ExceptionHandler;
 import com.razor.ioc.ContainerBuilder;
 import com.razor.ioc.IContainer;
 import com.razor.ioc.IContainerBuilder;
 import com.razor.env.Env;
 import com.razor.mvc.annotation.RoutePrefix;
-import com.razor.mvc.cache.Ehcache;
+import com.razor.cache.Cache;
+import com.razor.cache.Ehcache;
 import com.razor.mvc.controller.APIController;
 import com.razor.mvc.controller.Controller;
 import com.razor.mvc.controller.IController;
 import com.razor.mvc.http.HttpContext;
 import com.razor.mvc.http.HttpSessionManager;
+import com.razor.mvc.http.Session;
 import com.razor.mvc.http.SessionManager;
 import com.razor.mvc.middleware.Middleware;
 import com.razor.mvc.route.RouteManager;
@@ -71,7 +76,7 @@ public class Razor {
     /**
      * App environments
      */
-    private Env env = Env.defaults();
+    private Env env = Env.fromXml();
 
     /**
      * Current entry application class
@@ -96,7 +101,7 @@ public class Razor {
     /**
      * Path rules of static resource directory
      */
-    private final Set<String> statics = new HashSet<>(DEFAULT_STATICS);
+    private final Set<String> statics = new HashSet<>((List<String>)(env.getObject(ENV_KEY_STATIC_RULES).orElse(DEFAULT_STATICS)));
 
     /**
      * Static route prefix map with server directory
@@ -116,7 +121,17 @@ public class Razor {
     /**
      * Session manager
      */
-    private final SessionManager sessionManager = new HttpSessionManager(Ehcache.newInstance("_SESSION_"), this);
+    private SessionManager sessionManager = new HttpSessionManager(Ehcache.newInstance("_SESSION_"), this);
+
+    /**
+     * Exception handler for request
+     */
+    private ExceptionHandler exceptionHandler = null;
+
+    /**
+     * Event emitter
+     */
+    private final EventEmitter eventEmitter = EventEmitter.newInstance();
 
     /**
      * Initialize razor instance
@@ -151,7 +166,9 @@ public class Razor {
      */
     public void start(@NonNull Class<?> appClass, String[] args) {
 
-        start(appClass, DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT, args);
+        eventEmitter.emit(EventType.APP_START, this);
+
+        start(appClass, env.get(ENV_KEY_SERVER_HOST, DEFAULT_SERVER_HOST), env.getInt(ENV_KEY_SERVER_PORT, DEFAULT_SERVER_PORT), args);
     }
 
     /**
@@ -193,6 +210,8 @@ public class Razor {
      * Shutdown app and server
      */
     public void stop() {
+
+        eventEmitter.emit(EventType.APP_STOP, this);
 
         // TODO calculate run time
         nettyServer.shutdown();
@@ -432,6 +451,15 @@ public class Razor {
         iocBuilder.autoRegister(Controller.class);
         iocBuilder.autoRegister(APIController.class);
 
+        iocBuilder.autoRegister(ExceptionHandler.class);
+
+        iocBuilder.autoRegister(Session.class);
+        iocBuilder.autoRegister(SessionManager.class);
+
+        iocBuilder.autoRegister(Cache.class);
+
+        iocBuilder.registerInstance(this);
+
         ioc = iocBuilder.build();
     }
 
@@ -468,6 +496,26 @@ public class Razor {
     private void initRoutes() {
 
         RouteManager.getInstance(this).registerRoutes();
+    }
+
+    /**
+     * Initialize customized implements of some features
+     */
+    private void initImplements() {
+
+        // Exception handler
+        Set<Class<? extends ExceptionHandler>> exceptionHandlers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(ExceptionHandler.class);
+        if (exceptionHandlers.size() > 0) {
+
+            this.exceptionHandler = ioc.resolve(exceptionHandlers.iterator().next());
+        }
+
+        // Session manager
+        Set<Class<? extends SessionManager>> sessionManagers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(SessionManager.class);
+        if (sessionManagers.size() > 0) {
+
+            this.sessionManager = ioc.resolve(sessionManagers.iterator().next());
+        }
     }
 
     /**
@@ -514,6 +562,14 @@ public class Razor {
         this.initIoc();
         this.initMiddlewares();
         this.initRoutes();
+        this.initImplements();
         this.initRuntime();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+
+            log.info("App is shutting down!");
+
+            this.stop();
+        }));
     }
 }

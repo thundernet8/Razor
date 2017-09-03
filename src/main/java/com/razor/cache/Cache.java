@@ -21,58 +21,49 @@
  */
 
 
-package com.razor.mvc.http;
+package com.razor.cache;
 
-import com.razor.Razor;
-import com.razor.cache.Cache;
-
-import static com.razor.mvc.Constants.*;
+import java.util.Optional;
 
 /**
- * Session manager implement
+ * Cache interface
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public class HttpSessionManager implements SessionManager {
+public interface Cache {
 
-    private static final String SESSION_CACHE_GROUP = "_SESSION_";
+    void add(String key, Object value, int expires);
 
-    private Cache cache;
+    void add(String key, Object value, int expires, String group);
 
-    private int sessionTimeout;
+    boolean safeAdd(String key, Object value, int expires);
 
-    public HttpSessionManager(Cache cache, Razor razor) {
+    boolean safeAdd(String key, Object value, int expires, String group);
 
-        this.cache = cache;
-        this.sessionTimeout = razor.getEnv().getInt(ENV_KEY_SESSION_TIMEOUT, DEFAULT_SESSION_TIMEOUT);
-    }
+    void delete(String key);
 
-    @Override
-    public void add(Session session) {
+    void delete(String key, String group);
 
-        cache.add(session.id(), session, sessionTimeout, SESSION_CACHE_GROUP);
-    }
+    void clear();
 
-    @Override
-    public void remove(String id) {
+    void clear(String group);
 
-        cache.delete(id, SESSION_CACHE_GROUP);
-    }
+    Optional<Object> get(String key);
 
-    @Override
-    public Session get(String id) {
+    Optional<Object> get(String key, String group);
 
-        return (Session)cache.get(id, SESSION_CACHE_GROUP, null);
-    }
+    Object get(String key, Object defaultValue);
 
-    @Override
-    public void persist() {
-        // TODO
-    }
+    Object get(String key, String group, Object defaultValue);
 
-    @Override
-    public void restore() {
-        // TODO
-    }
+    long incr(String key, int by);
+
+    long incr(String key, String group, int by);
+
+    long decr(String key, int by);
+
+    long decr(String key, String group, int by);
+
+    void shutdown();
 }
