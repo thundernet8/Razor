@@ -45,6 +45,7 @@ public class Cookie {
 
     @Getter
     @Setter
+    @Builder.Default
     private String path = "/";
 
     @Getter
@@ -53,9 +54,11 @@ public class Cookie {
 
     @Getter
     @Setter
+    @Builder.Default
     private long maxAge = -1;
 
     @Setter
+    @Builder.Default
     private boolean httpOnly = false;
 
     public boolean isHttpOnly() {
@@ -64,6 +67,7 @@ public class Cookie {
     }
 
     @Setter
+    @Builder.Default
     private boolean secure = false;
 
     public boolean isSecure() {

@@ -76,7 +76,7 @@ public class Razor {
     /**
      * App environments
      */
-    private Env env = Env.defaults();
+    private Env env = Env.fromXml();
 
     /**
      * Current entry application class
@@ -101,7 +101,7 @@ public class Razor {
     /**
      * Path rules of static resource directory
      */
-    private final Set<String> statics = new HashSet<>(DEFAULT_STATICS);
+    private final Set<String> statics = new HashSet<>((List<String>)(env.getObject(ENV_KEY_STATIC_RULES).orElse(DEFAULT_STATICS)));
 
     /**
      * Static route prefix map with server directory
@@ -168,7 +168,7 @@ public class Razor {
 
         eventEmitter.emit(EventType.APP_START, this);
 
-        start(appClass, DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT, args);
+        start(appClass, env.get(ENV_KEY_SERVER_HOST, DEFAULT_SERVER_HOST), env.getInt(ENV_KEY_SERVER_PORT, DEFAULT_SERVER_PORT), args);
     }
 
     /**

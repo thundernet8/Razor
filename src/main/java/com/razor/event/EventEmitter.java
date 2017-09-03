@@ -66,8 +66,6 @@ public final class EventEmitter {
 
     public void on(EventType eventType, EventListener listener) {
 
-        System.out.println("add event listener: " + eventType);
-
         listeners.get(eventType).add(listener);
     }
 

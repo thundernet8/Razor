@@ -33,7 +33,7 @@ public class MvcTest {
     public static void main(String[] args) {
         Razor razor = Razor.self();
 
-        razor.webRoot("web");
+        razor.webRoot("WWW");
         razor.addStatic("/txt/");
         razor.set404("404.htm");
 //        razor.addStatic("/images/");

@@ -58,14 +58,24 @@ public class Ehcache implements Cache {
 
         if (file.exists()) {
 
-            Configuration configuration = ConfigurationFactory.parseConfiguration(file);
-            this.cacheManager = CacheManager.create(configuration);
+            log.info("Ehcache use configuration from file {}", configXmlPath);
+
         } else {
 
-            this.cacheManager = CacheManager.create();
-            this.cacheManager.addCache(group);
-            this.cacheManager.addCache(DEFAULT_GROUP);
+            configXmlPath = Constants.RAZOR_CLASS_PATH.concat("/ehcache_default.xml");
+
+            log.info("Ehcache default configuration file is not exist, use {} instead.", configXmlPath);
+
+            file = new File(configXmlPath);
         }
+
+        Configuration configuration = ConfigurationFactory.parseConfiguration(file);
+
+        this.cacheManager = CacheManager.create(configuration);
+
+//        this.cacheManager = CacheManager.create();
+//        this.cacheManager.addCache(group);
+//        this.cacheManager.addCache(DEFAULT_GROUP);
 
         // persist when app stop
         EventEmitter.newInstance().on(EventType.APP_STOP, e -> {

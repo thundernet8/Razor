@@ -23,11 +23,14 @@
 
 package com.razor.env;
 
+import com.razor.config.ConfigurationFactory;
+import com.razor.mvc.Constants;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -43,6 +46,11 @@ import java.util.Properties;
 public class Env {
 
     private Properties props = new Properties();
+
+    private Env(Properties props) {
+
+        this.props = props;
+    }
 
     public static Env defaults() {
 
@@ -133,7 +141,31 @@ public class Env {
         return props;
     }
 
-    // TODO load envs from file or others
+    public static Env fromXml() {
 
-    // TODO controllers package suffix
+        String appXmlPath = Constants.CLASS_PATH.concat("/WEB-INF/app.xml");
+        File file = new File(appXmlPath);
+
+        if (!file.exists()) {
+
+            String defaultAppXmlPath = Constants.RAZOR_CLASS_PATH.concat("app_default.xml");
+
+            log.info("App configuration file {} is not exist, use {} instead.", appXmlPath, defaultAppXmlPath);
+
+            file = new File(defaultAppXmlPath);
+        }
+
+
+        try {
+
+            Properties properties = ConfigurationFactory.parseAppXml(file);
+
+            return new Env(properties);
+        } catch (Exception e) {
+
+            log.error(e.toString());
+
+            return Env.defaults();
+        }
+    }
 }

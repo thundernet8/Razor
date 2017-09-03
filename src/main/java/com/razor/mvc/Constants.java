@@ -42,6 +42,7 @@ public interface Constants {
     String VERSION = "0.0.1-SNAPSHOT";
 
     // System
+    String RAZOR_CLASS_PATH = new File(Constants.class.getResource("/razor.png").getPath()).getParent();
     String CLASS_PATH = new File(Constants.class.getResource("/").getPath()).getAbsolutePath();
 
     // Server default constants
@@ -49,7 +50,7 @@ public interface Constants {
 
     int DEFAULT_SERVER_PORT = 8088;
 
-    String DEFAULT_WEB_ROOT_DIR = "web"; // relative to classpath
+    String DEFAULT_WEB_ROOT_DIR = "WWW"; // relative to classpath
 
     String DEFAULT_TEMPLATE_ROOT_DIR = "WEB-INF/templates"; // relative to classpath
 
@@ -79,11 +80,15 @@ public interface Constants {
 
     String ENV_KEY_SERVER_PORT = "razor.server.port";
 
+    String ENV_KEY_CHARSET = "razor.server.charset";
+
     String ENV_KEY_SSL = "razor.server.ssl";
 
     String ENV_KEY_WEB_ROOT_DIR = "razor.web.root";
 
     String ENV_KEY_TEMPLATE_ROOT_DIR = "razor.web.template.root";
+
+    String ENV_KEY_STATIC_RULES = "razor.web.statics";
 
     String ENV_KEY_INDEX_FILES = "razor.web.indexs";
 
