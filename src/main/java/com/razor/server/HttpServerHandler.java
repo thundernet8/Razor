@@ -132,6 +132,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
                 response.end();
             }
+
             HttpContext.remove();
         }
     }
@@ -140,7 +141,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
 
         super.channelReadComplete(ctx);
-        // TODO fix timeout issue, connection not close
         ctx.flush();
     }
 
