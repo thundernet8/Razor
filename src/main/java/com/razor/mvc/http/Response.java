@@ -42,10 +42,7 @@ import io.netty.util.AsciiString;
 import io.netty.util.CharsetUtil;
 
 import java.io.RandomAccessFile;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import static io.netty.handler.codec.http.HttpVersion.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
@@ -108,12 +105,20 @@ public class Response {
 
             iterator.remove();
         }
+
+        httpResponse.headers().add(SET_COOKIE, cookieHeaderQueue);
+        cookieHeaderQueue.clear();
     }
 
     /**
      * In order to add headers when httpResponse instance is not prepared
      */
     private Map<AsciiString, AsciiString> headerQueue = new HashMap<>();
+
+    /**
+     * In order to add cookie header when httpResponse instance is not prepared, `Set-Cookie` header can repeat.
+     */
+    private List<String> cookieHeaderQueue = new ArrayList<>();
 
     /**
      * Http response status, include status code and cause message
@@ -320,7 +325,13 @@ public class Response {
             }
         }
 
-        header(SET_COOKIE, sb.toString());
+        if (httpResponse == null) {
+
+            cookieHeaderQueue.add(sb.toString());
+        } else {
+
+            httpResponse.headers().add(SET_COOKIE, sb.toString());
+        }
 
         return this;
     }
@@ -334,7 +345,13 @@ public class Response {
      */
     public Response cookie(Cookie cookie) {
 
-        header(SET_COOKIE, cookie.toString());
+        if (httpResponse == null) {
+
+            cookieHeaderQueue.add(cookie.toString());
+        } else {
+
+            httpResponse.headers().add(SET_COOKIE, cookie.toString());
+        }
 
         return this;
     }
@@ -346,14 +363,6 @@ public class Response {
      * @return Response self
      */
     public Response clearCookie(String name) {
-
-        if (httpResponse != null) {
-
-            httpResponse.headers().remove(name);
-        } else {
-
-            headerQueue.remove(name);
-        }
 
         Cookie cookie = Cookie.builder().name(name).maxAge(-1).build();
 
