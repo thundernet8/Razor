@@ -4,7 +4,7 @@
 
     <groupId>com.razor</groupId>
     <artifactId>razor-mvc</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Razor</name>
@@ -32,7 +32,7 @@
     <scm>
         <url>git://github.com/thundernet8/Razor.git</url>
         <connection>scm:git:git@github.com:thundernet8/Razor.git</connection>
-        <tag>razor@0.0.3-SNAPSHOT</tag>
+        <tag>razor@v{project.version}</tag>
     </scm>
 
     <issueManagement>
