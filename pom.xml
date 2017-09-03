@@ -4,7 +4,7 @@
 
     <groupId>com.razor</groupId>
     <artifactId>razor-mvc</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
 
     <name>Razor</name>
