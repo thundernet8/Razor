@@ -45,7 +45,7 @@ public class JtwigTemplateEngine implements TemplateEngine{
     @Override
     public String render(String templatePath, Map<String, Object> data) throws Exception {
 
-        // TODO template cache
+        // TODO template cache when startup
         JtwigTemplate template = JtwigTemplate.classpathTemplate(templatePath);
         JtwigModel model = JtwigModel.newModel(data);
 

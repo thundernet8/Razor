@@ -50,11 +50,6 @@ public class Router {
      */
     private Class<?> targetType;
 
-    /**
-     * Controller instance
-     */
-//    private Controller target;
-
 
     /**
      * Router bind method
@@ -81,7 +76,7 @@ public class Router {
         return routeMatcher.getPattern().matcher(url).matches();
     }
 
-    String getFullPath() {
+    private String getFullPath() {
 
         String routePrefix = routeMatcher.getRoutePrefix();
         String route = routeMatcher.getRoute();

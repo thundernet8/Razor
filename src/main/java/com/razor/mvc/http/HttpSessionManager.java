@@ -26,6 +26,8 @@ package com.razor.mvc.http;
 import com.razor.Razor;
 import com.razor.cache.Cache;
 
+import lombok.extern.slf4j.Slf4j;
+
 import static com.razor.mvc.Constants.*;
 
 /**
@@ -34,6 +36,7 @@ import static com.razor.mvc.Constants.*;
  * @author Touchumind
  * @since 0.0.1
  */
+@Slf4j
 public class HttpSessionManager implements SessionManager {
 
     private static final String SESSION_CACHE_GROUP = "_SESSION_";
@@ -63,16 +66,26 @@ public class HttpSessionManager implements SessionManager {
     @Override
     public Session get(String id) {
 
-        return (Session)cache.get(id, SESSION_CACHE_GROUP, null);
+        try {
+
+            return (Session)cache.get(id, SESSION_CACHE_GROUP, null);
+        } catch (Exception e) {
+
+            log.error("Get session from cache has error", e);
+
+            return null;
+        }
     }
 
     @Override
     public void persist() {
-        // TODO
+
+        // Current use ehcache which has disk persistence feature, no more work to do here
     }
 
     @Override
     public void restore() {
-        // TODO
+
+        // Current use ehcache which has disk persistence feature, no more work to do here
     }
 }

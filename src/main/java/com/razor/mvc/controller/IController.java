@@ -29,7 +29,4 @@ package com.razor.mvc.controller;
  * @author Touchumind
  * @since 0.0.1
  */
-public interface IController {
-
-
-}
+public interface IController { }

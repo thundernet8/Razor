@@ -40,8 +40,6 @@ import static com.razor.mvc.http.HttpHeaderNames.CONTENT_TYPE;
 @RoutePrefix
 public class APIController implements IController {
 
-//    private HttpContext httpContext;
-
     protected HttpContext Context() {
 
         return HttpContext.get();

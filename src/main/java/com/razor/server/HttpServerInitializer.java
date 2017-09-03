@@ -32,9 +32,6 @@ import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
-//import io.netty.handler.codec.http.cors.CorsConfig;
-//import io.netty.handler.codec.http.cors.CorsConfigBuilder;
-//import io.netty.handler.codec.http.cors.CorsHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
 /**
@@ -67,10 +64,6 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
         pl.addLast("continue", new HttpServerExpectContinueHandler());
         pl.addLast("aggregator", new HttpObjectAggregator(512*1024));
         pl.addLast("chunk", new ChunkedWriteHandler());
-
-        // cors
-//        CorsConfig corsConfig = CorsConfigBuilder.forAnyOrigin().allowNullOrigin().allowCredentials().maxAge(60l).build();
-//        pl.addLast("cors", new CorsHandler(corsConfig));
 
         pl.addLast("request", new HttpServerHandler(razor));
     }

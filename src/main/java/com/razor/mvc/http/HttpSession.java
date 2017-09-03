@@ -40,7 +40,7 @@ public class HttpSession implements Session {
 
     private long expireAt = -1;
 
-    private Map<String, Object> attrubutes = new HashMap<>();
+    private Map<String, Object> attributes = new HashMap<>();
 
     public HttpSession(String id, long createAt, long expireAt) {
 
@@ -70,13 +70,13 @@ public class HttpSession implements Session {
     @Override
     public Map<String, Object> attributes() {
 
-        return attrubutes;
+        return attributes;
     }
 
     @Override
     public <T> T attribute(String name) {
 
-        Object value = attrubutes.get(name);
+        Object value = attributes.get(name);
 
         if (value != null) {
 
@@ -89,12 +89,12 @@ public class HttpSession implements Session {
     @Override
     public void addAttribute(String name, Object value) {
 
-        this.attrubutes.put(name, value);
+        this.attributes.put(name, value);
     }
 
     @Override
     public void removeAttribute(String name) {
 
-        this.attrubutes.remove(name);
+        this.attributes.remove(name);
     }
 }

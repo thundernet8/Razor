@@ -27,14 +27,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * Url parameter object
+ * Parameter from path
  *
  * @author Touchumind
  * @since 0.0.1
  */
 @AllArgsConstructor
 @Getter
-public class RouteParameter {
+public class PathParameter {
 
     private String name;
 

@@ -23,9 +23,11 @@
 
 package com.razor.mvc.http;
 
+import com.google.gson.Gson;
 import com.razor.Razor;
 import com.razor.exception.NotImplementException;
 import com.razor.mvc.Constants;
+import com.razor.mvc.json.GsonFactory;
 import com.razor.server.ProgressiveFutureListener;
 import com.razor.util.DateKit;
 
@@ -137,8 +139,6 @@ public class Response {
 
             keepAlive = false;
         }
-        // TODO
-
     }
 
     public static Response build(ChannelHandlerContext cxt, FullHttpResponse res) {
@@ -339,10 +339,13 @@ public class Response {
         return this;
     }
 
+    /**
+     * Clear one cookie
+     *
+     * @param name cookie name
+     * @return Response self
+     */
     public Response clearCookie(String name) {
-
-        Map<String, Object> options = new HashMap<>();
-        options.put("expires", DateKit.getGmtDateString(new Date(0)));
 
         if (httpResponse != null) {
 
@@ -352,7 +355,9 @@ public class Response {
             headerQueue.remove(name);
         }
 
-        return cookie(name, "", options);
+        Cookie cookie = Cookie.builder().name(name).maxAge(-1).build();
+
+        return cookie(cookie);
     }
 
     /**
@@ -368,11 +373,17 @@ public class Response {
         return this;
     }
 
+    /**
+     * Set `Date` header for response
+     */
     public void setDate() {
 
         header(DATE, DateKit.getGmtDateString());
     }
 
+    /**
+     * Set `X-Powered-By` header for response
+     */
     public void setPowerBy() {
 
         header(SERVER, "Netty");
@@ -386,7 +397,12 @@ public class Response {
      */
     public void json(Object data) {
 
-        // TODO
+        header(CONTENT_TYPE, ContentType.JSON.getMimeTypeWithCharset());
+
+        Gson gson = GsonFactory.getGson();
+        String text = gson.toJson(data);
+
+        end(text);
     }
 
     /**
@@ -421,9 +437,15 @@ public class Response {
         end();
     }
 
+    /**
+     * Location to another path with refer header
+     *
+     * @param path new path
+     */
     public void location(String path) {
 
         // TODO location to another path with refer header
+        throw new NotImplementException();
     }
 
     /**
@@ -465,6 +487,11 @@ public class Response {
         return this;
     }
 
+    /**
+     * Send multi-type data
+     *
+     * @param data unknown type data
+     */
     public void send(Object data) {
 
         // TODO send multi-type data
@@ -483,6 +510,7 @@ public class Response {
 
     /**
      * Send response immediately when error occurs
+     *
      * @param status Http response status including code and cause message
      */
     public void sendError(HttpResponseStatus status) {
@@ -565,6 +593,7 @@ public class Response {
 
     /**
      * Send response immediately for a file response
+     *
      * @param raf RandomAccessFile
      */
     public void sendFile(RandomAccessFile raf, long length) {
@@ -665,7 +694,6 @@ public class Response {
      */
     public void end(String data, String[]... options) {
 
-        // TODO encoding
         header(CONTENT_LENGTH, Integer.toString(data.length()));
 
         if (httpResponse == null) {

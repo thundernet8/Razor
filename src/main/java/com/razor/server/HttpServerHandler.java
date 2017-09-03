@@ -196,21 +196,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
         Object controller = ioc.resolve(controllerClass);
 
-        // inject httpContext
-//        try {
-//
-//            Field contextField = superClass.getDeclaredField("httpContext");
-//            contextField.setAccessible(true);
-//            contextField.set(controller, HttpContext.get());
-//            contextField.setAccessible(false);
-//        } catch (NoSuchFieldException e) {
-//
-//            log.error("{} has no httpContext field, it's not a controller", superClass.getName());
-//        } catch (IllegalAccessException e) {
-//
-//            log.error("{} httpContext field is unaccessible", superClass.getName());
-//        }
-
         Method action = signature.getRouter().getAction();
 
         try {
@@ -228,7 +213,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             Class<?> returnType = action.getReturnType();
 
             if (response.flushed()) {
-                // mostly a view renderer happened
+
                 return;
             }
 

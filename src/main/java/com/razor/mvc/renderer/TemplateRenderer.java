@@ -75,10 +75,11 @@ public class TemplateRenderer extends Renderer {
 
             String view = TemplateEngineFactory.getEngine().render(templatePath, model);
 
-            // TODO flush data, content-type and other headers
             if (response.get(CONTENT_TYPE) == null) {
+
                 response.header(CONTENT_TYPE, getContentType().getMimeTypeWithCharset());
             }
+
             response.end(view);
 
         } catch (Exception e) {

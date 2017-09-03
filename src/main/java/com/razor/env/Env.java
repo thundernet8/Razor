@@ -66,9 +66,7 @@ public class Env {
 
     public Env setMulti(@NonNull Map<String, String> map) {
 
-        map.forEach((key, value) -> {
-            props.setProperty(key, value);
-        });
+        map.forEach(props::setProperty);
 
         return this;
     }
@@ -141,6 +139,11 @@ public class Env {
         return props;
     }
 
+    /**
+     * Initialize env from xml file
+     *
+     * @return Env instance
+     */
     public static Env fromXml() {
 
         String appXmlPath = Constants.CLASS_PATH.concat("/WEB-INF/app.xml");
