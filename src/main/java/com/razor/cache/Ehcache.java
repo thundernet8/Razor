@@ -21,12 +21,18 @@
  */
 
 
-package com.razor.mvc.cache;
+package com.razor.cache;
 
+import com.razor.event.EventEmitter;
+import com.razor.event.EventType;
+import com.razor.mvc.Constants;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.config.Configuration;
+import net.sf.ehcache.config.ConfigurationFactory;
 
+import java.io.File;
 import java.util.Optional;
 
 /**
@@ -47,9 +53,26 @@ public class Ehcache implements Cache {
 
     private Ehcache(String group) {
 
-        this.cacheManager = CacheManager.create();
-        this.cacheManager.addCache(group);
-        this.cacheManager.addCache(DEFAULT_GROUP);
+        String configXmlPath = Constants.CLASS_PATH.concat("/WEB-INF/ehcache.xml");
+        File file = new File(configXmlPath);
+
+        if (file.exists()) {
+
+            Configuration configuration = ConfigurationFactory.parseConfiguration(file);
+            this.cacheManager = CacheManager.create(configuration);
+        } else {
+
+            this.cacheManager = CacheManager.create();
+            this.cacheManager.addCache(group);
+            this.cacheManager.addCache(DEFAULT_GROUP);
+        }
+
+        // persist when app stop
+        EventEmitter.newInstance().on(EventType.APP_STOP, e -> {
+
+            log.info("Persist as app shutting down");
+            this.shutdown();
+        });
     }
 
     public synchronized static Ehcache newInstance(String group) {

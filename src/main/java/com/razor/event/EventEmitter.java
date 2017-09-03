@@ -21,58 +21,64 @@
  */
 
 
-package com.razor.mvc.http;
+package com.razor.event;
 
 import com.razor.Razor;
-import com.razor.cache.Cache;
 
-import static com.razor.mvc.Constants.*;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * Session manager implement
+ * Global events register and trigger
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public class HttpSessionManager implements SessionManager {
+public final class EventEmitter {
 
-    private static final String SESSION_CACHE_GROUP = "_SESSION_";
+    private static EventEmitter instance;
 
-    private Cache cache;
+    private Map<EventType, List<EventListener>> listeners;
 
-    private int sessionTimeout;
+    private EventEmitter() {
 
-    public HttpSessionManager(Cache cache, Razor razor) {
-
-        this.cache = cache;
-        this.sessionTimeout = razor.getEnv().getInt(ENV_KEY_SESSION_TIMEOUT, DEFAULT_SESSION_TIMEOUT);
+        listeners = Stream.of(EventType.values()).collect(Collectors.toMap(key -> key, value -> new LinkedList<>()));
     }
 
-    @Override
-    public void add(Session session) {
+    public static EventEmitter newInstance() {
 
-        cache.add(session.id(), session, sessionTimeout, SESSION_CACHE_GROUP);
+        if(instance == null) {
+
+            synchronized (EventEmitter.class) {
+
+                if (instance == null) {
+
+                    instance = new EventEmitter();
+                }
+            }
+        }
+
+        return instance;
     }
 
-    @Override
-    public void remove(String id) {
+    public void on(EventType eventType, EventListener listener) {
 
-        cache.delete(id, SESSION_CACHE_GROUP);
+        System.out.println("add event listener: " + eventType);
+
+        listeners.get(eventType).add(listener);
     }
 
-    @Override
-    public Session get(String id) {
+    public void emit(EventType eventType) {
 
-        return (Session)cache.get(id, SESSION_CACHE_GROUP, null);
+
+        emit(eventType, null);
     }
 
-    @Override
-    public void persist() {
-        // TODO
-    }
+    public void emit(EventType eventType, Razor razor) {
 
-    @Override
-    public void restore() {
-        // TODO
+        listeners.get(eventType).forEach(listener -> listener.call(new Event(eventType, razor)));
     }
 }

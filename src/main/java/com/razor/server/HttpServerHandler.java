@@ -24,6 +24,7 @@
 package com.razor.server;
 
 import com.razor.Razor;
+import com.razor.exception.ExceptionHandler;
 import com.razor.exception.RazorException;
 import com.razor.ioc.IContainer;
 import com.razor.mvc.controller.APIController;
@@ -33,7 +34,6 @@ import com.razor.mvc.middleware.CookieParserMiddleware;
 import com.razor.mvc.route.RouteSignature;
 import com.razor.mvc.route.Router;
 
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -43,7 +43,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import lombok.extern.slf4j.Slf4j;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import static io.netty.buffer.Unpooled.copiedBuffer;
@@ -65,17 +64,19 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
     private SessionHandler sessionHandler;
 
+    private ExceptionHandler exceptionHandler;
+
     HttpServerHandler(Razor razor) {
 
         this.razor = razor;
         this.staticFileHandler = new StaticFileHandler(razor);
         this.sessionHandler = razor.getSessionManager() != null ? new SessionHandler(razor) : null;
+        this.exceptionHandler = razor.getExceptionHandler();
     }
 
     public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) throws Exception {
 
         // TODO
-        // OPTIONS request support
         // HEAD request support
 
         Request request = Request.build(ctx, fullHttpRequest, sessionHandler);
@@ -83,32 +84,56 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
         HttpContext.set(new HttpContext(request, response));
 
-        if (request.isStatic()) {
+        try {
 
-            staticFileHandler.handle(ctx, request, response);
-            return;
+            if (request.isStatic()) {
+
+                staticFileHandler.handle(ctx, request, response);
+                return;
+            }
+
+            // prepare cookies for session
+            new CookieParserMiddleware().apply(request, response);
+
+            // check session
+            request.session();
+
+            // TODO complete RouteSignature
+            RouteSignature routeSignature = RouteSignature.builder().request(request).response(response).build();
+            Router router = request.router();
+
+            if (router != null) {
+
+                routeSignature.setRouter(router);
+                this.handleRoute(ctx, routeSignature);
+            } else {
+
+                response.notFound();
+            }
+
+        } catch (Exception e) {
+
+            if (!response.flushed()) {
+
+                response.interanlError();
+            }
+
+            if (this.exceptionHandler != null) {
+
+                exceptionHandler.handle(e, razor);
+            } else {
+
+                throw e;
+            }
+
+        } finally {
+
+            if (!response.flushed()) {
+
+                response.end();
+            }
+            HttpContext.remove();
         }
-
-        // prepare cookies for session
-        new CookieParserMiddleware().apply(request, response);
-
-        // check session
-        request.session();
-
-        // TODO complete RouteSignature
-        RouteSignature routeSignature = RouteSignature.builder().request(request).response(response).build();
-        Router router = request.router();
-
-        if (router != null) {
-
-            routeSignature.setRouter(router);
-            this.handleRoute(ctx, routeSignature);
-        } else {
-
-            response.notFound();
-        }
-
-        HttpContext.remove();
     }
 
     @Override
@@ -139,7 +164,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         log.error(cause.getMessage());
     }
 
-    private void handleRoute(ChannelHandlerContext ctx, RouteSignature signature) throws RazorException {
+    private void handleRoute(ChannelHandlerContext ctx, RouteSignature signature) throws Exception {
 
         Request request = signature.request();
         Response response = signature.response();
@@ -216,11 +241,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         } catch (Exception e) {
 
             log.error(e.getMessage());
-            ctx.writeAndFlush(new DefaultFullHttpResponse(
-                    HttpVersion.HTTP_1_1,
-                    HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                    copiedBuffer(e.getMessage().getBytes())
-            )).addListener(ChannelFutureListener.CLOSE);
+            throw e;
         }
     }
 
