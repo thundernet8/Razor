@@ -23,17 +23,13 @@
 
 package com.razor.test.controllers;
 
-
-import com.fedepot.ioc.annotation.FromService;
 import com.fedepot.mvc.annotation.*;
 import com.fedepot.mvc.controller.APIController;
-import com.fedepot.mvc.controller.Controller;
 import com.fedepot.mvc.http.FormFile;
 import com.fedepot.mvc.http.HttpContext;
 import com.fedepot.mvc.http.Request;
 import com.fedepot.mvc.http.Response;
 import com.fedepot.mvc.json.GsonFactory;
-import com.razor.test.IService;
 import com.razor.test.model.Book;
 
 import java.nio.charset.StandardCharsets;
@@ -42,11 +38,6 @@ import java.util.Map;
 
 @RoutePrefix("api")
 public class BookController extends APIController {
-
-    public String defaultName = "book";
-
-    @FromService
-    public IService service;
 
     public BookController() {
 
