@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,49 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.mvc.middleware;
 
-    public String name = "Service Name";
 
-    public Date date;
+import com.fedepot.mvc.http.Request;
+import com.fedepot.mvc.http.Response;
 
-    public Service() {
-        date = new Date();
-    }
+import io.netty.handler.codec.http.QueryStringDecoder;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Parse cookie string to map object for request, this middleware was enabled as default to support session
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public class CookieParserMiddleware implements Middleware{
 
     @Override
-    public String getName() {
-        return name;
-    }
+    public void apply(Request req, Response res) {
 
-    @Override
-    public Date getDate() {
-        return date;
+        String cookie = req.getRawCookie();
+
+        if (cookie != null && !cookie.isEmpty()) {
+
+            Map<String, String> cookieMap = new HashMap<>();
+
+            QueryStringDecoder decoder = new QueryStringDecoder(cookie, false);
+            for (String key : decoder.parameters().keySet()) {
+                List<String> values = decoder.parameters().get(key);
+
+                if (values != null && values.get(0) != null) {
+
+                    cookieMap.put(key, values.get(0));
+                } else {
+
+                    cookieMap.put(key, "");
+                }
+            }
+
+            req.setCookies(cookieMap);
+        }
     }
 }

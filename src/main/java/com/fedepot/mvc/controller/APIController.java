@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,39 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.mvc.controller;
 
-    public String name = "Service Name";
+import com.fedepot.mvc.annotation.RoutePrefix;
+import com.fedepot.mvc.http.ActionResult;
+import com.fedepot.mvc.http.ContentType;
+import com.fedepot.mvc.http.HttpContext;
+import com.fedepot.mvc.http.Response;
 
-    public Date date;
+import lombok.extern.slf4j.Slf4j;
 
-    public Service() {
-        date = new Date();
+import static com.fedepot.mvc.http.HttpHeaderNames.CONTENT_TYPE;
+
+/**
+ * Abstract controller specified for API actions
+ */
+@Slf4j
+@RoutePrefix
+public class APIController implements IController {
+
+    protected HttpContext Context() {
+
+        return HttpContext.get();
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
+    /**
+     * Send a json response immediately
+     *
+     * @param json data to send
+     */
+    protected void JSON(Object json) {
 
-    @Override
-    public Date getDate() {
-        return date;
+        Response response = Context().response();
+        response.header(CONTENT_TYPE, ContentType.JSON.getMimeTypeWithCharset());
+        response.end(ActionResult.build(json, json.getClass()).getBytes());
     }
 }

@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,34 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.mvc.template;
 
-    public String name = "Service Name";
+import org.jtwig.JtwigModel;
+import org.jtwig.JtwigTemplate;
 
-    public Date date;
+import java.util.Map;
 
-    public Service() {
-        date = new Date();
-    }
+/**
+ * Jtwig template engine
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public class JtwigTemplateEngine implements TemplateEngine{
 
     @Override
     public String getName() {
-        return name;
+
+        return "Jtwig";
     }
 
     @Override
-    public Date getDate() {
-        return date;
+    public String render(String templatePath, Map<String, Object> data) throws Exception {
+
+        // TODO template cache when startup
+        JtwigTemplate template = JtwigTemplate.classpathTemplate(templatePath);
+        JtwigModel model = JtwigModel.newModel(data);
+
+        return template.render(model);
     }
 }

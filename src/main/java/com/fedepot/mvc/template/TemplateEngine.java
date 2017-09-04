@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,27 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.mvc.template;
 
-    public String name = "Service Name";
+import java.util.Map;
 
-    public Date date;
+/**
+ * Template Engine interface
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public interface TemplateEngine {
 
-    public Service() {
-        date = new Date();
-    }
+    String getName();
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public Date getDate() {
-        return date;
-    }
+    /**
+     * Render view
+     *
+     * @param templatePath full path of template file relative to classpath
+     * @param data data in Map format
+     * @return rendered view content
+     * @throws Exception exception when failed
+     */
+    String render(String templatePath, Map<String, Object> data) throws Exception;
 }

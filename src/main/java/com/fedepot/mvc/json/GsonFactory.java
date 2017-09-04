@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,33 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.mvc.json;
 
-    public String name = "Service Name";
+import com.google.gson.Gson;
 
-    public Date date;
+/**
+ * Gson instance factory
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public class GsonFactory {
 
-    public Service() {
-        date = new Date();
-    }
+    private static Gson gsonInstance;
 
-    @Override
-    public String getName() {
-        return name;
-    }
+    public static Gson getGson() {
 
-    @Override
-    public Date getDate() {
-        return date;
+        if (gsonInstance == null) {
+
+            synchronized (GsonFactory.class) {
+
+                if (gsonInstance == null) {
+
+                    gsonInstance = new Gson();
+                }
+            }
+        }
+
+        return gsonInstance;
     }
 }

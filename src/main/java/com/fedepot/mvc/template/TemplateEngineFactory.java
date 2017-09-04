@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,44 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.mvc.template;
 
-    public String name = "Service Name";
+import lombok.extern.slf4j.Slf4j;
 
-    public Date date;
+/**
+ * Template engine factory
+ *
+ *
+ */
+@Slf4j
+public class TemplateEngineFactory {
 
-    public Service() {
-        date = new Date();
+    private static TemplateEngine instance;
+
+    /**
+     * Set template engine
+     *
+     * @param templateEngine template engine instance
+     */
+    public static void setTemplateEngine(TemplateEngine templateEngine) {
+
+        instance = templateEngine;
+
+        log.info("Template engine is set to: {}", templateEngine.getName());
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
+    /**
+     * Get current template engine
+     *
+     * @return selected template engine instance
+     */
+    public static TemplateEngine getEngine() {
 
-    @Override
-    public Date getDate() {
-        return date;
+        if (instance == null) {
+
+            instance = new BeetlTemplateEngine();
+        }
+
+        return instance;
     }
 }

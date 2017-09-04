@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,23 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.ioc;
 
-    public String name = "Service Name";
+/**
+ * Data structure used to construct registrations
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public interface IRegistrationBuilder {
 
-    public Date date;
+    <T> IRegistrationBuilder as(Class<T> implementationType);
 
-    public Service() {
-        date = new Date();
-    }
+    IRegistrationBuilder named(String name);
 
-    @Override
-    public String getName() {
-        return name;
-    }
+    <E extends Enum<E>> IRegistrationBuilder keyed(E enumType);
 
-    @Override
-    public Date getDate() {
-        return date;
-    }
+    IRegistrationBuilder instancePerDependency();
+
+    IRegistrationBuilder singleInstance();
 }

@@ -1,8 +1,8 @@
 package com.razor.test;
 
-import com.razor.Razor;
-import com.razor.mvc.middleware.CookieParserMiddleware;
-import com.razor.mvc.middleware.CorsMiddleware;
+import com.fedepot.Razor;
+import com.fedepot.mvc.middleware.CookieParserMiddleware;
+import com.fedepot.mvc.middleware.CorsMiddleware;
 import com.razor.test.controllers.BookController;
 
 /**

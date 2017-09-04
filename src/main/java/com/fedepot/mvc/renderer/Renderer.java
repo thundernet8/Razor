@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,28 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.mvc.renderer;
 
-    public String name = "Service Name";
+import com.fedepot.exception.RazorException;
+import com.fedepot.mvc.http.ContentType;
+import com.fedepot.mvc.http.Request;
+import com.fedepot.mvc.http.Response;
 
-    public Date date;
+import lombok.Getter;
+import lombok.Setter;
 
-    public Service() {
-        date = new Date();
-    }
+/**
+ * Abstract renderer class
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+abstract class Renderer {
 
-    @Override
-    public String getName() {
-        return name;
-    }
+    @Getter
+    @Setter
+    private ContentType contentType;
 
-    @Override
-    public Date getDate() {
-        return date;
-    }
+    public abstract void render(Request request, Response response) throws RazorException;
+
 }

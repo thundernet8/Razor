@@ -24,15 +24,15 @@
 package com.razor.test.controllers;
 
 
-import com.razor.ioc.annotation.FromService;
-import com.razor.mvc.annotation.*;
-import com.razor.mvc.controller.APIController;
-import com.razor.mvc.controller.Controller;
-import com.razor.mvc.http.FormFile;
-import com.razor.mvc.http.HttpContext;
-import com.razor.mvc.http.Request;
-import com.razor.mvc.http.Response;
-import com.razor.mvc.json.GsonFactory;
+import com.fedepot.ioc.annotation.FromService;
+import com.fedepot.mvc.annotation.*;
+import com.fedepot.mvc.controller.APIController;
+import com.fedepot.mvc.controller.Controller;
+import com.fedepot.mvc.http.FormFile;
+import com.fedepot.mvc.http.HttpContext;
+import com.fedepot.mvc.http.Request;
+import com.fedepot.mvc.http.Response;
+import com.fedepot.mvc.json.GsonFactory;
 import com.razor.test.IService;
 import com.razor.test.model.Book;
 

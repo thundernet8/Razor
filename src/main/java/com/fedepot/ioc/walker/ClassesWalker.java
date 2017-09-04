@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,47 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.ioc.walker;
 
-    public String name = "Service Name";
 
-    public Date date;
+import org.reflections.Reflections;
 
-    public Service() {
-        date = new Date();
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Reflect classes for a interface
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public class ClassesWalker {
+
+    private static final Map<Class<?>, Class<?>[]> classesMap = new HashMap<>();
+
+    private static Class<?> appClass;
+
+    public static <T> Class<?>[] reflectImplementers(Class<?> appClass, Class<T> implType) {
+
+        Class<?>[] implementers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(implType).stream().map(impl -> (Class<?>)impl).toArray(Class<?>[]::new);
+
+        // cache reflection results
+        classesMap.put(implType, implementers);
+
+        ClassesWalker.appClass = appClass;
+
+        return implementers;
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
+    public static Class<?>[] cachedImplementers(Class<?> implType) {
 
-    @Override
-    public Date getDate() {
-        return date;
+        Class<?>[] implementers = classesMap.get(implType);
+
+        if (implementers != null) {
+
+            return implementers;
+        }
+
+        return reflectImplementers(appClass, implType);
     }
 }

@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,21 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.server;
 
-    public String name = "Service Name";
+import com.fedepot.exception.RazorException;
+import com.fedepot.mvc.http.Request;
+import com.fedepot.mvc.http.Response;
 
-    public Date date;
+import io.netty.channel.ChannelHandlerContext;
 
-    public Service() {
-        date = new Date();
-    }
+/**
+ * Request handler interface
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public interface IRequestHandler<T> {
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public Date getDate() {
-        return date;
-    }
+    T handle(ChannelHandlerContext ctx, Request request, Response response) throws RazorException;
 }

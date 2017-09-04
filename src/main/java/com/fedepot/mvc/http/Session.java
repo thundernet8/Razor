@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,32 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.mvc.http;
 
-    public String name = "Service Name";
+import java.io.Serializable;
+import java.util.Map;
 
-    public Date date;
+/**
+ * Session interface
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public interface Session extends Serializable {
 
-    public Service() {
-        date = new Date();
-    }
+    // TODO Serializable
 
-    @Override
-    public String getName() {
-        return name;
-    }
+    String id();
 
-    @Override
-    public Date getDate() {
-        return date;
-    }
+    long createAt();
+
+    long expireAt();
+
+    Map<String, Object> attributes();
+
+    void addAttribute(String name, Object value);
+
+    void removeAttribute(String name);
+
+    <T> T attribute(String name);
 }

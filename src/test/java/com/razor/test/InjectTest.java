@@ -23,7 +23,7 @@
 
 package com.razor.test;
 
-import com.razor.ioc.annotation.Inject;
+import com.fedepot.ioc.annotation.Inject;
 
 @Inject
 public class InjectTest {

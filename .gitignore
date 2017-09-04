@@ -28,4 +28,5 @@ org.eclipse.core.resources.prefs
 
 release.properties
 pom.xml.releaseBackup
+pom.xml.versionsBackup
 settings.xml

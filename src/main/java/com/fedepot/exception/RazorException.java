@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,48 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.exception;
 
-    public String name = "Service Name";
+public class RazorException extends Exception {
+    /**
+     * Exception code, useful for finding more detail information
+     */
+    private int code = 0;
 
-    public Date date;
+    public RazorException() {
 
-    public Service() {
-        date = new Date();
+        super();
     }
 
-    @Override
-    public String getName() {
-        return name;
+    public RazorException(String message) {
+
+        super(message);
     }
 
-    @Override
-    public Date getDate() {
-        return date;
+    public RazorException(int code, String message) {
+
+        super(message);
+        this.code = code;
+    }
+
+    public RazorException(Throwable cause) {
+
+        super(cause);
+    }
+
+    public RazorException(String message, Throwable cause) {
+
+        super(message, cause);
+    }
+
+    public RazorException(int code, String message, Throwable cause) {
+
+        super(message, cause);
+        this.code = code;
+    }
+
+    public int getCode() {
+
+        return code;
     }
 }

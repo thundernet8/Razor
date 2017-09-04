@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,60 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.mvc.http;
 
-    public String name = "Service Name";
+import com.fedepot.mvc.json.GsonFactory;
 
-    public Date date;
+import com.google.gson.Gson;
 
-    public Service() {
-        date = new Date();
+/**
+ * Action execute result wrapper
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public class ActionResult {
+
+    private Object origin;
+
+    private Class<?> originType;
+
+    private String text;
+
+    private ActionResult() { }
+
+    public static ActionResult build(Object result, Class<?> type) {
+
+        ActionResult actionResult = new ActionResult();
+        actionResult.origin = result;
+        actionResult.originType = type;
+
+        actionResult.cast();
+
+        return actionResult;
     }
 
-    @Override
-    public String getName() {
-        return name;
+    /**
+     * Core cast method
+     */
+    private void cast() {
+
+        // void
+        if (originType == Void.TYPE) {
+
+            text = "";
+            return;
+        }
+
+        // TODO complicated customized object serialization
+        Gson gson = GsonFactory.getGson();
+
+        text = gson.toJson(origin);
     }
 
-    @Override
-    public Date getDate() {
-        return date;
+
+    public byte[] getBytes() {
+
+        return text.getBytes();
     }
 }
