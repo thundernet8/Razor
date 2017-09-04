@@ -20,24 +20,20 @@
  * SOFTWARE.
  */
 
+package com.fedepot.ioc.annotation;
 
-package com.fedepot.ioc;
 
-import com.fedepot.ioc.exception.DependencyRegisterException;
+import java.lang.annotation.*;
 
 /**
- * Dependency injection services container
+ * Mark a class ignored by ioc register
  *
  * @author Touchumind
  * @since 0.0.1
  */
-public interface IContainerBuilder {
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface IocIgnore {
 
-    <T> IRegistrationBuilder registerType(Class<T> implementer) throws DependencyRegisterException;
-
-    <T> IRegistrationBuilder registerInstance(T instance);
-
-    <T> void autoRegister(Class<T> clazz);
-
-    IContainer build();
+    String value() default "";
 }

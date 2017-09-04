@@ -26,6 +26,7 @@ package com.fedepot.mvc.http;
 import com.fedepot.Razor;
 import com.fedepot.cache.Cache;
 
+import com.fedepot.ioc.annotation.IocIgnore;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.fedepot.mvc.Constants.*;
@@ -37,6 +38,7 @@ import static com.fedepot.mvc.Constants.*;
  * @since 0.0.1
  */
 @Slf4j
+@IocIgnore
 public class HttpSessionManager implements SessionManager {
 
     private static final String SESSION_CACHE_GROUP = "_SESSION_";

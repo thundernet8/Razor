@@ -196,6 +196,12 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
         Object controller = ioc.resolve(controllerClass);
 
+        if (controller == null) {
+
+            response.interanlError();
+            return;
+        }
+
         Method action = signature.getRouter().getAction();
 
         try {

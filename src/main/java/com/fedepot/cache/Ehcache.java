@@ -25,6 +25,7 @@ package com.fedepot.cache;
 
 import com.fedepot.event.EventEmitter;
 import com.fedepot.event.EventType;
+import com.fedepot.ioc.annotation.IocIgnore;
 import com.fedepot.mvc.Constants;
 
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,7 @@ import java.util.Optional;
  * @since 0.0.1
  */
 @Slf4j
+@IocIgnore
 public class Ehcache implements Cache {
 
     private static Ehcache instance;
@@ -51,15 +53,17 @@ public class Ehcache implements Cache {
 
     private CacheManager cacheManager;
 
-
     private Ehcache(String group) {
 
         String configXmlPath = Constants.CLASS_PATH.concat("/WEB-INF/ehcache.xml");
         File file = new File(configXmlPath);
+        Configuration configuration;
 
         if (file.exists()) {
 
             log.info("Ehcache use configuration from file {}", configXmlPath);
+
+            configuration = ConfigurationFactory.parseConfiguration(file);
 
         } else {
 
@@ -67,10 +71,8 @@ public class Ehcache implements Cache {
 
             log.info("Ehcache default configuration file is not exist, use {} instead.", configXmlPath);
 
-            file = new File(configXmlPath);
+            configuration = ConfigurationFactory.parseConfiguration(Ehcache.class.getResourceAsStream("/ehcache_default.xml"));
         }
-
-        Configuration configuration = ConfigurationFactory.parseConfiguration(file);
 
         this.cacheManager = CacheManager.create(configuration);
 

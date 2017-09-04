@@ -23,6 +23,8 @@
 
 package com.fedepot.mvc.http;
 
+import com.fedepot.ioc.annotation.IocIgnore;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +34,7 @@ import java.util.Map;
  * @author Touchumind
  * @since 0.0.1
  */
+@IocIgnore
 public class HttpSession implements Session {
 
     private String id = null;

@@ -24,11 +24,14 @@
 package com.fedepot.ioc;
 
 import com.fedepot.ioc.annotation.Inject;
+import com.fedepot.ioc.annotation.IocIgnore;
 import com.fedepot.ioc.exception.DependencyRegisterException;
 import com.fedepot.ioc.walker.ClassesWalker;
 import com.fedepot.ioc.walker.ConstructorWalker;
 import com.fedepot.ioc.walker.FieldsWalker;
 
+import com.fedepot.mvc.controller.APIController;
+import com.fedepot.mvc.controller.Controller;
 import org.reflections.Reflections;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,6 +40,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Beans container builder
@@ -96,9 +100,25 @@ public class ContainerBuilder implements IContainerBuilder {
     }
 
     @Override
-    public <T> void autoRegister(Class<T> abstractController) {
+    public <T> void autoRegister(Class<T> clazz) {
 
-        this.registerControllers(abstractController);
+        IocIgnore ignore = clazz.getAnnotation(IocIgnore.class);
+
+        if (ignore != null) {
+
+            return;
+        }
+
+        if (clazz.isInterface()) {
+
+            recursiveRegisterType(clazz);
+            return;
+        }
+
+        if (clazz == Controller.class || clazz == APIController.class) {
+
+            this.registerControllers(clazz);
+        }
 
         // scan inject annotated class
         Set<Class<?>> types = new Reflections(appClass.getPackage().getName()).getTypesAnnotatedWith(Inject.class);
@@ -119,6 +139,7 @@ public class ContainerBuilder implements IContainerBuilder {
     private  <T> void registerControllers(Class<T> abstractController) {
 
         Set<Class<? extends T>> controllers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(abstractController);
+
         controllers.forEach(this::recursiveRegisterType);
         log.info("Ioc registered {} controllers", controllers.size());
     }
@@ -126,6 +147,13 @@ public class ContainerBuilder implements IContainerBuilder {
     private void recursiveRegisterType(Class<?> clazz) {
 
         if (registeredTypes.contains(clazz)) {
+
+            return;
+        }
+
+        IocIgnore ignore = clazz.getAnnotation(IocIgnore.class);
+
+        if (ignore != null) {
 
             return;
         }

@@ -32,6 +32,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -48,12 +49,12 @@ public class ConfigurationFactory {
 
     public static Properties parseAppXml(File file) throws Exception {
 
-        FileInputStream in = new FileInputStream(file);
+        InputStream in = new FileInputStream(file);
 
         return parseAppXml(in);
     }
 
-    public static Properties parseAppXml(FileInputStream in) throws Exception {
+    public static Properties parseAppXml(InputStream in) throws Exception {
 
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuiler = dbFactory.newDocumentBuilder();

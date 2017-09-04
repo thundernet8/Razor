@@ -150,19 +150,21 @@ public class Env {
         String appXmlPath = Constants.CLASS_PATH.concat("/WEB-INF/app.xml");
         File file = new File(appXmlPath);
 
-        if (!file.exists()) {
-
-            String defaultAppXmlPath = Constants.RAZOR_CLASS_PATH.concat("app_default.xml");
-
-            log.info("App configuration file {} is not exist, use {} instead.", appXmlPath, defaultAppXmlPath);
-
-            file = new File(defaultAppXmlPath);
-        }
-
-
         try {
 
-            Properties properties = ConfigurationFactory.parseAppXml(file);
+            Properties properties;
+
+            if (!file.exists()) {
+
+                String defaultAppXmlPath = Constants.RAZOR_CLASS_PATH.concat("app_default.xml");
+
+                log.info("App configuration file {} is not exist, use {} instead.", appXmlPath, defaultAppXmlPath);
+
+                properties = ConfigurationFactory.parseAppXml(Env.class.getResourceAsStream("/app_default.xml"));
+            } else {
+
+                properties = ConfigurationFactory.parseAppXml(file);
+            }
 
             return new Env(properties);
         } catch (Exception e) {
