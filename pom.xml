@@ -32,7 +32,7 @@
     <scm>
         <url>git://github.com/thundernet8/Razor.git</url>
         <connection>scm:git:git@github.com:thundernet8/Razor.git</connection>
-        <tag>razor@v{project.version}</tag>
+        <tag>${project.version}</tag>
     </scm>
 
     <issueManagement>
@@ -61,22 +61,15 @@
     <profiles>
         <profile>
             <id>release</id>
-            <!-- mvn -DperformRelease=true ... -->
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
             <distributionManagement>
                 <snapshotRepository>
-                    <id>ossrh</id>
+                    <id>oss</id>
                     <url>
                         https://oss.sonatype.org/content/repositories/snapshots/
                     </url>
                 </snapshotRepository>
                 <repository>
-                    <id>ossrh</id>
+                    <id>oss</id>
                     <url>
                         https://oss.sonatype.org/service/local/staging/deploy/maven2/
                     </url>
@@ -98,6 +91,17 @@
                     </resource>
                 </resources>
                 <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.7</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
@@ -253,27 +257,9 @@
                 <version>1.6</version>
             </plugin>
             <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
-                <configuration>
-                    <useReleaseProfile>false</useReleaseProfile>
-                    <arguments>-P release</arguments>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <allowTimestampedSnapshots>false</allowTimestampedSnapshots>
-                    <tagNameFormat>razor@${project.version}</tagNameFormat>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.scm</groupId>
-                        <artifactId>maven-scm-api</artifactId>
-                        <version>1.9.4</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.apache.maven.scm</groupId>
-                        <artifactId>maven-scm-provider-gitexe</artifactId>
-                        <version>1.9.4</version>
-                    </dependency>
-                </dependencies>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
             </plugin>
         </plugins>
     </build>
