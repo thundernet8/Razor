@@ -23,8 +23,8 @@
 
 package com.razor.test;
 
-import com.razor.Razor;
-import com.razor.server.NettyServer;
+import com.fedepot.Razor;
+import com.fedepot.server.NettyServer;
 
 public class TestNettyServer {
     public static void main(String[] args) {

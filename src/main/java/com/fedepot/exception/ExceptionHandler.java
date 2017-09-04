@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,14 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.exception;
 
-    public String name = "Service Name";
+import com.fedepot.Razor;
 
-    public Date date;
+/**
+ * Exception handler interface, implement it to add your own actions, e.g log
+ */
+public interface ExceptionHandler {
 
-    public Service() {
-        date = new Date();
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public Date getDate() {
-        return date;
-    }
+    public void handle(Exception e, Razor razor);
 }

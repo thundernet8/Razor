@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,60 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.util;
 
-    public String name = "Service Name";
+import io.netty.handler.codec.http.HttpHeaders;
 
-    public Date date;
+import static com.fedepot.mvc.http.HttpHeaderNames.*;
 
-    public Service() {
-        date = new Date();
+
+/**
+ * Http request/response related utils
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public class HttpKit {
+
+    /**
+     * Get proxy ip list from headers
+     *
+     * @param headers http headers
+     * @return ip list
+     */
+    public static String[] proxyIP(HttpHeaders headers) {
+
+        CharSequence ip = headers.get(X_FORWARDED_FOR);
+
+        if (ip == null) {
+
+            return new String[]{};
+        }
+
+        return ip.toString().split(",");
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
+    public static String getIP(HttpHeaders headers) {
 
-    @Override
-    public Date getDate() {
-        return date;
+        String[] ips = proxyIP(headers);
+
+        if (ips.length > 0 && !ips[0].equals("")) {
+
+            return ips[0].split(":")[0];
+        }
+
+        CharSequence realIpChar = headers.get(X_REAL_IP);
+
+        if (realIpChar != null) {
+
+            String[] realIp = realIpChar.toString().split(":");
+
+            if (realIp.length > 0 && !realIp[0].equals("[")) {
+
+                return realIp[0];
+            }
+        }
+
+        return "127.0.0.1";
     }
 }

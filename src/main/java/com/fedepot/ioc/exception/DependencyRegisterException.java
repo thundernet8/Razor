@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,34 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.ioc.exception;
 
-    public String name = "Service Name";
+/**
+ * Exception of registering dependencies
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public class DependencyRegisterException extends Exception {
 
-    public Date date;
+    public DependencyRegisterException() {
 
-    public Service() {
-        date = new Date();
+        super();
     }
 
-    @Override
-    public String getName() {
-        return name;
+    public DependencyRegisterException(String message) {
+
+        super(message);
     }
 
-    @Override
-    public Date getDate() {
-        return date;
+    public DependencyRegisterException(Throwable cause) {
+
+        super(cause);
     }
+
+    public DependencyRegisterException(String message, Throwable cause) {
+
+        super(message, cause);
+    }
+
 }

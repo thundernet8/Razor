@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,70 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.ioc;
 
-    public String name = "Service Name";
+import org.apache.commons.lang3.StringUtils;
+import lombok.Getter;
 
-    public Date date;
+/**
+ * Bean descriptor
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+@Getter
+class ServiceBean {
 
-    public Service() {
-        date = new Date();
+    private Class<?> regType;
+
+    private Class<?> implType;
+
+    private String name;
+
+    private Object key;
+
+    private Object bean;
+
+    private boolean sington;
+
+    boolean hasName() {
+
+        return !StringUtils.isEmpty(name);
     }
 
-    @Override
-    public String getName() {
-        return name;
+    boolean hasKey() {
+
+        return key != null;
     }
 
-    @Override
-    public Date getDate() {
-        return date;
+    boolean isSington() {
+
+        return sington;
+    }
+
+    private ServiceBean(RegistrationData rd) {
+
+        implType = rd.getImplType();
+        regType = rd.getRegType();
+        name = rd.getName();
+        key = rd.getKey();
+        bean = rd.getInstance();
+        sington = rd.isSington();
+
+        if (regType == null) {
+
+            regType = implType;
+        }
+        // TODO
+    }
+
+    void setBean(Object bean) {
+
+        this.bean = bean;
+    }
+
+    static ServiceBean fromRegistrationData(RegistrationData rd) {
+
+        return new ServiceBean(rd);
     }
 }

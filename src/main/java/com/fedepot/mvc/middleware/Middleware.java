@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,47 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.mvc.middleware;
 
-    public String name = "Service Name";
+import com.fedepot.mvc.http.Request;
+import com.fedepot.mvc.http.Response;
 
-    public Date date;
+import java.util.HashMap;
+import java.util.Map;
 
-    public Service() {
-        date = new Date();
+/**
+ * Request middleware functional interface
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+@FunctionalInterface
+public interface Middleware extends Comparable<Middleware> {
+
+    Map<Middleware, Integer> priorities = new HashMap<>();
+
+    default public int getPriority() {
+
+        try {
+
+            return priorities.get(this);
+        } catch (NullPointerException e) {
+
+            return -1;
+        }
     }
 
-    @Override
-    public String getName() {
-        return name;
+    default public void setPriority(int priority) {
+
+        assert priority >=0 : "priority should not smaller than 0";
+
+        priorities.put(this, priority);
     }
 
-    @Override
-    public Date getDate() {
-        return date;
+    public void apply(Request req, Response res);
+
+    default public int compareTo(Middleware other) {
+
+        return getPriority() - other.getPriority();
     }
 }

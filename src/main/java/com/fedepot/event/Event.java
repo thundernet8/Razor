@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,38 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.event;
 
-    public String name = "Service Name";
+import com.fedepot.Razor;
 
-    public Date date;
+import lombok.Getter;
 
-    public Service() {
-        date = new Date();
+/**
+ * Event
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public final class Event {
+
+    @Getter
+    private EventType type;
+
+    private Razor app;
+
+    public Razor app() {
+
+        return app;
     }
 
-    @Override
-    public String getName() {
-        return name;
+    public Event(EventType type) {
+
+        this.type = type;
     }
 
-    @Override
-    public Date getDate() {
-        return date;
+    public Event(EventType type, Razor razor) {
+
+        this.type = type;
+        this.app = razor;
     }
 }

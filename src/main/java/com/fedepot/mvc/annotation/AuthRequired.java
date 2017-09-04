@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,22 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.mvc.annotation;
 
-    public String name = "Service Name";
+import java.lang.annotation.*;
 
-    public Date date;
+/**
+ * Mark a route needs authorization or not
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface AuthRequired {
 
-    public Service() {
-        date = new Date();
-    }
+    // TODO implement
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public Date getDate() {
-        return date;
-    }
+    boolean value() default true;
 }

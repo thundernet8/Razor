@@ -1,8 +1,8 @@
 package com.razor.test.controllers;
 
-import com.razor.mvc.controller.Controller;
-import com.razor.mvc.annotation.Route;
-import com.razor.mvc.http.Cookie;
+import com.fedepot.mvc.controller.Controller;
+import com.fedepot.mvc.annotation.Route;
+import com.fedepot.mvc.http.Cookie;
 
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>

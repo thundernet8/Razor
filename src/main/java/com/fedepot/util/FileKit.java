@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,48 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.util;
 
-    public String name = "Service Name";
+import lombok.extern.slf4j.Slf4j;
 
-    public Date date;
+import java.io.File;
+import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 
-    public Service() {
-        date = new Date();
-    }
+/**
+ * File handle utils
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+@Slf4j
+public class FileKit {
 
-    @Override
-    public String getName() {
-        return name;
-    }
+    /**
+     * Read specified file content(Encoding UTF-8)
+     *
+     * @param absPath file path
+     * @return content string
+     */
+    public static String read(String absPath) {
 
-    @Override
-    public Date getDate() {
-        return date;
+        File file = new File(absPath);
+        if (file.exists() && file.isFile() && !file.isHidden()) {
+            RandomAccessFile raf;
+            try {
+
+                raf = new RandomAccessFile(file, "r");
+                byte[] data = new byte[(int)raf.length()];
+                raf.readFully(data);
+
+                return new String(data, StandardCharsets.UTF_8);
+
+            } catch (Exception e) {
+
+                log.error(e.toString());
+            }
+        }
+
+        return null;
     }
 }

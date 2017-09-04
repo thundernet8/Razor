@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,22 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.mvc.route;
 
-    public String name = "Service Name";
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-    public Date date;
+/**
+ * Parameter from path
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+@AllArgsConstructor
+@Getter
+public class PathParameter {
 
-    public Service() {
-        date = new Date();
-    }
+    private String name;
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public Date getDate() {
-        return date;
-    }
+    private Object value;
 }

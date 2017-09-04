@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,49 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.cache;
 
-    public String name = "Service Name";
+import java.util.Optional;
 
-    public Date date;
+/**
+ * Cache interface
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public interface Cache {
 
-    public Service() {
-        date = new Date();
-    }
+    void add(String key, Object value, int expires);
 
-    @Override
-    public String getName() {
-        return name;
-    }
+    void add(String key, Object value, int expires, String group);
 
-    @Override
-    public Date getDate() {
-        return date;
-    }
+    boolean safeAdd(String key, Object value, int expires);
+
+    boolean safeAdd(String key, Object value, int expires, String group);
+
+    void delete(String key);
+
+    void delete(String key, String group);
+
+    void clear();
+
+    void clear(String group);
+
+    Optional<Object> get(String key);
+
+    Optional<Object> get(String key, String group);
+
+    Object get(String key, Object defaultValue);
+
+    Object get(String key, String group, Object defaultValue);
+
+    long incr(String key, int by);
+
+    long incr(String key, String group, int by);
+
+    long decr(String key, int by);
+
+    long decr(String key, String group, int by);
+
+    void shutdown();
 }

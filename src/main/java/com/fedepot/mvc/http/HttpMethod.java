@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,27 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.mvc.http;
 
-    public String name = "Service Name";
+/**
+ * Http methods
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public interface HttpMethod {
 
-    public Date date;
+    String ALL = "ALL";
 
-    public Service() {
-        date = new Date();
-    }
+    String GET = "GET";
 
-    @Override
-    public String getName() {
-        return name;
-    }
+    String POST = "POST";
 
-    @Override
-    public Date getDate() {
-        return date;
-    }
+    String PUT = "PUT";
+
+    String DELETE = "DELETE";
+
+    String HEAD= "HEAD";
+
+    String OPTIONS = "OPTIONS";
 }

@@ -1,13 +1,3 @@
-package com.razor.test.other;
-
-import com.fedepot.Razor;
-import com.fedepot.mvc.Constants;
-import com.razor.test.MvcTest;
-
-import java.io.File;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -31,21 +21,52 @@ import java.util.regex.Pattern;
  */
 
 
-public class Test {
+package com.fedepot.server;
 
-    public static void main(String[] args) {
-        String host = "baidu.com";
-        Pattern pattern = Pattern.compile("^([^:]+)(:(\\d+))?$");
-        Matcher matcher = pattern.matcher(host);
-        matcher.find();
-        String hostname = matcher.group(1);
+import io.netty.channel.ChannelProgressiveFuture;
+import io.netty.channel.ChannelProgressiveFutureListener;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.RandomAccessFile;
+
+/**
+ * Implement of {@link ChannelProgressiveFutureListener} for file progressive future listener
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+@Slf4j
+public class ProgressiveFutureListener implements ChannelProgressiveFutureListener {
+
+    private RandomAccessFile raf;
+
+    public ProgressiveFutureListener(RandomAccessFile raf) {
+
+        this.raf = raf;
+    }
+
+    @Override
+    public void operationProgressed(ChannelProgressiveFuture future, long progress, long total) throws Exception {
+
+        if (total < 0) {
+
+            log.debug("Channel {} transfer progress: {}", future.channel(), progress);
+        } else {
+
+            log.debug("Channel {} transfer progress: {}, total {}", future.channel(), progress, total);
+        }
+    }
+
+    @Override
+    public void operationComplete(ChannelProgressiveFuture future) throws Exception {
 
         try {
-            String pa = new File(Constants.class.getResource("/").getPath()).getCanonicalPath();
-            System.out.println(pa);
+
+            raf.close();
+            log.debug("Channel {} transfer complete", future.channel());
         } catch (Exception e) {
-            System.out.println(e.toString());
+
+            log.error("Close randomAccessFile with error", e);
         }
-        System.out.println(File.separator);
     }
 }

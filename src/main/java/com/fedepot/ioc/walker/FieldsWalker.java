@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,43 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.ioc.walker;
 
-    public String name = "Service Name";
+import com.fedepot.ioc.annotation.FromService;
 
-    public Date date;
+import java.util.*;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 
-    public Service() {
-        date = new Date();
+/**
+ * Find fields marked as from services
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public class FieldsWalker {
+    private static final Map<Class<?>, Field[]> fieldsMap = new HashMap<>();
+
+    public static Field[] findInjectFields(Class<?> clazz) {
+
+        Field[] fields = Arrays.stream(clazz.getFields()).filter(field ->
+                field.getAnnotation(FromService.class) != null
+        ).toArray(Field[]::new);
+
+        // Cache fields
+        fieldsMap.put(clazz, fields);
+
+        return fields;
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
+    public static Field[] cachedInjectFields(Class<?> clazz) {
 
-    @Override
-    public Date getDate() {
-        return date;
+        Field[] fields = fieldsMap.get(clazz);
+        if (fields != null) {
+
+            return fields;
+        }
+
+        return findInjectFields(clazz);
     }
 }

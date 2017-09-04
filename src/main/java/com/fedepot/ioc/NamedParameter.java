@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,14 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.ioc;
 
-    public String name = "Service Name";
+/**
+ * Named parameter for dependency resolving
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public class NamedParameter {
 
-    public Date date;
-
-    public Service() {
-        date = new Date();
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public Date getDate() {
-        return date;
-    }
 }

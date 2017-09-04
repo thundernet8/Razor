@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,22 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.ioc;
 
-    public String name = "Service Name";
+/**
+ * Service beans container interface
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public interface IContainer {
 
-    public Date date;
+    <T> T resolve(Class<T> t);
 
-    public Service() {
-        date = new Date();
-    }
+    <T> T resolveNamed(Class<T> t, String name);
 
-    @Override
-    public String getName() {
-        return name;
-    }
+    <T, E extends Enum<E>> T resolveKeyed(Class<T> t, E enumKey);
 
-    @Override
-    public Date getDate() {
-        return date;
-    }
+    // TODO IContainer.Resolve<T>(NamedParameter namedParameter)
+    // TODO container.Resolve<DBManager>(new NamedParameter("name", "SQL"))
 }

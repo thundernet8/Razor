@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,16 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.event;
 
-    public String name = "Service Name";
+/**
+ * Event type
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public enum EventType {
 
-    public Date date;
-
-    public Service() {
-        date = new Date();
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public Date getDate() {
-        return date;
-    }
+    APP_START,
+    APP_STOP
 }

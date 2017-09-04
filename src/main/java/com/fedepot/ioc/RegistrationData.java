@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,41 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.ioc;
 
-    public String name = "Service Name";
+import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
-    public Date date;
+/**
+ * Data common to all registrations made in the container, both direct (IComponentRegistration) and and dynamic (IRegistrationSource.)
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+class RegistrationData {
 
-    public Service() {
-        date = new Date();
-    }
+    /**
+     * Determinate the lifecycle of ServiceBean which will bind to this registration.
+     */
+    private boolean isSington = false;
 
-    @Override
-    public String getName() {
-        return name;
-    }
+    private Class<?> regType;
 
-    @Override
-    public Date getDate() {
-        return date;
+    private Class<?> implType;
+
+    private String name = "";
+
+    private Object key = null;
+
+    private Object instance = null;
+
+    static RegistrationData defaults() {
+        
+        return new RegistrationData();
     }
 }

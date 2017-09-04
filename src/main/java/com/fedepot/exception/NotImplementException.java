@@ -1,9 +1,3 @@
-package com.razor.test;
-
-import com.fedepot.ioc.annotation.Inject;
-
-import java.util.Date;
-
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
  * <p>
@@ -27,26 +21,34 @@ import java.util.Date;
  */
 
 
-@Inject(
-        sington = false
-)
-public class Service implements IService {
+package com.fedepot.exception;
 
-    public String name = "Service Name";
+/**
+ * Method not implement exception
+ *
+ * @author Touchumind
+ * @since 0.0.1
+ */
+public class NotImplementException extends RuntimeException {
 
-    public Date date;
+    public NotImplementException() {
 
-    public Service() {
-        date = new Date();
+        super("Method is not implemented");
     }
 
-    @Override
-    public String getName() {
-        return name;
+    public NotImplementException(String message) {
+
+        super(message);
     }
 
-    @Override
-    public Date getDate() {
-        return date;
+    public NotImplementException(Throwable cause) {
+
+        super(cause);
     }
+
+    public NotImplementException(String message, Throwable cause) {
+
+        super(message, cause);
+    }
+
 }
