@@ -76,12 +76,12 @@ public class RouteMatcher {
      */
     private boolean isUniversal = false;
 
-    public boolean isUniversal() {
+    boolean isUniversal() {
 
         return isUniversal;
     }
 
-    public String getRoutePrefix() {
+    String getRoutePrefix() {
 
         return routePrefix;
     }
@@ -107,7 +107,7 @@ public class RouteMatcher {
      * @param path url path
      * @return parameter values in url
      */
-    public RouteParameter[] getParams(String path) {
+    public PathParameter[] getParams(String path) {
 
         int paramCount = Math.min(paramTypes.length, paramNames.length);
 
@@ -123,7 +123,7 @@ public class RouteMatcher {
             return null;
         }
 
-        RouteParameter[] params = new RouteParameter[paramCount];
+        PathParameter[] params = new PathParameter[paramCount];
 
         for (int i = 0; i < paramCount; i++) {
 
@@ -131,10 +131,10 @@ public class RouteMatcher {
 
             if (StringUtils.equals(paramTypes[i], "int")) {
 
-                params[i] = new RouteParameter(paramNames[i], Integer.parseInt(value));
+                params[i] = new PathParameter(paramNames[i], Integer.parseInt(value));
             } else {
 
-                params[i] = new RouteParameter(paramNames[i], value);
+                params[i] = new PathParameter(paramNames[i], value);
             }
         }
 

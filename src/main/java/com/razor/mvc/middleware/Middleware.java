@@ -38,7 +38,7 @@ import java.util.Map;
 @FunctionalInterface
 public interface Middleware extends Comparable<Middleware> {
 
-    static Map<Middleware, Integer> priorities = new HashMap<>();
+    Map<Middleware, Integer> priorities = new HashMap<>();
 
     default public int getPriority() {
 

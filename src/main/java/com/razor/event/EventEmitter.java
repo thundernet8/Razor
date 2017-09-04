@@ -64,17 +64,34 @@ public final class EventEmitter {
         return instance;
     }
 
+    /**
+     * Add event listener
+     *
+     * @param eventType event type {@link EventType}
+     * @param listener action callback
+     */
     public void on(EventType eventType, EventListener listener) {
 
         listeners.get(eventType).add(listener);
     }
 
+    /**
+     * Trigger event
+     *
+     * @param eventType event type {@link EventType}
+     */
     public void emit(EventType eventType) {
 
 
         emit(eventType, null);
     }
 
+    /**
+     * Trigger event
+     *
+     * @param eventType event type {@link EventType}
+     * @param razor Razor app instance
+     */
     public void emit(EventType eventType, Razor razor) {
 
         listeners.get(eventType).forEach(listener -> listener.call(new Event(eventType, razor)));

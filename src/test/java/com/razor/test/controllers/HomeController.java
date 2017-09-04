@@ -2,6 +2,7 @@ package com.razor.test.controllers;
 
 import com.razor.mvc.controller.Controller;
 import com.razor.mvc.annotation.Route;
+import com.razor.mvc.http.Cookie;
 
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
@@ -32,7 +33,6 @@ public class HomeController extends Controller {
     public void index() {
 
         //return "Home page";
-        Object cookies = Context().request().getCookies();
 
         Render("home.htm", "var1", "home result using beetl");
     }

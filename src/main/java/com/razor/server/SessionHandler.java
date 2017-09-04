@@ -110,5 +110,7 @@ public class SessionHandler {
 
         session.attributes().clear();
         sessionManager.remove(session.id());
+
+        response.cookie(Cookie.builder().name(session.id()).maxAge(-1).build());
     }
 }

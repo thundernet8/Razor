@@ -107,7 +107,7 @@ public class RouteSignature {
             return;
         }
 
-        RouteParameter[] routeParams = request.pathParams();
+        PathParameter[] routeParams = request.pathParams();
         Parameter[] actionParams = action.getParameters();
         Object[] paramValues = new Object[actionParamCount];
 

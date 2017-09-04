@@ -26,6 +26,7 @@ package com.razor.cache;
 import com.razor.event.EventEmitter;
 import com.razor.event.EventType;
 import com.razor.mvc.Constants;
+
 import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -73,9 +74,15 @@ public class Ehcache implements Cache {
 
         this.cacheManager = CacheManager.create(configuration);
 
-//        this.cacheManager = CacheManager.create();
-//        this.cacheManager.addCache(group);
-//        this.cacheManager.addCache(DEFAULT_GROUP);
+        if (!cacheManager.cacheExists(DEFAULT_GROUP)) {
+
+            this.cacheManager.addCache(DEFAULT_GROUP);
+        }
+
+        if (!cacheManager.cacheExists(group)) {
+
+            this.cacheManager.addCache(group);
+        }
 
         // persist when app stop
         EventEmitter.newInstance().on(EventType.APP_STOP, e -> {

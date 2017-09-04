@@ -40,10 +40,7 @@ public class ActionResult {
 
     private String text;
 
-    private ActionResult() {
-
-        // TODO
-    }
+    private ActionResult() { }
 
     public static ActionResult build(Object result, Class<?> type) {
 
@@ -68,6 +65,7 @@ public class ActionResult {
             return;
         }
 
+        // TODO complicated customized object serialization
         Gson gson = GsonFactory.getGson();
 
         text = gson.toJson(origin);

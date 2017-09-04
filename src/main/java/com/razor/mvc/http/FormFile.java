@@ -52,7 +52,7 @@ public class FormFile {
     @Expose(serialize = false)
     private byte[] data;
 
-    public FormFile(String name, String fileName, String contentType, long length) {
+    FormFile(String name, String fileName, String contentType, long length) {
 
         this.name = name;
         this.fileName = fileName;

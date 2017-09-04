@@ -23,10 +23,10 @@
 
 package com.razor.mvc.http;
 
-import com.razor.Razor;
+import com.razor.exception.NotImplementException;
 import com.razor.mvc.route.RouteManager;
 import com.razor.mvc.route.Router;
-import com.razor.mvc.route.RouteParameter;
+import com.razor.mvc.route.PathParameter;
 import com.razor.server.SessionHandler;
 import com.razor.util.HttpKit;
 import com.razor.util.MimeKit;
@@ -66,11 +66,6 @@ public class Request {
     private static final HttpDataFactory HTTP_DATA_FACTORY = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
 
     private ChannelHandlerContext channelCxt;
-
-    public ChannelHandlerContext serverContext() {
-
-        return channelCxt;
-    }
 
     private FullHttpRequest fullHttpRequest;
 
@@ -237,9 +232,9 @@ public class Request {
     /**
      * url match route properties, e.g you have a route /book/:name, the `name` would be one url parameter
      */
-    private RouteParameter[] pathParams;
+    private PathParameter[] pathParams;
 
-    public RouteParameter[] pathParams() {
+    public PathParameter[] pathParams() {
 
         return pathParams;
     }
@@ -428,28 +423,31 @@ public class Request {
 
     /**
      * Check if specified content type are acceptable and return the best match, empty for none match
+     *
      * @param docType content type
      * @return matched content type
      */
     public String accept(String docType) {
 
         // TODO
-        return "";
+        throw new NotImplementException();
     }
 
     /**
      * Check if specified content types are acceptable and return the best match, empty for none match
+     *
      * @param docTypes content types
      * @return matched content type
      */
     public String accept(String[] docTypes) {
 
         // TODO
-        return "";
+        throw new NotImplementException();
     }
 
     /**
      * Returns the specified HTTP request header field (case-insensitive match)
+     *
      * @param field header field
      * @return field value
      */
@@ -460,6 +458,7 @@ public class Request {
 
     /**
      * Returns the specified HTTP request header field (case-insensitive match)
+     *
      * @param field header field {@link AsciiString}
      * @return field value
      */
@@ -469,6 +468,11 @@ public class Request {
     }
 
 
+    /**
+     * Parse data from http request body
+     *
+     * @param data {@link InterfaceHttpData}
+     */
     private void parseBodyData(InterfaceHttpData data) {
 
         try {
@@ -500,6 +504,12 @@ public class Request {
     }
 
 
+    /**
+     * Handler file upload request(Content-Type: multipart/form-data)
+     *
+     * @param fileUpload {@link FileUpload}
+     * @throws IOException IO exception
+     */
     private void handleFileUpload(FileUpload fileUpload) throws IOException {
 
         if (fileUpload.isCompleted()) {

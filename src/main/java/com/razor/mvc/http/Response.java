@@ -23,9 +23,11 @@
 
 package com.razor.mvc.http;
 
+import com.google.gson.Gson;
 import com.razor.Razor;
 import com.razor.exception.NotImplementException;
 import com.razor.mvc.Constants;
+import com.razor.mvc.json.GsonFactory;
 import com.razor.server.ProgressiveFutureListener;
 import com.razor.util.DateKit;
 
@@ -40,10 +42,7 @@ import io.netty.util.AsciiString;
 import io.netty.util.CharsetUtil;
 
 import java.io.RandomAccessFile;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import static io.netty.handler.codec.http.HttpVersion.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
@@ -106,12 +105,20 @@ public class Response {
 
             iterator.remove();
         }
+
+        httpResponse.headers().add(SET_COOKIE, cookieHeaderQueue);
+        cookieHeaderQueue.clear();
     }
 
     /**
      * In order to add headers when httpResponse instance is not prepared
      */
     private Map<AsciiString, AsciiString> headerQueue = new HashMap<>();
+
+    /**
+     * In order to add cookie header when httpResponse instance is not prepared, `Set-Cookie` header can repeat.
+     */
+    private List<String> cookieHeaderQueue = new ArrayList<>();
 
     /**
      * Http response status, include status code and cause message
@@ -137,8 +144,6 @@ public class Response {
 
             keepAlive = false;
         }
-        // TODO
-
     }
 
     public static Response build(ChannelHandlerContext cxt, FullHttpResponse res) {
@@ -320,7 +325,13 @@ public class Response {
             }
         }
 
-        header(SET_COOKIE, sb.toString());
+        if (httpResponse == null) {
+
+            cookieHeaderQueue.add(sb.toString());
+        } else {
+
+            httpResponse.headers().add(SET_COOKIE, sb.toString());
+        }
 
         return this;
     }
@@ -334,25 +345,28 @@ public class Response {
      */
     public Response cookie(Cookie cookie) {
 
-        header(SET_COOKIE, cookie.toString());
+        if (httpResponse == null) {
+
+            cookieHeaderQueue.add(cookie.toString());
+        } else {
+
+            httpResponse.headers().add(SET_COOKIE, cookie.toString());
+        }
 
         return this;
     }
 
+    /**
+     * Clear one cookie
+     *
+     * @param name cookie name
+     * @return Response self
+     */
     public Response clearCookie(String name) {
 
-        Map<String, Object> options = new HashMap<>();
-        options.put("expires", DateKit.getGmtDateString(new Date(0)));
+        Cookie cookie = Cookie.builder().name(name).maxAge(-1).build();
 
-        if (httpResponse != null) {
-
-            httpResponse.headers().remove(name);
-        } else {
-
-            headerQueue.remove(name);
-        }
-
-        return cookie(name, "", options);
+        return cookie(cookie);
     }
 
     /**
@@ -368,11 +382,17 @@ public class Response {
         return this;
     }
 
+    /**
+     * Set `Date` header for response
+     */
     public void setDate() {
 
         header(DATE, DateKit.getGmtDateString());
     }
 
+    /**
+     * Set `X-Powered-By` header for response
+     */
     public void setPowerBy() {
 
         header(SERVER, "Netty");
@@ -386,7 +406,12 @@ public class Response {
      */
     public void json(Object data) {
 
-        // TODO
+        header(CONTENT_TYPE, ContentType.JSON.getMimeTypeWithCharset());
+
+        Gson gson = GsonFactory.getGson();
+        String text = gson.toJson(data);
+
+        end(text);
     }
 
     /**
@@ -421,9 +446,15 @@ public class Response {
         end();
     }
 
+    /**
+     * Location to another path with refer header
+     *
+     * @param path new path
+     */
     public void location(String path) {
 
         // TODO location to another path with refer header
+        throw new NotImplementException();
     }
 
     /**
@@ -465,6 +496,11 @@ public class Response {
         return this;
     }
 
+    /**
+     * Send multi-type data
+     *
+     * @param data unknown type data
+     */
     public void send(Object data) {
 
         // TODO send multi-type data
@@ -483,6 +519,7 @@ public class Response {
 
     /**
      * Send response immediately when error occurs
+     *
      * @param status Http response status including code and cause message
      */
     public void sendError(HttpResponseStatus status) {
@@ -565,6 +602,7 @@ public class Response {
 
     /**
      * Send response immediately for a file response
+     *
      * @param raf RandomAccessFile
      */
     public void sendFile(RandomAccessFile raf, long length) {
@@ -665,7 +703,6 @@ public class Response {
      */
     public void end(String data, String[]... options) {
 
-        // TODO encoding
         header(CONTENT_LENGTH, Integer.toString(data.length()));
 
         if (httpResponse == null) {

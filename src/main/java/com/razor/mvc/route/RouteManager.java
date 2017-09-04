@@ -28,6 +28,7 @@ import com.razor.mvc.controller.APIController;
 import com.razor.mvc.controller.Controller;
 import com.razor.mvc.annotation.*;
 import com.razor.mvc.http.HttpMethod;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
@@ -84,6 +85,9 @@ public class RouteManager {
         return instance;
     }
 
+    /**
+     * Register routes when startup
+     */
     public void registerRoutes() {
 
         Set<Class<? extends Controller>> controllers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(Controller.class);
@@ -92,6 +96,11 @@ public class RouteManager {
         apiControllers.forEach(this::parseControllerRoutes);
     }
 
+    /**
+     * Parse controller routes from a specified controller class
+     *
+     * @param clazz {@link Controller} or {@link APIController} class
+     */
     private void parseControllerRoutes(Class<?> clazz) {
 
         String routePrefix = "";
@@ -155,6 +164,13 @@ public class RouteManager {
         }
     }
 
+    /**
+     * Find route with request method and path
+     *
+     * @param path path to request
+     * @param httpMethod http method
+     * @return Router instance
+     */
     public Router findRoute(String path, String httpMethod) {
 
         Router router = routerMap.get(path.concat("::").concat(httpMethod));

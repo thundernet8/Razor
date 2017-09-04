@@ -30,7 +30,7 @@
 
     <session>
         <key>SESSION</key>
-        <timeout>3600</timeout>
+        <timeout>2592000</timeout>
     </session>
 
     <!-- Error page template path relative templates folder path -->

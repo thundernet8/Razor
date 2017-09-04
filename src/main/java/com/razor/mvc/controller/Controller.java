@@ -48,8 +48,6 @@ import static com.razor.mvc.Constants.*;
 @RoutePrefix
 public abstract class Controller implements IController {
 
-//    private HttpContext httpContext;
-
     protected HttpContext Context() {
 
         return HttpContext.get();
@@ -65,6 +63,11 @@ public abstract class Controller implements IController {
         return null;
     }
 
+    /**
+     * Render view with template
+     *
+     * @param templatePath the template used to render
+     */
     protected void Render(String templatePath) {
 
         TemplateRenderer renderer = new TemplateRenderer(templateFullPath(templatePath));
@@ -72,6 +75,12 @@ public abstract class Controller implements IController {
         proxyRender(renderer);
     }
 
+    /**
+     * Render view with template and data
+     *
+     * @param templatePath the template used to render
+     * @param data data for rendering
+     */
     protected void Render(String templatePath, Map<String, Object> data) {
 
         TemplateRenderer renderer = new TemplateRenderer(templateFullPath(templatePath), data);
@@ -79,6 +88,13 @@ public abstract class Controller implements IController {
         proxyRender(renderer);
     }
 
+    /**
+     * Render view with template and single key, value
+     *
+     * @param templatePath the template used to render
+     * @param dataKey variable key
+     * @param dataValue variable value
+     */
     protected void Render(String templatePath, String dataKey, String dataValue) {
 
         TemplateRenderer renderer = new TemplateRenderer(templateFullPath(templatePath), dataKey, dataValue);

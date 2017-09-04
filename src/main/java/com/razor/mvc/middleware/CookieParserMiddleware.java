@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Parse cookie string to map object for request
+ * Parse cookie string to map object for request, this middleware was enabled as default to support session
  *
  * @author Touchumind
  * @since 0.0.1
