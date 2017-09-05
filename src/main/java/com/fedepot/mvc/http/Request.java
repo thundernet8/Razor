@@ -86,7 +86,7 @@ public class Request {
 
     /**
      * Parsed body data, default to null
-     * if Content-Type is application/json, use {@link com.razor.mvc.annotation.FromBody} deserialize rawBody to a certain type
+     * if Content-Type is application/json, use {@link com.fedepot.mvc.annotation.FromBody} deserialize rawBody to a certain type
      * if Content-Type is application/x-www-form-urlencoded {@see Request.formParams}
      * if Content-Type is multipart/form-data {@see Request.formParams Request.files}
      */

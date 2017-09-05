@@ -56,10 +56,10 @@ public class CookieParserMiddleware implements Middleware{
 
                 if (values != null && values.get(0) != null) {
 
-                    cookieMap.put(key, values.get(0));
+                    cookieMap.put(key.trim(), values.get(0));
                 } else {
 
-                    cookieMap.put(key, "");
+                    cookieMap.put(key.trim(), "");
                 }
             }
 

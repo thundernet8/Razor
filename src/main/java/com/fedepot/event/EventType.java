@@ -32,5 +32,6 @@ package com.fedepot.event;
 public enum EventType {
 
     APP_START,
+    APP_STARTED,
     APP_STOP
 }

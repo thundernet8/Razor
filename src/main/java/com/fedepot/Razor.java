@@ -195,6 +195,7 @@ public class Razor {
                 try {
 
                     nettyServer.run(Razor.this, args);
+                    eventEmitter.emit(EventType.APP_STARTED, this);
                 } catch (Exception e) {
 
                     log.error("Run razor in new thread failed, error: {}", e.getMessage());
@@ -216,8 +217,6 @@ public class Razor {
 
         // TODO calculate run time
         nettyServer.shutdown();
-
-        // TODO event manager, shut down other systems, e.g cache
     }
 
     /**

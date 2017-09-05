@@ -61,6 +61,8 @@ public class Response {
 
     private boolean keepAlive = true;
 
+    private long startAt = 0l;
+
     /**
      * Indicate the response has been flushed or not(which also means headers has been sent)
      */
@@ -144,6 +146,9 @@ public class Response {
 
             keepAlive = false;
         }
+
+        // Record start time
+        this.startAt = System.currentTimeMillis();
     }
 
     public static Response build(ChannelHandlerContext cxt, FullHttpResponse res) {
@@ -399,6 +404,12 @@ public class Response {
         header(X_POWERED_BY, "Razor");
     }
 
+    public void setResponseTime() {
+
+        long elapsedTime = System.currentTimeMillis() - this.startAt;
+        header(X_RESPONSE_TIME, elapsedTime + "ms");
+    }
+
     /**
      * Send json response
      *
@@ -609,6 +620,7 @@ public class Response {
 
         setDate();
         setPowerBy();
+        setResponseTime();
         header(CONTENT_LENGTH, Long.toString(length));
 
         setHttpResponse(new DefaultHttpResponse(HTTP_1_1, getStatus(), true));
@@ -661,6 +673,7 @@ public class Response {
 
         setDate();
         setPowerBy();
+        setResponseTime();
 
         if (close) {
 
