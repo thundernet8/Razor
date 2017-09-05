@@ -56,7 +56,7 @@
         <beetl.version>2.7.21</beetl.version>
         <locality.uuid.version>1.1.1</locality.uuid.version>
         <ehcache.core.version>2.10.4</ehcache.core.version>
-        <project.scm.id>ossrh</project.scm.id>
+        <project.scm.id>github</project.scm.id>
     </properties>
 
     <profiles>
