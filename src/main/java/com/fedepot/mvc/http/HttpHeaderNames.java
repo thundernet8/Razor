@@ -198,5 +198,7 @@ public final class HttpHeaderNames {
 
     public static final AsciiString X_REAL_IP = new AsciiString("X-Real-IP");
 
+    public static final AsciiString X_RESPONSE_TIME = new AsciiString("X-Response-Time");
+
     private HttpHeaderNames() { }
 }
