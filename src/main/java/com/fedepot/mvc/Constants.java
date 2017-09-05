@@ -40,7 +40,7 @@ public interface Constants {
 
     // System
     String RAZOR_CLASS_PATH = new File(Constants.class.getResource("/razor.png").getPath()).getParent();
-    String APP_CLASS_PATH = new File((Constants.class.getResource("/") == null ? Constants.class.getResource("/razor.png") : Constants.class.getResource("/")).getPath()).getAbsolutePath();
+    String APP_CLASS_PATH = Constants.class.getResource("/") == null ? new File(Constants.class.getResource("/razor.png").getPath()).getParent() : new File((Constants.class.getResource("/")).getPath()).getAbsolutePath();
 
     // Server default constants
     String DEFAULT_SERVER_HOST = "0.0.0.0";
