@@ -55,7 +55,7 @@ public class Ehcache implements Cache {
 
     private Ehcache(String group) {
 
-        String configXmlPath = Constants.CLASS_PATH.concat("/WEB-INF/ehcache.xml");
+        String configXmlPath = Constants.APP_CLASS_PATH.concat("/WEB-INF/ehcache.xml");
         File file = new File(configXmlPath);
         Configuration configuration;
 

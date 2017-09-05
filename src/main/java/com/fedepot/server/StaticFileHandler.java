@@ -102,7 +102,7 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         }
 
         Env env = razor.getEnv();
-        String webRoot = CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_WEB_ROOT_DIR, DEFAULT_WEB_ROOT_DIR));
+        String webRoot = APP_CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_WEB_ROOT_DIR, DEFAULT_WEB_ROOT_DIR));
         String absPath = webRoot.concat(path);
 
         File file = new File(absPath);

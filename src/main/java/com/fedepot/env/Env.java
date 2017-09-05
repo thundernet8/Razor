@@ -147,7 +147,7 @@ public class Env {
      */
     public static Env fromXml() {
 
-        String appXmlPath = Constants.CLASS_PATH.concat("/WEB-INF/app.xml");
+        String appXmlPath = Constants.APP_CLASS_PATH.concat("/WEB-INF/app.xml");
         File file = new File(appXmlPath);
 
         try {
@@ -162,6 +162,8 @@ public class Env {
 
                 properties = ConfigurationFactory.parseAppXml(Env.class.getResourceAsStream("/app_default.xml"));
             } else {
+
+                log.info("App use configuration from file {}", appXmlPath);
 
                 properties = ConfigurationFactory.parseAppXml(file);
             }

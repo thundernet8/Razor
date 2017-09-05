@@ -167,8 +167,6 @@ public class Razor {
      */
     public void start(@NonNull Class<?> appClass, String[] args) {
 
-        eventEmitter.emit(EventType.APP_START, this);
-
         start(appClass, env.get(ENV_KEY_SERVER_HOST, DEFAULT_SERVER_HOST), env.getInt(ENV_KEY_SERVER_PORT, DEFAULT_SERVER_PORT), args);
     }
 
@@ -181,6 +179,8 @@ public class Razor {
      * @param args other args
      */
     public void start(@NonNull Class<?> appClass, @NonNull String host, int port, String[] args) {
+
+        eventEmitter.emit(EventType.APP_START, this);
 
         try {
 
@@ -523,10 +523,10 @@ public class Razor {
      */
     private void initRuntime() {
 
-        String webAbsPath = CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_WEB_ROOT_DIR, DEFAULT_WEB_ROOT_DIR)).concat(File.separator);
+        String webAbsPath = APP_CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_WEB_ROOT_DIR, DEFAULT_WEB_ROOT_DIR)).concat(File.separator);
         env.set(ENV_RT_KEY_WEB_ROOT_ABS_PATH, webAbsPath);
 
-        String templateAbsPath = CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_TEMPLATE_ROOT_DIR, DEFAULT_TEMPLATE_ROOT_DIR)).concat(File.separator);
+        String templateAbsPath = APP_CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_TEMPLATE_ROOT_DIR, DEFAULT_TEMPLATE_ROOT_DIR)).concat(File.separator);
         env.set(ENV_RT_KEY_TEMPLATE_ROOT_ABS_PATH, templateAbsPath);
 
         String[] templates = new String[]{ENV_KEY_403_PAGE_TEMPLATE, ENV_KEY_404_PAGE_TEMPLATE, ENV_KEY_500_PAGE_TEMPLATE, ENV_KEY_502_PAGE_TEMPLATE};
