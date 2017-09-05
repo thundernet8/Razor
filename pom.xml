@@ -269,8 +269,8 @@
                     <useReleaseProfile>false</useReleaseProfile>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <allowTimestampedSnapshots>false</allowTimestampedSnapshots>
-                    <scmCommentPrefix>#42:tada:</scmCommentPrefix>
-                    <tagNameFormat>V${project.version}</tagNameFormat>
+                    <scmCommentPrefix>:tada:</scmCommentPrefix>
+                    <tagNameFormat>Release v${project.version}</tagNameFormat>
                     <releaseProfiles>release</releaseProfiles>
                 </configuration>
                 <dependencies>
