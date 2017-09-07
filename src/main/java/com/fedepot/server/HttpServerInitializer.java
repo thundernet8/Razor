@@ -34,6 +34,8 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
+import static com.fedepot.mvc.Constants.*;
+
 /**
  * Netty channel initializer
  *
@@ -59,7 +61,10 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
         pl.addLast("codec", new HttpServerCodec());
 
         // enable gzip
-        pl.addLast("gzip", new HttpContentCompressor());
+        if (razor.getEnv().getBool(ENV_KEY_GZIP, DEFAULT_GZIP_ENABLE)) {
+
+            pl.addLast("gzip", new HttpContentCompressor());
+        }
 
         pl.addLast("continue", new HttpServerExpectContinueHandler());
         pl.addLast("aggregator", new HttpObjectAggregator(512*1024));

@@ -270,7 +270,7 @@
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <allowTimestampedSnapshots>false</allowTimestampedSnapshots>
                     <scmCommentPrefix>:tada:</scmCommentPrefix>
-                    <tagNameFormat>Release_v${project.version}</tagNameFormat>
+                    <tagNameFormat>${project.version}</tagNameFormat>
                     <releaseProfiles>release</releaseProfiles>
                 </configuration>
                 <dependencies>

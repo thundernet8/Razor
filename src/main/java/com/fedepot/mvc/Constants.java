@@ -38,9 +38,6 @@ public interface Constants {
     // Package
     String PACKAGE_NAME = "Razor";
 
-    // Version
-    String VERSION = "0.0.1-SNAPSHOT";
-
     // System
     String RAZOR_CLASS_PATH = new File(Constants.class.getResource("/razor.png").getPath()).getParent();
     String APP_CLASS_PATH = new File((Constants.class.getResource("/") == null ? Constants.class.getResource("/razor.png") : Constants.class.getResource("/")).getPath()).getAbsolutePath();
@@ -59,6 +56,8 @@ public interface Constants {
     List<String> DEFAULT_INDEX_FILES = Arrays.asList("index.html", "index.htm");
 
     boolean DEFAULT_SSL_ENABLE = false;
+
+    boolean DEFAULT_GZIP_ENABLE = false;
 
     // Http constants
     String DEFAULT_CHARSET = "utf-8";
@@ -83,6 +82,8 @@ public interface Constants {
     String ENV_KEY_CHARSET = "razor.server.charset";
 
     String ENV_KEY_SSL = "razor.server.ssl";
+
+    String ENV_KEY_GZIP = "razor.server.gzip";
 
     String ENV_KEY_WEB_ROOT_DIR = "razor.web.root";
 

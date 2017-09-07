@@ -24,6 +24,7 @@
 package com.fedepot.mvc.renderer;
 
 import com.fedepot.exception.RazorException;
+import com.fedepot.mvc.http.ContentType;
 import com.fedepot.mvc.http.Request;
 import com.fedepot.mvc.http.Response;
 import com.fedepot.mvc.template.TemplateEngineFactory;
@@ -77,7 +78,8 @@ public class TemplateRenderer extends Renderer {
 
             if (response.get(CONTENT_TYPE) == null) {
 
-                response.header(CONTENT_TYPE, getContentType().getMimeTypeWithCharset());
+                ContentType contentType = getContentType() != null ? getContentType() : ContentType.TEXT;
+                response.header(CONTENT_TYPE, contentType.getMimeTypeWithCharset());
             }
 
             response.end(view);

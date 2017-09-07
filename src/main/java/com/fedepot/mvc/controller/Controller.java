@@ -71,6 +71,7 @@ public abstract class Controller implements IController {
     protected void Render(String templatePath) {
 
         TemplateRenderer renderer = new TemplateRenderer(templateFullPath(templatePath));
+        renderer.setContentType(ContentType.HTML);
 
         proxyRender(renderer);
     }
@@ -84,6 +85,7 @@ public abstract class Controller implements IController {
     protected void Render(String templatePath, Map<String, Object> data) {
 
         TemplateRenderer renderer = new TemplateRenderer(templateFullPath(templatePath), data);
+        renderer.setContentType(ContentType.HTML);
 
         proxyRender(renderer);
     }

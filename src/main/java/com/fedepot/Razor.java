@@ -70,18 +70,19 @@ import static com.fedepot.mvc.Constants.*;
  * @since 0.0.1
  */
 @Slf4j
-@Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Razor {
 
     /**
      * App environments
      */
+    @Getter
     private Env env = Env.fromXml();
 
     /**
      * Current entry application class
      */
+    @Getter
     private Class<?> appClass;
 
     /**
@@ -92,6 +93,7 @@ public class Razor {
     /**
      * Services container
      */
+    @Getter
     private IContainer ioc;
 
     /**
@@ -102,37 +104,55 @@ public class Razor {
     /**
      * Path rules of static resource directory
      */
+    @Getter
     private final Set<String> statics = new HashSet<>((List<String>)(env.getObject(ENV_KEY_STATIC_RULES).orElse(DEFAULT_STATICS)));
 
     /**
      * Static route prefix map with server directory
      */
+    @Getter
     private final Map<String, String> staticsMap = new HashMap<>();
 
     /**
      * Middlewares registered to all routes
      */
+    @Getter
     private final Set<Middleware> rootMiddlewares = new HashSet<>();
 
     /**
      * Middlewares registered to specified route
      */
+    @Getter
     private final Map<String, Set<Middleware>> pathMiddlewares = new HashMap<>();
 
     /**
      * Session manager
      */
+    @Getter
     private SessionManager sessionManager = new HttpSessionManager(Ehcache.newInstance("_SESSION_"), this);
 
     /**
      * Exception handler for request
      */
+    @Getter
     private ExceptionHandler exceptionHandler = null;
 
     /**
      * Event emitter
      */
+    @Getter
     private final EventEmitter eventEmitter = EventEmitter.newInstance();
+
+    /**
+     * App classes waiting for registering in IOC
+     */
+    private final Set<Class<?>> registerClassQueue = new HashSet<>();
+
+
+    /**
+     * Instances in App waiting for registering in IOC
+     */
+    private final Set<Object> registerInstanceQueue = new HashSet<>();
 
     /**
      * Initialize razor instance
@@ -320,6 +340,25 @@ public class Razor {
         return this;
     }
 
+    /**
+     * Enable/disable gzip support
+     *
+     * @param gzip gzip enable status
+     * @return Razor
+     */
+    public Razor gzip(boolean gzip) {
+
+        try {
+
+            env.set(ENV_KEY_GZIP, gzip);
+        } catch (Exception e) {
+
+            log.error(e.getMessage());
+        }
+
+        return this;
+    }
+
 
     /**
      * Customize 404 page
@@ -441,6 +480,30 @@ public class Razor {
     }
 
     /**
+     * Register a class from App in IOC
+     *
+     * @param clazz class to register
+     */
+    public void registerClass(Class<?> clazz) {
+
+        this.registerClassQueue.add(clazz);
+    }
+
+    /**
+     * Register a instance from App in IOC
+     *
+     * @param instance instance to register
+     */
+    public void registerInstance(Object instance) {
+
+        if (registerInstanceQueue.stream().anyMatch(x -> x.getClass() == instance.getClass())) {
+
+            return;
+        }
+        this.registerInstanceQueue.add(instance);
+    }
+
+    /**
      * Initialize the container
      */
     private void initIoc() {
@@ -459,6 +522,9 @@ public class Razor {
         iocBuilder.autoRegister(Cache.class);
 
         iocBuilder.registerInstance(this);
+
+        registerClassQueue.forEach(iocBuilder::autoRegister);
+        registerInstanceQueue.forEach(iocBuilder::registerInstance);
 
         ioc = iocBuilder.build();
     }
