@@ -4,7 +4,7 @@
 
     <groupId>com.fedepot</groupId>
     <artifactId>razor-mvc</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.3</version>
     <packaging>jar</packaging>
 
     <name>Razor</name>
@@ -32,7 +32,7 @@
     <scm>
         <url>git://github.com/thundernet8/Razor.git</url>
         <connection>scm:git:git@github.com:thundernet8/Razor.git</connection>
-        <tag>Release v0.0.2</tag>
+        <tag>0.0.3</tag>
     </scm>
 
     <issueManagement>
