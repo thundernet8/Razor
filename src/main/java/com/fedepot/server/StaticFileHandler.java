@@ -25,6 +25,7 @@ package com.fedepot.server;
 
 import com.fedepot.Razor;
 import com.fedepot.exception.RazorException;
+import com.fedepot.mvc.Constants;
 import com.fedepot.mvc.http.ContentType;
 import com.fedepot.mvc.http.HttpMethod;
 import com.fedepot.mvc.http.Request;
@@ -35,11 +36,10 @@ import com.fedepot.env.Env;
 
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
+import java.net.URL;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -102,8 +102,50 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         }
 
         Env env = razor.getEnv();
-        String webRoot = APP_CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_WEB_ROOT_DIR, DEFAULT_WEB_ROOT_DIR));
+        String webRoot = env.get(ENV_RT_KEY_WEB_ROOT_ABS_PATH, "");
         String absPath = webRoot.concat(path);
+
+        URL url = getClass().getResource(File.separator.concat(env.get(ENV_KEY_WEB_ROOT_DIR, DEFAULT_WEB_ROOT_DIR)).concat(path));
+
+        if (url == null) {
+
+            response.sendError(NOT_FOUND);
+
+            return false;
+        }
+
+        if (url.toString().startsWith("file:/") || url.toString().startsWith("jar:file:/")) {
+
+            File tmpFile = new File(Constants.ROOT_FOLDER.concat(File.separator).concat("cache").concat(path));
+
+            if (!tmpFile.exists()) {
+
+                // for resources packaged in one jar file, only direct files will be handled, sub folder index files will not be checked
+                try {
+
+                    InputStream openStream = url.openStream();
+                    int contentLength = openStream.available();
+                    byte[] binaryData = new byte[contentLength];
+                    openStream.read(binaryData);
+
+                    FileUtils.copyURLToFile(url, tmpFile);
+
+                    setHeaders(tmpFile, request, response);
+                    response.end(binaryData);
+
+                    openStream.close();
+
+                    return true;
+                } catch (Exception e) {
+
+                    response.interanlError();
+                    return false;
+                }
+            } else {
+
+                absPath = tmpFile.getAbsolutePath();
+            }
+        }
 
         File file = new File(absPath);
 

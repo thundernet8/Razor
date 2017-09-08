@@ -31,7 +31,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
+import java.net.URL;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -148,13 +148,14 @@ public class Env {
     public static Env fromXml() {
 
         String appXmlPath = Constants.APP_CLASS_PATH.concat("/WEB-INF/app.xml");
-        File file = new File(appXmlPath);
+
+        URL appXmlUrl = Env.class.getResource("/WEB-INF/app.xml");
 
         try {
 
             Properties properties;
 
-            if (!file.exists()) {
+            if (appXmlUrl == null) {
 
                 String defaultAppXmlPath = Constants.RAZOR_CLASS_PATH.concat("app_default.xml");
 
@@ -165,7 +166,7 @@ public class Env {
 
                 log.info("App use configuration from file {}", appXmlPath);
 
-                properties = ConfigurationFactory.parseAppXml(file);
+                properties = ConfigurationFactory.parseAppXml(appXmlUrl.openStream());
             }
 
             return new Env(properties);

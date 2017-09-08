@@ -34,7 +34,7 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 
-import java.io.File;
+import java.net.URL;
 import java.util.Optional;
 
 /**
@@ -56,42 +56,48 @@ public class Ehcache implements Cache {
     private Ehcache(String group) {
 
         String configXmlPath = Constants.APP_CLASS_PATH.concat("/WEB-INF/ehcache.xml");
-        File file = new File(configXmlPath);
+        URL appXmlUrl = Ehcache.class.getResource("/WEB-INF/ehcache.xml");
         Configuration configuration;
 
-        if (file.exists()) {
+        try {
 
-            log.info("Ehcache use configuration from file {}", configXmlPath);
+            if (appXmlUrl != null) {
 
-            configuration = ConfigurationFactory.parseConfiguration(file);
+                log.info("Ehcache use configuration from file {}", configXmlPath);
 
-        } else {
+                configuration = ConfigurationFactory.parseConfiguration(appXmlUrl.openStream());
 
-            configXmlPath = Constants.RAZOR_CLASS_PATH.concat("/ehcache_default.xml");
+            } else {
 
-            log.info("Ehcache default configuration file is not exist, use {} instead.", configXmlPath);
+                configXmlPath = Constants.RAZOR_CLASS_PATH.concat("/ehcache_default.xml");
 
-            configuration = ConfigurationFactory.parseConfiguration(Ehcache.class.getResourceAsStream("/ehcache_default.xml"));
+                log.info("Ehcache configuration file is not exist, use {} instead.", configXmlPath);
+
+                configuration = ConfigurationFactory.parseConfiguration(Ehcache.class.getResourceAsStream("/ehcache_default.xml"));
+            }
+
+            this.cacheManager = CacheManager.create(configuration);
+
+            if (!cacheManager.cacheExists(DEFAULT_GROUP)) {
+
+                this.cacheManager.addCache(DEFAULT_GROUP);
+            }
+
+            if (!cacheManager.cacheExists(group)) {
+
+                this.cacheManager.addCache(group);
+            }
+
+            // persist when app stop
+            EventEmitter.newInstance().on(EventType.APP_STOP, e -> {
+
+                log.info("Persist as app shutting down");
+                this.shutdown();
+            });
+        } catch (Exception e) {
+
+            log.error("Ehcache configuration initialize failed", e);
         }
-
-        this.cacheManager = CacheManager.create(configuration);
-
-        if (!cacheManager.cacheExists(DEFAULT_GROUP)) {
-
-            this.cacheManager.addCache(DEFAULT_GROUP);
-        }
-
-        if (!cacheManager.cacheExists(group)) {
-
-            this.cacheManager.addCache(group);
-        }
-
-        // persist when app stop
-        EventEmitter.newInstance().on(EventType.APP_STOP, e -> {
-
-            log.info("Persist as app shutting down");
-            this.shutdown();
-        });
     }
 
     public synchronized static Ehcache newInstance(String group) {
