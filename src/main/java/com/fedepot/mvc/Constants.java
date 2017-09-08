@@ -39,6 +39,12 @@ public interface Constants {
     String PACKAGE_NAME = "Razor";
 
     // System
+
+    /**
+     * Root folder, for running a packaged jar file, it will be the folder contain this jar; for source code running, it will be the target folder contains compiled classes folder.
+     */
+    public static String ROOT_FOLDER = new File(Constants.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getAbsolutePath();
+
     String RAZOR_CLASS_PATH = new File(Constants.class.getResource("/razor.png").getPath()).getParent();
     String APP_CLASS_PATH = Constants.class.getResource("/") == null ? new File(Constants.class.getResource("/razor.png").getPath()).getParent() : new File((Constants.class.getResource("/")).getPath()).getAbsolutePath();
 

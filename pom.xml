@@ -56,6 +56,7 @@
         <beetl.version>2.7.21</beetl.version>
         <locality.uuid.version>1.1.1</locality.uuid.version>
         <ehcache.core.version>2.10.4</ehcache.core.version>
+        <commonsio.version>1.3.2</commonsio.version>
         <project.scm.id>github</project.scm.id>
     </properties>
 
@@ -382,6 +383,12 @@
             <groupId>net.sf.ehcache.internal</groupId>
             <artifactId>ehcache-core</artifactId>
             <version>${ehcache.core.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-io -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commonsio.version}</version>
         </dependency>
     </dependencies>
 </project>
