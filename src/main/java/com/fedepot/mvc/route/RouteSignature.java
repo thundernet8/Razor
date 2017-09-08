@@ -114,7 +114,7 @@ public class RouteSignature {
         int i = 0;
         for (Parameter parameter : actionParams) {
 
-            if (i < routeParams.length) {
+            if (routeParams != null && i < routeParams.length) {
 
                 paramValues[i] = routeParams[i].getValue();
             } else if (parameter.getAnnotation(FromBody.class) != null) {
