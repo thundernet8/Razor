@@ -40,7 +40,7 @@ public class FieldsWalker {
 
     public static Field[] findInjectFields(Class<?> clazz) {
 
-        Field[] fields = Arrays.stream(clazz.getFields()).filter(field ->
+        Field[] fields = Arrays.stream(clazz.getDeclaredFields()).filter(field ->
                 field.getAnnotation(FromService.class) != null
         ).toArray(Field[]::new);
 

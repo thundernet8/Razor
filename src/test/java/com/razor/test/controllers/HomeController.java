@@ -1,8 +1,9 @@
 package com.razor.test.controllers;
 
+import com.fedepot.ioc.annotation.FromService;
 import com.fedepot.mvc.controller.Controller;
 import com.fedepot.mvc.annotation.Route;
-import com.fedepot.mvc.http.Cookie;
+import com.razor.test.model.Book;
 
 /**
  * Copyright (c) 2017, Touchumind<chinash2010@gmail.com>
@@ -28,6 +29,9 @@ import com.fedepot.mvc.http.Cookie;
 
 
 public class HomeController extends Controller {
+
+    @FromService
+    private Book book;
 
     @Route("")
     public void index() {
