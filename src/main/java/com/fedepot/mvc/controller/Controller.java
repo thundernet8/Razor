@@ -145,7 +145,7 @@ public abstract class Controller implements IController {
             path = path.substring(1);
         }
 
-        String templateDir = HttpContext.app().getEnv().get(ENV_KEY_TEMPLATE_ROOT_DIR, DEFAULT_TEMPLATE_ROOT_DIR);
+        String templateDir = HttpContext.app().getEnv().get(ENV_KEY_TEMPLATE_ROOT_FOLDER, DEFAULT_TEMPLATE_ROOT_FOLDER);
         return templateDir.concat("/").concat(path);
     }
 }

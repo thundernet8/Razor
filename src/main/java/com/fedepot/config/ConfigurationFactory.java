@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import static com.fedepot.mvc.Constants.*;
 
@@ -89,8 +90,24 @@ public class ConfigurationFactory {
             if (rootNode.getNodeType() == Node.ELEMENT_NODE) {
 
                 Element element = (Element)rootNode;
-                properties.put(ENV_KEY_WEB_ROOT_DIR, element.getElementsByTagName("web").item(0).getTextContent());
-                properties.put(ENV_KEY_TEMPLATE_ROOT_DIR, element.getElementsByTagName("template").item(0).getTextContent());
+
+                NodeList props = element.getElementsByTagName("property");
+                for (int i=0; i<props.getLength(); i++) {
+                    Element propEle = (Element)props.item(i);
+                    String name = propEle.getAttribute("name");
+                    switch (name) {
+
+                        case "www":
+                            String webRoot = propEle.getTextContent();
+                            boolean useOuterWebRoot = webRoot.startsWith("/") || Pattern.compile("^([a-zA-Z]):".concat(File.separator + File.separator)).matcher(webRoot).find();
+                            properties.put(ENV_KEY_WEB_ROOT_FOLDER, propEle.getTextContent());
+                            properties.put(ENV_KEY_USE_OUTER_WEB_ROOT, useOuterWebRoot);
+                            break;
+                        case "template":
+                            properties.put(ENV_KEY_TEMPLATE_ROOT_FOLDER, propEle.getTextContent());
+                            break;
+                    }
+                }
             }
         }
 
@@ -168,7 +185,7 @@ public class ConfigurationFactory {
                             properties.put(ENV_KEY_403_PAGE_TEMPLATE, propEle.getTextContent());
                             break;
                         case "404":
-                            properties.put(ENV_KEY_404_PAGE_TEMPLATE, Integer.parseInt(propEle.getTextContent()));
+                            properties.put(ENV_KEY_404_PAGE_TEMPLATE, propEle.getTextContent());
                             break;
                         case "500":
                             properties.put(ENV_KEY_500_PAGE_TEMPLATE, propEle.getTextContent());

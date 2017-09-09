@@ -277,24 +277,34 @@ public class Razor {
     }
 
     /**
-     * Specify web root dir of resource, default `web` which means a web folder under your resources folder, and web folder under your classpath when running
+     * Specify web root dir of resource, default `WWW` which means a WWW folder under your resources folder, and WWW folder under your classpath when running
+     *
+     * Note: if you specify a absolute path, all statics web resources will be load from that folder rather than a subfolder of classpath
      *
      * @param webDir web root dir
      * @return Razor
      */
     public Razor webRoot(String webDir) {
 
-        if (!Pattern.compile("^([^/.])([0-9a-zA-Z_]*)([^/.])$").matcher(webDir).find()) {
+        boolean useOuterWebRoot = false;
+        // absolute web root
+        if (webDir.startsWith("/") || Pattern.compile("^([a-zA-Z]):".concat(File.separator + File.separator)).matcher(webDir).find()) {
 
-            log.error("Content package should only include numbers, latin letters, _ or /, and should not start or end with /");
+            useOuterWebRoot = true;
+        } else {
 
-            return this;
+            if (!Pattern.compile("^([^/.])([0-9a-zA-Z_]*)([^/.])$").matcher(webDir).find()) {
+
+                log.error("Relative web folder name should only include numbers, latin letters, _ or /, and should not start or end with /");
+
+                return this;
+            }
         }
 
         try {
 
-            env.set(ENV_KEY_WEB_ROOT_DIR, webDir);
-            statics.add("/".concat(webDir).concat("/"));
+            env.set(ENV_KEY_WEB_ROOT_FOLDER, webDir);
+            env.set(ENV_KEY_USE_OUTER_WEB_ROOT, useOuterWebRoot);
         } catch (Exception e) {
 
             log.error(e.getMessage());
@@ -302,6 +312,7 @@ public class Razor {
 
         return this;
     }
+
 
     /**
      * Specify the file index for a directory
@@ -589,10 +600,21 @@ public class Razor {
      */
     private void initRuntime() {
 
-        String webAbsPath = APP_CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_WEB_ROOT_DIR, DEFAULT_WEB_ROOT_DIR)).concat(File.separator);
-        env.set(ENV_RT_KEY_WEB_ROOT_ABS_PATH, webAbsPath);
+        Optional<String> webRoot = env.get(ENV_KEY_WEB_ROOT_FOLDER);
+        boolean useOuterWebRoot = env.getBool(ENV_KEY_USE_OUTER_WEB_ROOT, false);
 
-        String templateAbsPath = APP_CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_TEMPLATE_ROOT_DIR, DEFAULT_TEMPLATE_ROOT_DIR)).concat(File.separator);
+
+        if (!useOuterWebRoot || !webRoot.isPresent()) {
+
+            String webAbsPath = APP_CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_WEB_ROOT_FOLDER, DEFAULT_WEB_ROOT_FOLDER));
+            env.set(ENV_RT_KEY_WEB_ROOT_ABS_PATH, webAbsPath);
+
+        } else {
+
+            env.set(ENV_RT_KEY_WEB_ROOT_ABS_PATH, webRoot.get());
+        }
+
+        String templateAbsPath = APP_CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_TEMPLATE_ROOT_FOLDER, DEFAULT_TEMPLATE_ROOT_FOLDER));
         env.set(ENV_RT_KEY_TEMPLATE_ROOT_ABS_PATH, templateAbsPath);
 
         String[] templates = new String[]{ENV_KEY_403_PAGE_TEMPLATE, ENV_KEY_404_PAGE_TEMPLATE, ENV_KEY_500_PAGE_TEMPLATE, ENV_KEY_502_PAGE_TEMPLATE};
@@ -630,6 +652,8 @@ public class Razor {
         this.initRoutes();
         this.initImplements();
         this.initRuntime();
+
+        log.info("App use web root folder: {}", env.get(ENV_KEY_WEB_ROOT_FOLDER, DEFAULT_WEB_ROOT_FOLDER));
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 
