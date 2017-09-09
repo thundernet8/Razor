@@ -33,6 +33,7 @@ import com.fedepot.mvc.renderer.TemplateRenderer;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,6 +48,8 @@ import static com.fedepot.mvc.Constants.*;
 @Slf4j
 @RoutePrefix
 public abstract class Controller implements IController {
+
+    private final Map<String, Object> viewBag = new HashMap<>();
 
     protected HttpContext Context() {
 
@@ -64,14 +67,25 @@ public abstract class Controller implements IController {
     }
 
     /**
+     * Set global variables for view rendering
+     *
+     * @param key data key
+     * @param value data value
+     */
+    protected void ViewBag(String key, Object value) {
+
+        viewBag.put(key, value);
+    }
+
+
+    /**
      * Render view with template
      *
      * @param templatePath the template used to render
      */
-    protected void Render(String templatePath) {
+    protected void View(String templatePath) {
 
         TemplateRenderer renderer = new TemplateRenderer(templateFullPath(templatePath));
-        renderer.setContentType(ContentType.HTML);
 
         proxyRender(renderer);
     }
@@ -82,10 +96,9 @@ public abstract class Controller implements IController {
      * @param templatePath the template used to render
      * @param data data for rendering
      */
-    protected void Render(String templatePath, Map<String, Object> data) {
+    protected void View(String templatePath, Map<String, Object> data) {
 
         TemplateRenderer renderer = new TemplateRenderer(templateFullPath(templatePath), data);
-        renderer.setContentType(ContentType.HTML);
 
         proxyRender(renderer);
     }
@@ -97,10 +110,9 @@ public abstract class Controller implements IController {
      * @param dataKey variable key
      * @param dataValue variable value
      */
-    protected void Render(String templatePath, String dataKey, String dataValue) {
+    protected void View(String templatePath, String dataKey, String dataValue) {
 
         TemplateRenderer renderer = new TemplateRenderer(templateFullPath(templatePath), dataKey, dataValue);
-        renderer.setContentType(ContentType.HTML);
 
         proxyRender(renderer);
     }
@@ -109,6 +121,8 @@ public abstract class Controller implements IController {
 
         try {
 
+            renderer.setContentType(ContentType.HTML);
+            renderer.setViewBag(viewBag);
             renderer.render(HttpContext.request(), HttpContext.response());
         } catch (RazorException e) {
 

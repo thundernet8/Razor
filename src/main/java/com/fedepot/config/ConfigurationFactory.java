@@ -157,13 +157,29 @@ public class ConfigurationFactory {
             if (errPageNode.getNodeType() == Node.ELEMENT_NODE) {
 
                 Element element = (Element)errPageNode;
-                properties.put(ENV_KEY_403_PAGE_TEMPLATE, element.getElementsByTagName("_403").item(0).getTextContent());
-                properties.put(ENV_KEY_404_PAGE_TEMPLATE, element.getElementsByTagName("_404").item(0).getTextContent());
-                properties.put(ENV_KEY_500_PAGE_TEMPLATE, element.getElementsByTagName("_500").item(0).getTextContent());
-                properties.put(ENV_KEY_502_PAGE_TEMPLATE, element.getElementsByTagName("_502").item(0).getTextContent());
+
+                NodeList props = element.getElementsByTagName("property");
+                for (int i=0; i<props.getLength(); i++) {
+                    Element propEle = (Element)props.item(i);
+                    String name = propEle.getAttribute("name");
+                    switch (name) {
+
+                        case "403":
+                            properties.put(ENV_KEY_403_PAGE_TEMPLATE, propEle.getTextContent());
+                            break;
+                        case "404":
+                            properties.put(ENV_KEY_404_PAGE_TEMPLATE, Integer.parseInt(propEle.getTextContent()));
+                            break;
+                        case "500":
+                            properties.put(ENV_KEY_500_PAGE_TEMPLATE, propEle.getTextContent());
+                            break;
+                        case "502":
+                            properties.put(ENV_KEY_502_PAGE_TEMPLATE, propEle.getTextContent());
+                            break;
+                    }
+                }
             }
         }
-
 
         return properties;
     }

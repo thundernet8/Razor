@@ -35,9 +35,9 @@
 
     <!-- Error page template path relative templates folder path -->
     <!--<errorPage>-->
-    <!--<_403>403.htm</_403>-->
-    <!--<_404>404.htm</_404>-->
-    <!--<_500>500.htm</_500>-->
-    <!--<_502>502.htm</_502>-->
+        <!--<property name="403">403.htm</property>-->
+        <!--<property name="404">404.htm</property>-->
+        <!--<property name="500">500.htm</property>-->
+        <!--<property name="502">502.htm</property>-->
     <!--</errorPage>-->
 </app>

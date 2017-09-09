@@ -31,6 +31,8 @@ import com.fedepot.mvc.http.Response;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Map;
+
 /**
  * Abstract renderer class
  *
@@ -42,6 +44,10 @@ abstract class Renderer {
     @Getter
     @Setter
     private ContentType contentType;
+
+    @Getter
+    @Setter
+    private Map<String, Object> viewBag;
 
     public abstract void render(Request request, Response response) throws RazorException;
 
