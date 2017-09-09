@@ -45,6 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
 
+import static com.fedepot.mvc.http.HttpHeaderNames.CONTENT_TYPE;
 import static io.netty.buffer.Unpooled.copiedBuffer;
 
 
@@ -226,6 +227,11 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             if (returnType == Void.TYPE) {
 
                 result = "";
+            }
+
+            if (response.get(CONTENT_TYPE) == null) {
+
+                response.header(CONTENT_TYPE, ContentType.TEXT.getMimeTypeWithCharset());
             }
 
             response.end(ActionResult.build(result, returnType).getBytes());
