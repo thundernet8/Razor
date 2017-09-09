@@ -232,32 +232,23 @@ public class Request {
     /**
      * url match route properties, e.g you have a route /book/:name, the `name` would be one url parameter
      */
+    @Getter
     private PathParameter[] pathParams;
 
-    public PathParameter[] pathParams() {
-
-        return pathParams;
-    }
 
     /**
      * data items from form body
      */
+    @Getter
     private Map<String, List<String>> formParams;
 
-    public Map<String, List<String>> formParams() {
-
-        return formParams;
-    }
 
     /**
      * Url queries
      */
+    @Getter
     private Map<String, List<String>> queries;
 
-    public Map<String, List<String>> queries() {
-
-        return queries;
-    }
 
     /**
      * Form upload files
@@ -283,12 +274,8 @@ public class Request {
     /**
      * Store some data, useful for middleware
      */
+    @Getter
     private Map<String, Object> locals;
-
-    public Map<String, Object> locals() {
-
-        return locals;
-    }
 
     public void locals(String key, Object value) {
 

@@ -23,6 +23,8 @@
 
 package com.fedepot.mvc.template;
 
+import com.fedepot.mvc.http.HttpContext;
+import com.fedepot.mvc.http.Session;
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
@@ -30,6 +32,7 @@ import org.beetl.core.resource.ClasspathResourceLoader;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -41,9 +44,9 @@ import java.util.Map;
 @Slf4j
 public class BeetlTemplateEngine implements TemplateEngine{
 
-    private static GroupTemplate groupTemplate;
+    private GroupTemplate groupTemplate;
 
-    private static GroupTemplate getGroupTemplate() {
+    private GroupTemplate getGroupTemplate() {
 
         if (groupTemplate == null) {
 //            synchronized (BeetlTemplateEngine.class) {
@@ -76,6 +79,13 @@ public class BeetlTemplateEngine implements TemplateEngine{
     public String render(String templatePath, Map<String, Object> data) throws Exception {
 
         GroupTemplate gt = getGroupTemplate();
+        // set template global shared vars
+        Map<String, Object> sharedVars = new HashMap<>();
+        sharedVars.put("REQUEST", HttpContext.request());
+        Session session = HttpContext.request().session();
+        sharedVars.put("SESSION", session != null ? session.attributes() : new HashMap<String, Object>());
+        gt.setSharedVars(sharedVars);
+
         Template template = gt.getTemplate(templatePath);
         template.binding(data);
 

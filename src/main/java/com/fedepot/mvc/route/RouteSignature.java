@@ -107,7 +107,7 @@ public class RouteSignature {
             return;
         }
 
-        PathParameter[] routeParams = request.pathParams();
+        PathParameter[] routeParams = request.getPathParams();
         Parameter[] actionParams = action.getParameters();
         Object[] paramValues = new Object[actionParamCount];
 
@@ -128,8 +128,8 @@ public class RouteSignature {
                     request.setBody(value);
                 } else {
 
-                    if (request.formParams() != null) {
-                        Map<String, List<String>> formParams = request.formParams();
+                    if (request.getFormParams() != null) {
+                        Map<String, List<String>> formParams = request.getFormParams();
                         Map<String, Object> formatFormParams = new HashMap<>();
 
                         for (String key : formParams.keySet()) {
