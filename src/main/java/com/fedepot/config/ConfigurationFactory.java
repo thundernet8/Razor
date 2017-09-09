@@ -89,8 +89,24 @@ public class ConfigurationFactory {
             if (rootNode.getNodeType() == Node.ELEMENT_NODE) {
 
                 Element element = (Element)rootNode;
-                properties.put(ENV_KEY_WEB_ROOT_DIR, element.getElementsByTagName("web").item(0).getTextContent());
-                properties.put(ENV_KEY_TEMPLATE_ROOT_DIR, element.getElementsByTagName("template").item(0).getTextContent());
+
+                NodeList props = element.getElementsByTagName("property");
+                for (int i=0; i<props.getLength(); i++) {
+                    Element propEle = (Element)props.item(i);
+                    String name = propEle.getAttribute("name");
+                    switch (name) {
+
+                        case "www":
+                            properties.put(ENV_KEY_WEB_ROOT_FOLDER, propEle.getTextContent());
+                            break;
+                        case "template":
+                            properties.put(ENV_KEY_TEMPLATE_ROOT_FOLDER, propEle.getTextContent());
+                            break;
+                        case "resource":
+                            properties.put(ENV_KEY_RESOURCES_DIR, propEle.getTextContent());
+                            break;
+                    }
+                }
             }
         }
 
@@ -168,7 +184,7 @@ public class ConfigurationFactory {
                             properties.put(ENV_KEY_403_PAGE_TEMPLATE, propEle.getTextContent());
                             break;
                         case "404":
-                            properties.put(ENV_KEY_404_PAGE_TEMPLATE, Integer.parseInt(propEle.getTextContent()));
+                            properties.put(ENV_KEY_404_PAGE_TEMPLATE, propEle.getTextContent());
                             break;
                         case "500":
                             properties.put(ENV_KEY_500_PAGE_TEMPLATE, propEle.getTextContent());

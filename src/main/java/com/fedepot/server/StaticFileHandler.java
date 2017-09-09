@@ -105,47 +105,53 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         String webRoot = env.get(ENV_RT_KEY_WEB_ROOT_ABS_PATH, "");
         String absPath = webRoot.concat(path);
 
-        URL url = getClass().getResource(File.separator.concat(env.get(ENV_KEY_WEB_ROOT_DIR, DEFAULT_WEB_ROOT_DIR)).concat(path));
+        boolean useClassPathResDir = env.get(ENV_KEY_RESOURCES_DIR, "").equals("");
 
-        if (url == null) {
+        if (useClassPathResDir) {
 
-            response.sendError(NOT_FOUND);
+            URL url = getClass().getResource(File.separator.concat(env.get(ENV_KEY_WEB_ROOT_FOLDER, DEFAULT_WEB_ROOT_FOLDER)).concat(path));
 
-            return false;
-        }
+            if (url == null) {
 
-        if (url.toString().startsWith("file:/") || url.toString().startsWith("jar:file:/")) {
+                response.sendError(NOT_FOUND);
 
-            File tmpFile = new File(Constants.ROOT_FOLDER.concat(File.separator).concat("cache").concat(path));
+                return false;
+            }
 
-            if (!tmpFile.exists()) {
+            if (url.toString().startsWith("file:/") || url.toString().startsWith("jar:file:/")) {
 
-                // for resources packaged in one jar file, only direct files will be handled, sub folder index files will not be checked
-                try {
+                File tmpFile = new File(Constants.ROOT_DIR.concat(File.separator).concat("cache").concat(path));
 
-                    InputStream openStream = url.openStream();
-                    int contentLength = openStream.available();
-                    byte[] binaryData = new byte[contentLength];
-                    openStream.read(binaryData);
+                if (!tmpFile.exists()) {
 
-                    FileUtils.copyURLToFile(url, tmpFile);
+                    // for resources packaged in one jar file, only direct files will be handled, sub folder index files will not be checked
+                    try {
 
-                    setHeaders(tmpFile, request, response);
-                    response.end(binaryData);
+                        InputStream openStream = url.openStream();
+                        int contentLength = openStream.available();
+                        byte[] binaryData = new byte[contentLength];
+                        openStream.read(binaryData);
 
-                    openStream.close();
+                        FileUtils.copyURLToFile(url, tmpFile);
 
-                    return true;
-                } catch (Exception e) {
+                        setHeaders(tmpFile, request, response);
+                        response.end(binaryData);
 
-                    response.interanlError();
-                    return false;
+                        openStream.close();
+
+                        return true;
+                    } catch (Exception e) {
+
+                        response.interanlError();
+                        return false;
+                    }
+                } else {
+
+                    absPath = tmpFile.getAbsolutePath();
                 }
-            } else {
-
-                absPath = tmpFile.getAbsolutePath();
             }
         }
+
 
         File file = new File(absPath);
 

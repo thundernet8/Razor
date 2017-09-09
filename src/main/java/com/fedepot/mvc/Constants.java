@@ -43,7 +43,7 @@ public interface Constants {
     /**
      * Root folder, for running a packaged jar file, it will be the folder contain this jar; for source code running, it will be the target folder contains compiled classes folder.
      */
-    public static String ROOT_FOLDER = new File(Constants.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getAbsolutePath();
+    String ROOT_DIR = new File(Constants.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getAbsolutePath();
 
     String RAZOR_CLASS_PATH = new File(Constants.class.getResource("/razor.png").getPath()).getParent();
     String APP_CLASS_PATH = Constants.class.getResource("/") == null ? new File(Constants.class.getResource("/razor.png").getPath()).getParent() : new File((Constants.class.getResource("/")).getPath()).getAbsolutePath();
@@ -51,19 +51,19 @@ public interface Constants {
     // Server default constants
     String DEFAULT_SERVER_HOST = "0.0.0.0";
 
-    int DEFAULT_SERVER_PORT = 8088;
+    Integer DEFAULT_SERVER_PORT = 8088;
 
-    String DEFAULT_WEB_ROOT_DIR = "WWW"; // relative to classpath
+    String DEFAULT_WEB_ROOT_FOLDER = "WWW"; // relative to classpath
 
-    String DEFAULT_TEMPLATE_ROOT_DIR = "WEB-INF/templates"; // relative to classpath
+    String DEFAULT_TEMPLATE_ROOT_FOLDER = "WEB-INF/templates"; // relative to classpath
 
     List<String> DEFAULT_STATICS = Arrays.asList("/favicon.ico", "/robots.txt", "/sitemap.xml");
 
     List<String> DEFAULT_INDEX_FILES = Arrays.asList("index.html", "index.htm");
 
-    boolean DEFAULT_SSL_ENABLE = false;
+    Boolean DEFAULT_SSL_ENABLE = false;
 
-    boolean DEFAULT_GZIP_ENABLE = false;
+    Boolean DEFAULT_GZIP_ENABLE = false;
 
     // Http constants
     String DEFAULT_CHARSET = "utf-8";
@@ -78,7 +78,7 @@ public interface Constants {
 
     String DEFAULT_SESSION_KEY = "SESSION";
 
-    int DEFAULT_SESSION_TIMEOUT = 3600;
+    Integer DEFAULT_SESSION_TIMEOUT = 3600;
 
     // Env keys
     String ENV_KEY_SERVER_HOST = "razor.server.host";
@@ -91,9 +91,11 @@ public interface Constants {
 
     String ENV_KEY_GZIP = "razor.server.gzip";
 
-    String ENV_KEY_WEB_ROOT_DIR = "razor.web.root";
+    String ENV_KEY_WEB_ROOT_FOLDER = "razor.web.root";
 
-    String ENV_KEY_TEMPLATE_ROOT_DIR = "razor.web.template.root";
+    String ENV_KEY_TEMPLATE_ROOT_FOLDER = "razor.web.template.root";
+
+    String ENV_KEY_RESOURCES_DIR = "razor.resources.root"; // blank means use inner resources directory, which is the classpath
 
     String ENV_KEY_STATIC_RULES = "razor.web.statics";
 
