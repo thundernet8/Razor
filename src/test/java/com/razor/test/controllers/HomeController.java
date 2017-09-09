@@ -38,7 +38,7 @@ public class HomeController extends Controller {
 
         //return "Home page";
 
-        Render("home.htm", "var1", "home result using beetl");
+        View("home.htm", "var1", "home result using beetl");
     }
 
     @Route("redirect")

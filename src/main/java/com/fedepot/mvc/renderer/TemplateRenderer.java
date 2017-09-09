@@ -74,6 +74,7 @@ public class TemplateRenderer extends Renderer {
 
         try {
 
+            model.put("VIEWBAG", getViewBag());
             String view = TemplateEngineFactory.getEngine().render(templatePath, model);
 
             if (response.get(CONTENT_TYPE) == null) {
