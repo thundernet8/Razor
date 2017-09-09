@@ -12,11 +12,10 @@
 
     <root>
         <!-- Web root folder relative your class path -->
+        <!-- If a absolute path specified, class path prefix will be ignored -->
         <property name="www">WWW</property>
         <!-- Template folder path relative your class path -->
         <property name="template">WEB-INF/templates</property>
-        <!-- Outer resources directory -->
-        <property name="resource"></property>
     </root>
 
     <statics>

@@ -93,9 +93,9 @@ public interface Constants {
 
     String ENV_KEY_WEB_ROOT_FOLDER = "razor.web.root";
 
-    String ENV_KEY_TEMPLATE_ROOT_FOLDER = "razor.web.template.root";
+    String ENV_KEY_USE_OUTER_WEB_ROOT = "razor.web.root.outer"; // false means use inner resources directory, which is a subfolder of the classpath
 
-    String ENV_KEY_RESOURCES_DIR = "razor.resources.root"; // blank means use inner resources directory, which is the classpath
+    String ENV_KEY_TEMPLATE_ROOT_FOLDER = "razor.web.template.root";
 
     String ENV_KEY_STATIC_RULES = "razor.web.statics";
 

@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import static com.fedepot.mvc.Constants.*;
 
@@ -97,13 +98,13 @@ public class ConfigurationFactory {
                     switch (name) {
 
                         case "www":
+                            String webRoot = propEle.getTextContent();
+                            boolean useOuterWebRoot = webRoot.startsWith("/") || Pattern.compile("^([a-zA-Z]):".concat(File.separator + File.separator)).matcher(webRoot).find();
                             properties.put(ENV_KEY_WEB_ROOT_FOLDER, propEle.getTextContent());
+                            properties.put(ENV_KEY_USE_OUTER_WEB_ROOT, useOuterWebRoot);
                             break;
                         case "template":
                             properties.put(ENV_KEY_TEMPLATE_ROOT_FOLDER, propEle.getTextContent());
-                            break;
-                        case "resource":
-                            properties.put(ENV_KEY_RESOURCES_DIR, propEle.getTextContent());
                             break;
                     }
                 }

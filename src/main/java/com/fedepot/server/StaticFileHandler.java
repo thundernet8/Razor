@@ -105,9 +105,9 @@ public class StaticFileHandler implements IRequestHandler<Boolean> {
         String webRoot = env.get(ENV_RT_KEY_WEB_ROOT_ABS_PATH, "");
         String absPath = webRoot.concat(path);
 
-        boolean useClassPathResDir = env.get(ENV_KEY_RESOURCES_DIR, "").equals("");
+        boolean useOuterWebRootDir = env.getBool(ENV_KEY_USE_OUTER_WEB_ROOT, false) && env.get(ENV_KEY_WEB_ROOT_FOLDER).isPresent();
 
-        if (useClassPathResDir) {
+        if (!useOuterWebRootDir) {
 
             URL url = getClass().getResource(File.separator.concat(env.get(ENV_KEY_WEB_ROOT_FOLDER, DEFAULT_WEB_ROOT_FOLDER)).concat(path));
 

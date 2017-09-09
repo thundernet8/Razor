@@ -279,22 +279,32 @@ public class Razor {
     /**
      * Specify web root dir of resource, default `WWW` which means a WWW folder under your resources folder, and WWW folder under your classpath when running
      *
+     * Note: if you specify a absolute path, all statics web resources will be load from that folder rather than a subfolder of classpath
+     *
      * @param webDir web root dir
      * @return Razor
      */
     public Razor webRoot(String webDir) {
 
-        if (!Pattern.compile("^([^/.])([0-9a-zA-Z_]*)([^/.])$").matcher(webDir).find()) {
+        boolean useOuterWebRoot = false;
+        // absolute web root
+        if (webDir.startsWith("/") || Pattern.compile("^([a-zA-Z]):".concat(File.separator + File.separator)).matcher(webDir).find()) {
 
-            log.error("Content package should only include numbers, latin letters, _ or /, and should not start or end with /");
+            useOuterWebRoot = true;
+        } else {
 
-            return this;
+            if (!Pattern.compile("^([^/.])([0-9a-zA-Z_]*)([^/.])$").matcher(webDir).find()) {
+
+                log.error("Relative web folder name should only include numbers, latin letters, _ or /, and should not start or end with /");
+
+                return this;
+            }
         }
 
         try {
 
             env.set(ENV_KEY_WEB_ROOT_FOLDER, webDir);
-            statics.add("/".concat(webDir).concat("/"));
+            env.set(ENV_KEY_USE_OUTER_WEB_ROOT, useOuterWebRoot);
         } catch (Exception e) {
 
             log.error(e.getMessage());
@@ -303,33 +313,6 @@ public class Razor {
         return this;
     }
 
-    /**
-     * Specify other resources dir to replace default classpath resources dir, when your app run as a packaged jar(static resources also packaged), it's useful to apply this option
-     * Note: any configuration files e.g app.xml, ehcache.xml and view templates should keep the old path and will be read at runtime.
-     * So recommend that only copy web static files(not includes templates in the WEB-INF folder) to outer resources directory and keep same hierarchy as the old way
-     *
-     * @param resDir resources absolute directory
-     * @return Razor self
-     */
-    public Razor resDir(String resDir) {
-
-        if (!resDir.startsWith("/") && !Pattern.compile("^([a-zA-Z]):".concat(File.separator + File.separator)).matcher(resDir).find()) {
-
-            log.error("Resource directory must be a absolute directory");
-
-            return this;
-        }
-
-        try {
-
-            env.set(ENV_KEY_RESOURCES_DIR, resDir);
-        } catch (Exception e) {
-
-            log.error(e.getMessage());
-        }
-
-        return this;
-    }
 
     /**
      * Specify the file index for a directory
@@ -617,22 +600,22 @@ public class Razor {
      */
     private void initRuntime() {
 
-        String resDir = env.get(ENV_KEY_RESOURCES_DIR, "");
+        Optional<String> webRoot = env.get(ENV_KEY_WEB_ROOT_FOLDER);
+        boolean useOuterWebRoot = env.getBool(ENV_KEY_USE_OUTER_WEB_ROOT, false);
 
-        String templateAbsPath;
-        if (resDir.equals("")) {
+
+        if (!useOuterWebRoot || !webRoot.isPresent()) {
 
             String webAbsPath = APP_CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_WEB_ROOT_FOLDER, DEFAULT_WEB_ROOT_FOLDER));
             env.set(ENV_RT_KEY_WEB_ROOT_ABS_PATH, webAbsPath);
 
-            templateAbsPath = APP_CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_TEMPLATE_ROOT_FOLDER, DEFAULT_TEMPLATE_ROOT_FOLDER));
-            env.set(ENV_RT_KEY_TEMPLATE_ROOT_ABS_PATH, templateAbsPath);
         } else {
 
-            templateAbsPath = resDir.concat(File.separator).concat(env.get(ENV_KEY_TEMPLATE_ROOT_FOLDER, DEFAULT_TEMPLATE_ROOT_FOLDER));
-            env.set(ENV_RT_KEY_WEB_ROOT_ABS_PATH, resDir.concat(File.separator).concat(env.get(ENV_KEY_WEB_ROOT_FOLDER, DEFAULT_WEB_ROOT_FOLDER)));
-            env.set(ENV_RT_KEY_TEMPLATE_ROOT_ABS_PATH, templateAbsPath);
+            env.set(ENV_RT_KEY_WEB_ROOT_ABS_PATH, webRoot.get());
         }
+
+        String templateAbsPath = APP_CLASS_PATH.concat(File.separator).concat(env.get(ENV_KEY_TEMPLATE_ROOT_FOLDER, DEFAULT_TEMPLATE_ROOT_FOLDER));
+        env.set(ENV_RT_KEY_TEMPLATE_ROOT_ABS_PATH, templateAbsPath);
 
         String[] templates = new String[]{ENV_KEY_403_PAGE_TEMPLATE, ENV_KEY_404_PAGE_TEMPLATE, ENV_KEY_500_PAGE_TEMPLATE, ENV_KEY_502_PAGE_TEMPLATE};
         String[] keys = new String[]{ENV_RT_KEY_403_HTML, ENV_RT_KEY_404_HTML, ENV_RT_KEY_500_HTML, ENV_RT_KEY_502_HTML};
@@ -670,7 +653,7 @@ public class Razor {
         this.initImplements();
         this.initRuntime();
 
-        log.info("App use resources root folder: {}", env.get(ENV_KEY_RESOURCES_DIR, APP_CLASS_PATH));
+        log.info("App use web root folder: {}", env.get(ENV_KEY_WEB_ROOT_FOLDER, DEFAULT_WEB_ROOT_FOLDER));
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 
