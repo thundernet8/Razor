@@ -49,7 +49,10 @@ public class ConstructorWalker {
 
         if (constructors.length == 0) {
 
-            throw new DependencyResolveException("Cannot resolve constructor for Type: " + clazz.getName());
+            //throw new DependencyResolveException("Cannot resolve constructor for Type: " + clazz.getName());
+            log.warn("Class {} has no any public constructors, if it registered as instance this could be ignored, otherwise it will lead to failure when resolving this class", clazz.getName());
+
+            return null;
         }
 
         Constructor injectConstructor = constructors[0];

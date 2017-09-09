@@ -179,12 +179,15 @@ public class ContainerBuilder implements IContainerBuilder {
 
             // constructor parameters
             Constructor constructor = ConstructorWalker.findInjectConstructor(clazz);
-            Parameter[] paramNames = constructor.getParameters();
-            Arrays.stream(paramNames).map(Parameter::getType).forEach(this::recursiveRegisterType);
-            log.info("Ioc registered {} parameters for {} constructor", paramNames, clazz.getName());
+            if (constructor != null) {
 
-            // class fields
-            registerFields(clazz);
+                Parameter[] paramNames = constructor.getParameters();
+                Arrays.stream(paramNames).map(Parameter::getType).forEach(this::recursiveRegisterType);
+                log.info("Ioc registered {} parameters for {} constructor", paramNames, clazz.getName());
+
+                // class fields
+                registerFields(clazz);
+            }
         } catch (Exception e) {
 
             log.error(e.getMessage());
