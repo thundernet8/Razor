@@ -122,12 +122,16 @@ public class Router {
         List<Middleware> collection = new ArrayList<>(razor.getRootMiddlewares());
 
         String path = getFullPath();
-        Pattern pattern = Pattern.compile("^(/[0-9a-zA-Z-_./]+)?(/[0-9a-zA-Z-_.]*\\{.+}.*)?((/\\*)(.*))?$");
-        Matcher matcher = pattern.matcher(path);
 
-        if (matcher.matches() && !(matcher.group(1).equals(path))) {
+        if (!path.equals("/*")) {
 
-            path = matcher.group(1).concat("/*");
+            Pattern pattern = Pattern.compile("^(/[0-9a-zA-Z-_./]+)?(/[0-9a-zA-Z-_.]*\\{.+}.*)?((/\\*)(.*))?$");
+            Matcher matcher = pattern.matcher(path);
+
+            if (matcher.matches() && !(matcher.group(1).equals(path))) {
+
+                path = matcher.group(1).concat("/*");
+            }
         }
 
         for (String key : razor.getPathMiddlewares().keySet()) {
