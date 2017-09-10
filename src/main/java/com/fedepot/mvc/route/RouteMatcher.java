@@ -152,7 +152,7 @@ public class RouteMatcher {
         // books/{string:category}/{int:id}.html
         this.route = route;
 
-        isUniversal = route.contains("/*") || Pattern.compile("\\{([0-9a-zA-Z]+)?:?([0-9a-zA-Z_]+)}").matcher(route).find();
+        isUniversal = route.equals("*") || route.contains("/*") || Pattern.compile("\\{([0-9a-zA-Z]+)?:?([0-9a-zA-Z_]+)}").matcher(route).find();
 
         if (!this.validateRoutes()) {
             isValid = false;
@@ -235,9 +235,14 @@ public class RouteMatcher {
 
         if (!matcher.matches()) {
 
-            log.error("Router Prefix {} is illegal, should consist of '0-9 a-z A-Z - _ /'", routePrefix);
+            log.error("Route Prefix {} is illegal, should consist of '0-9 a-z A-Z - _ /'", routePrefix);
             //throw new RazorException("Router prefix ".concat(routePrefix).concat(" is illegal"));
             return false;
+        }
+
+        if (route.equals("*")) {
+
+            return true;
         }
 
         pattern = Pattern.compile("^(([^/])([0-9a-zA-Z-_/{}:.]+)([^/]))?$");
@@ -245,7 +250,7 @@ public class RouteMatcher {
 
         if (!matcher.matches()) {
 
-            log.error("Router {} is illegal", route);
+            log.error("Route {} is illegal", route);
             //throw new RazorException("Router prefix ".concat(routePrefix).concat(" is illegal"));
         }
 
