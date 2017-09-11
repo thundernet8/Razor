@@ -66,6 +66,18 @@ public enum ContentType {
 
     WEBP("image/webp", "webp", true, "webp"),
 
+    SVG("image/svg+xml", "svg", true, "svg"),
+
+    TTF("application/x-font-ttf", "ttf", true, "ttf"),
+
+    OTF("application/x-font-opentype", "otf", true, "otf"),
+
+    WOFF("application/font-woff", "woff", true, "woff"),
+
+    WOFF2("application/font-woff2", "woff2", true, "woff2"),
+
+    EOT("application/vnd.ms-fontobject", "eot", true, "eot"),
+
     FLASH("application/x-shockwave-flash", "flash", false, "swf"),
 
     FLASH_VIDEO("video/x-flv", "flash-video", false, "flv"),
