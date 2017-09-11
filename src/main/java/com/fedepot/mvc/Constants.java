@@ -25,7 +25,10 @@ package com.fedepot.mvc;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Razor global constants
@@ -57,7 +60,7 @@ public interface Constants {
 
     String DEFAULT_TEMPLATE_ROOT_FOLDER = "WEB-INF/templates"; // relative to classpath
 
-    List<String> DEFAULT_STATICS = Arrays.asList("/favicon.ico", "/robots.txt", "/sitemap.xml");
+    List<String> DEFAULT_STATICS = Arrays.asList("/favicon.ico", "/robots.txt", "/sitemap.xml", ".txt", ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tif", ".webp", ".js", ".css", ".json", ".otf", ".eot", ".svg", ".ttf", ".woff", ".woff2");
 
     List<String> DEFAULT_INDEX_FILES = Arrays.asList("index.html", "index.htm");
 

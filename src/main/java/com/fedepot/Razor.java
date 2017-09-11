@@ -60,6 +60,8 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.fedepot.mvc.Constants.*;
 
@@ -105,7 +107,7 @@ public class Razor {
      * Path rules of static resource directory
      */
     @Getter
-    private final Set<String> statics = new HashSet<>((List<String>)(env.getObject(ENV_KEY_STATIC_RULES).orElse(DEFAULT_STATICS)));
+    private final Set<String> statics = new HashSet<>(Stream.of(DEFAULT_STATICS, (List<String>)(env.getObject(ENV_KEY_STATIC_RULES).orElse(Collections.EMPTY_LIST))).flatMap(List::stream).collect(Collectors.toList()));
 
     /**
      * Static route prefix map with server directory
