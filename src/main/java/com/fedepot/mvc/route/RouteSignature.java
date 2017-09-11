@@ -24,7 +24,9 @@
 package com.fedepot.mvc.route;
 
 import com.fedepot.exception.RazorException;
+import com.fedepot.mvc.annotation.FormFiles;
 import com.fedepot.mvc.annotation.FromBody;
+import com.fedepot.mvc.annotation.QueryParam;
 import com.fedepot.mvc.http.ContentType;
 import com.fedepot.mvc.http.Request;
 import com.fedepot.mvc.http.Response;
@@ -34,6 +36,7 @@ import io.netty.util.CharsetUtil;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
@@ -117,44 +120,65 @@ public class RouteSignature {
             if (routeParams != null && i < routeParams.length) {
 
                 paramValues[i] = routeParams[i].getValue();
-            } else if (parameter.getAnnotation(FromBody.class) != null) {
-
-                if (request.get(CONTENT_TYPE).toLowerCase().equals(ContentType.JSON.getMimeType())) {
-
-                    String rawBody = request.getRawBody().toString(CharsetUtil.UTF_8);
-                    Object value = GsonFactory.getGson().fromJson(rawBody, parameter.getType());
-
-                    paramValues[i] = value;
-                    request.setBody(value);
-                } else {
-
-                    if (request.getFormParams() != null) {
-                        Map<String, List<String>> formParams = request.getFormParams();
-                        Map<String, Object> formatFormParams = new HashMap<>();
-
-                        for (String key : formParams.keySet()) {
-
-                            List<String> valueList = formParams.get(key);
-                            if (valueList != null && valueList.size() == 1) {
-
-                                formatFormParams.put(key, valueList.get(0));
-                            } else {
-
-                                formatFormParams.put(key, valueList);
-                            }
-                        }
-
-                        String json = GsonFactory.getGson().toJson(formatFormParams);
-                        Object value = GsonFactory.getGson().fromJson(json, parameter.getType());
-                        paramValues[i] = value;
-                    } else {
-
-                        paramValues[i] = null;
-                    }
-                }
             } else {
 
-                paramValues[i] = null;
+                Annotation[] annotations = parameter.getAnnotations();
+
+                if (annotations.length > 0) {
+
+                    if (annotations[0].annotationType() == FormFiles.class) {
+
+                        paramValues[i] = request.files();
+                    } else if (annotations[0].annotationType() == QueryParam.class) {
+
+                        List<String> queries = request.getQueries().get(((QueryParam)annotations[0]).value());
+                        if (parameter.getType() == String.class) {
+
+                            paramValues[i] = queries.size() > 0 ? queries.get(0) : "";
+                        } else {
+
+                            paramValues[i] = queries;
+                        }
+                    } else if (annotations[0].annotationType() == FromBody.class) {
+
+                        if (request.get(CONTENT_TYPE).toLowerCase().equals(ContentType.JSON.getMimeType())) {
+
+                            String rawBody = request.getRawBody().toString(CharsetUtil.UTF_8);
+                            Object value = GsonFactory.getGson().fromJson(rawBody, parameter.getType());
+
+                            paramValues[i] = value;
+                            request.setBody(value);
+                        } else {
+
+                            if (request.getFormParams() != null) {
+                                Map<String, List<String>> formParams = request.getFormParams();
+                                Map<String, Object> formatFormParams = new HashMap<>();
+
+                                for (String key : formParams.keySet()) {
+
+                                    List<String> valueList = formParams.get(key);
+                                    if (valueList != null && valueList.size() == 1) {
+
+                                        formatFormParams.put(key, valueList.get(0));
+                                    } else {
+
+                                        formatFormParams.put(key, valueList);
+                                    }
+                                }
+
+                                String json = GsonFactory.getGson().toJson(formatFormParams);
+                                Object value = GsonFactory.getGson().fromJson(json, parameter.getType());
+                                paramValues[i] = value;
+                            } else {
+
+                                paramValues[i] = null;
+                            }
+                        }
+                    }
+                } else {
+
+                    paramValues[i] = null;
+                }
             }
 
             i++;

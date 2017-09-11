@@ -23,7 +23,7 @@
 
 package com.fedepot.ioc;
 
-import com.fedepot.ioc.annotation.Inject;
+import com.fedepot.ioc.annotation.Service;
 import com.fedepot.ioc.annotation.IocIgnore;
 import com.fedepot.ioc.exception.DependencyRegisterException;
 import com.fedepot.ioc.walker.ClassesWalker;
@@ -40,7 +40,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Beans container builder
@@ -67,6 +66,8 @@ public class ContainerBuilder implements IContainerBuilder {
                 if (instance == null) {
 
                     instance = new ContainerBuilder(appClass);
+
+                    instance.autoRegister();
                 }
             }
         }
@@ -77,6 +78,27 @@ public class ContainerBuilder implements IContainerBuilder {
     private final List<RegistrationBuilder> rbs = new ArrayList<>();
 
     private final Set<Class<?>> registeredTypes = new HashSet<>();
+
+    /**
+     * Auto register classes annotated with `Service`
+     */
+    private void autoRegister() {
+
+        // scan inject annotated class
+        Set<Class<?>> types = new Reflections(appClass.getPackage().getName()).getTypesAnnotatedWith(Service.class);
+        types.forEach(this::recursiveRegisterType);
+
+        // cache constructors
+        types.forEach(t -> {
+            try {
+
+                ConstructorWalker.findInjectConstructor(t);
+            } catch (Exception e) {
+
+                log.error(e.getMessage());
+            }
+        });
+    }
 
     @Override
     public <T> IRegistrationBuilder registerType(Class<T> implementer) throws DependencyRegisterException {
@@ -119,21 +141,6 @@ public class ContainerBuilder implements IContainerBuilder {
 
             this.registerControllers(clazz);
         }
-
-        // scan inject annotated class
-        Set<Class<?>> types = new Reflections(appClass.getPackage().getName()).getTypesAnnotatedWith(Inject.class);
-        types.forEach(this::recursiveRegisterType);
-
-        // cache constructors
-        types.forEach(t -> {
-            try {
-
-                ConstructorWalker.findInjectConstructor(t);
-            } catch (Exception e) {
-
-                log.error(e.getMessage());
-            }
-        });
     }
 
     private  <T> void registerControllers(Class<T> abstractController) {
@@ -170,7 +177,7 @@ public class ContainerBuilder implements IContainerBuilder {
 
         try {
             // controller self
-            Inject inject = clazz.getAnnotation(Inject.class);
+            Service inject = clazz.getAnnotation(Service.class);
             if (inject != null && inject.sington()) {
                 registerType(clazz).singleInstance();
             } else {

@@ -21,23 +21,23 @@
  */
 
 
-package com.fedepot.ioc.annotation;
+package com.fedepot.mvc.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
- * Mark a class as auto-injected
+ * Mark a parameter is from a request url query
  *
  * @author Touchumind
  * @since 0.0.1
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Inject {
+@Documented
+public @interface QueryParam {
 
-    String value() default "";
-    boolean sington() default false;
+    /**
+     * @return query arg name
+     */
+    String value();
 }
