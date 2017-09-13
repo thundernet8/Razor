@@ -23,12 +23,11 @@
 
 package com.fedepot.mvc.controller;
 
+import com.fedepot.exception.HttpException;
 import com.fedepot.mvc.annotation.RoutePrefix;
-import com.fedepot.mvc.http.ActionResult;
-import com.fedepot.mvc.http.ContentType;
-import com.fedepot.mvc.http.HttpContext;
-import com.fedepot.mvc.http.Response;
+import com.fedepot.mvc.http.*;
 
+import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.fedepot.mvc.http.HttpHeaderNames.CONTENT_TYPE;
@@ -45,6 +44,16 @@ public class APIController implements IController {
         return HttpContext.get();
     }
 
+    protected Request Request() {
+
+        return HttpContext.request();
+    }
+
+    protected  Response Response() {
+
+        return HttpContext.response();
+    }
+
     /**
      * Send a json response immediately
      *
@@ -52,8 +61,41 @@ public class APIController implements IController {
      */
     protected void JSON(Object json) {
 
-        Response response = Context().response();
+        Response response = Response();
         response.header(CONTENT_TYPE, ContentType.JSON.getMimeTypeWithCharset());
         response.end(ActionResult.build(json, json.getClass()).getBytes());
+    }
+
+    /**
+     * Send a successfully response
+     *
+     * @param data data to send
+     */
+    protected void Succeed(Object data) {
+
+        Response().status(200);
+        JSON(data);
+    }
+
+    /**
+     * Send a failed response
+     *
+     * @param e exception
+     */
+    protected void Fail(Exception e) {
+
+        int code = HttpResponseStatus.INTERNAL_SERVER_ERROR.code();
+        String msg = HttpResponseStatus.INTERNAL_SERVER_ERROR.reasonPhrase();
+
+        if (e instanceof HttpException) {
+
+            code = ((HttpException) e).getCode();
+            msg = e.getMessage();
+        }
+
+        log.error(msg, e);
+
+        Response().status(code);
+        JSON(msg);
     }
 }

@@ -44,13 +44,13 @@ public class HomeController extends Controller {
     @Route("redirect")
     public void redirect() {
 
-        Context().response().location("http://www.baidu.com/");
+        Response().location("http://www.baidu.com/");
     }
 
     @Route("redirect-local")
     public void redirectLocal() {
 
-        Context().response().location("/local");
+        Response().location("/local");
     }
 
     @Route("local")
