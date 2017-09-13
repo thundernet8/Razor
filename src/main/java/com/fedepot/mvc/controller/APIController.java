@@ -85,12 +85,11 @@ public class APIController implements IController {
     protected void Fail(Exception e) {
 
         int code = HttpResponseStatus.INTERNAL_SERVER_ERROR.code();
-        String msg = HttpResponseStatus.INTERNAL_SERVER_ERROR.reasonPhrase();
+        String msg = e.getMessage();
 
         if (e instanceof HttpException) {
 
             code = ((HttpException) e).getCode();
-            msg = e.getMessage();
         }
 
         log.error(msg, e);

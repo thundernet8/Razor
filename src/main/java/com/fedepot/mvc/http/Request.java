@@ -370,7 +370,6 @@ public class Request {
         baseUrl = fullHttpRequest.uri();
 
         rawBody = fullHttpRequest.content().copy();
-        fullHttpRequest.content().release();
 
         path = UrlKit.purgeUrlQueries(baseUrl);
 
