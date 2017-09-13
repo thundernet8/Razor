@@ -55,6 +55,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.FilterBuilder;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -547,7 +550,9 @@ public class Razor {
      */
     private void initMiddlewares() {
 
-        Set<Class<? extends IController>> controllers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(IController.class);
+        Reflections reflections = new Reflections(ClasspathHelper.forPackage(appClass.getPackage().getName()), new SubTypesScanner(), new FilterBuilder().include(".*.class"));
+
+        Set<Class<? extends IController>> controllers = reflections.getSubTypesOf(IController.class);
         controllers.forEach(controller -> {
 
             try {
@@ -582,15 +587,17 @@ public class Razor {
      */
     private void initImplements() {
 
+        Reflections reflections = new Reflections(ClasspathHelper.forPackage(appClass.getPackage().getName()), new SubTypesScanner(), new FilterBuilder().include(".*.class"));
+
         // Exception handler
-        Set<Class<? extends ExceptionHandler>> exceptionHandlers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(ExceptionHandler.class);
+        Set<Class<? extends ExceptionHandler>> exceptionHandlers = reflections.getSubTypesOf(ExceptionHandler.class);
         if (exceptionHandlers.size() > 0) {
 
             this.exceptionHandler = ioc.resolve(exceptionHandlers.iterator().next());
         }
 
         // Session manager
-        Set<Class<? extends SessionManager>> sessionManagers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(SessionManager.class);
+        Set<Class<? extends SessionManager>> sessionManagers = reflections.getSubTypesOf(SessionManager.class);
         if (sessionManagers.size() > 0) {
 
             this.sessionManager = ioc.resolve(sessionManagers.iterator().next());

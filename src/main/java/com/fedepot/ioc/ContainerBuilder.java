@@ -34,6 +34,10 @@ import com.fedepot.mvc.controller.APIController;
 import com.fedepot.mvc.controller.Controller;
 import org.reflections.Reflections;
 import lombok.extern.slf4j.Slf4j;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.FilterBuilder;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -84,8 +88,10 @@ public class ContainerBuilder implements IContainerBuilder {
      */
     private void autoRegister() {
 
+        Reflections reflections = new Reflections(ClasspathHelper.forPackage(appClass.getPackage().getName()), new SubTypesScanner(), new TypeAnnotationsScanner(), new FilterBuilder().include(".*.class"));
+
         // scan inject annotated class
-        Set<Class<?>> types = new Reflections(appClass.getPackage().getName()).getTypesAnnotatedWith(Service.class);
+        Set<Class<?>> types = reflections.getTypesAnnotatedWith(Service.class);
         types.forEach(this::recursiveRegisterType);
 
         // cache constructors
@@ -145,7 +151,9 @@ public class ContainerBuilder implements IContainerBuilder {
 
     private  <T> void registerControllers(Class<T> abstractController) {
 
-        Set<Class<? extends T>> controllers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(abstractController);
+        Reflections reflections = new Reflections(ClasspathHelper.forPackage(appClass.getPackage().getName()), new SubTypesScanner(), new FilterBuilder().include(".*.class"));
+
+        Set<Class<? extends T>> controllers = reflections.getSubTypesOf(abstractController);
 
         controllers.forEach(this::recursiveRegisterType);
         log.info("Ioc registered {} controllers", controllers.size());

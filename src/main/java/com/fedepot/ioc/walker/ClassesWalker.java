@@ -25,6 +25,9 @@ package com.fedepot.ioc.walker;
 
 
 import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.FilterBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +46,9 @@ public class ClassesWalker {
 
     public static <T> Class<?>[] reflectImplementers(Class<?> appClass, Class<T> implType) {
 
-        Class<?>[] implementers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(implType).stream().map(impl -> (Class<?>)impl).toArray(Class<?>[]::new);
+        Reflections reflections = new Reflections(ClasspathHelper.forPackage(appClass.getPackage().getName()), new SubTypesScanner(), new FilterBuilder().include(".*.class"));
+
+        Class<?>[] implementers = reflections.getSubTypesOf(implType).stream().map(impl -> (Class<?>)impl).toArray(Class<?>[]::new);
 
         // cache reflection results
         classesMap.put(implType, implementers);
