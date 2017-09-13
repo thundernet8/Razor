@@ -29,12 +29,10 @@ import com.fedepot.mvc.controller.Controller;
 import com.fedepot.mvc.annotation.*;
 import com.fedepot.mvc.http.HttpMethod;
 
+import com.fedepot.util.ReflectKit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.FilterBuilder;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -93,7 +91,7 @@ public class RouteManager {
      */
     public void registerRoutes() {
 
-        Reflections reflections = new Reflections(ClasspathHelper.forPackage(appClass.getPackage().getName()), new SubTypesScanner(), new FilterBuilder().include(".*.class"));
+        Reflections reflections = ReflectKit.getReflections(appClass);
 
         Set<Class<? extends Controller>> controllers = reflections.getSubTypesOf(Controller.class);
         Set<Class<? extends APIController>> apiControllers = reflections.getSubTypesOf(APIController.class);

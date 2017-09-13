@@ -32,12 +32,9 @@ import com.fedepot.ioc.walker.FieldsWalker;
 
 import com.fedepot.mvc.controller.APIController;
 import com.fedepot.mvc.controller.Controller;
+import com.fedepot.util.ReflectKit;
 import org.reflections.Reflections;
 import lombok.extern.slf4j.Slf4j;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.FilterBuilder;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -88,7 +85,7 @@ public class ContainerBuilder implements IContainerBuilder {
      */
     private void autoRegister() {
 
-        Reflections reflections = new Reflections(ClasspathHelper.forPackage(appClass.getPackage().getName()), new SubTypesScanner(), new TypeAnnotationsScanner(), new FilterBuilder().include(".*.class"));
+        Reflections reflections = ReflectKit.getReflections(appClass);
 
         // scan inject annotated class
         Set<Class<?>> types = reflections.getTypesAnnotatedWith(Service.class);
@@ -151,7 +148,7 @@ public class ContainerBuilder implements IContainerBuilder {
 
     private  <T> void registerControllers(Class<T> abstractController) {
 
-        Reflections reflections = new Reflections(ClasspathHelper.forPackage(appClass.getPackage().getName()), new SubTypesScanner(), new FilterBuilder().include(".*.class"));
+        Reflections reflections = ReflectKit.getReflections(appClass);
 
         Set<Class<? extends T>> controllers = reflections.getSubTypesOf(abstractController);
 

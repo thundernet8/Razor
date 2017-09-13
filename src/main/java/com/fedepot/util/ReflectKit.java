@@ -20,51 +20,30 @@
  * SOFTWARE.
  */
 
+package com.fedepot.util;
 
-package com.fedepot.ioc.walker;
-
-
-import com.fedepot.util.ReflectKit;
 import org.reflections.Reflections;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.FilterBuilder;
 
 /**
- * Reflect classes for a interface
+ * Reflect util
  *
  * @author Touchumind
- * @since 0.0.1
+ * @since 0.0.7
  */
-public class ClassesWalker {
+public final class ReflectKit {
 
-    private static final Map<Class<?>, Class<?>[]> classesMap = new HashMap<>();
+    public static Reflections getReflections(Class<?> appClass) {
 
-    private static Class<?> appClass;
+        String packageName = appClass.getPackage().getName();
 
-    public static <T> Class<?>[] reflectImplementers(Class<?> appClass, Class<T> implType) {
-
-        Reflections reflections = ReflectKit.getReflections(appClass);
-
-        Class<?>[] implementers = reflections.getSubTypesOf(implType).stream().map(impl -> (Class<?>)impl).toArray(Class<?>[]::new);
-
-        // cache reflection results
-        classesMap.put(implType, implementers);
-
-        ClassesWalker.appClass = appClass;
-
-        return implementers;
-    }
-
-    public static Class<?>[] cachedImplementers(Class<?> implType) {
-
-        Class<?>[] implementers = classesMap.get(implType);
-
-        if (implementers != null) {
-
-            return implementers;
-        }
-
-        return reflectImplementers(appClass, implType);
+        return new Reflections(
+                packageName,
+                new SubTypesScanner(),
+                new TypeAnnotationsScanner(),
+                new FilterBuilder.Exclude(".*.xml")
+        );
     }
 }

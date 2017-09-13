@@ -49,15 +49,13 @@ import com.fedepot.mvc.template.TemplateEngineFactory;
 import com.fedepot.server.NettyServer;
 import com.fedepot.util.FileKit;
 
+import com.fedepot.util.ReflectKit;
 import lombok.extern.slf4j.Slf4j;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.FilterBuilder;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -550,7 +548,7 @@ public class Razor {
      */
     private void initMiddlewares() {
 
-        Reflections reflections = new Reflections(ClasspathHelper.forPackage(appClass.getPackage().getName()), new SubTypesScanner(), new FilterBuilder().include(".*.class"));
+        Reflections reflections = ReflectKit.getReflections(appClass);
 
         Set<Class<? extends IController>> controllers = reflections.getSubTypesOf(IController.class);
         controllers.forEach(controller -> {
@@ -587,7 +585,7 @@ public class Razor {
      */
     private void initImplements() {
 
-        Reflections reflections = new Reflections(ClasspathHelper.forPackage(appClass.getPackage().getName()), new SubTypesScanner(), new FilterBuilder().include(".*.class"));
+        Reflections reflections = ReflectKit.getReflections(appClass);
 
         // Exception handler
         Set<Class<? extends ExceptionHandler>> exceptionHandlers = reflections.getSubTypesOf(ExceptionHandler.class);
@@ -611,7 +609,6 @@ public class Razor {
 
         Optional<String> webRoot = env.get(ENV_KEY_WEB_ROOT_FOLDER);
         boolean useOuterWebRoot = env.getBool(ENV_KEY_USE_OUTER_WEB_ROOT, false);
-
 
         if (!useOuterWebRoot || !webRoot.isPresent()) {
 
