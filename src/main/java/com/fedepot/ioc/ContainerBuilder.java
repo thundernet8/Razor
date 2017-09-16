@@ -32,6 +32,7 @@ import com.fedepot.ioc.walker.FieldsWalker;
 
 import com.fedepot.mvc.controller.APIController;
 import com.fedepot.mvc.controller.Controller;
+import com.fedepot.util.ReflectKit;
 import org.reflections.Reflections;
 import lombok.extern.slf4j.Slf4j;
 
@@ -84,8 +85,10 @@ public class ContainerBuilder implements IContainerBuilder {
      */
     private void autoRegister() {
 
+        Reflections reflections = ReflectKit.getReflections(appClass);
+
         // scan inject annotated class
-        Set<Class<?>> types = new Reflections(appClass.getPackage().getName()).getTypesAnnotatedWith(Service.class);
+        Set<Class<?>> types = reflections.getTypesAnnotatedWith(Service.class);
         types.forEach(this::recursiveRegisterType);
 
         // cache constructors
@@ -145,7 +148,9 @@ public class ContainerBuilder implements IContainerBuilder {
 
     private  <T> void registerControllers(Class<T> abstractController) {
 
-        Set<Class<? extends T>> controllers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(abstractController);
+        Reflections reflections = ReflectKit.getReflections(appClass);
+
+        Set<Class<? extends T>> controllers = reflections.getSubTypesOf(abstractController);
 
         controllers.forEach(this::recursiveRegisterType);
         log.info("Ioc registered {} controllers", controllers.size());

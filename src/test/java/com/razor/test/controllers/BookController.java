@@ -96,7 +96,7 @@ public class BookController extends APIController {
             return "null context";
         }
 
-        Request request = context.request();
+        Request request = Request();
         return request.getBaseUrl();
 //        return "Books list ";
     }
@@ -107,7 +107,7 @@ public class BookController extends APIController {
 
         // curl -H "Content-Type: application/json" -X POST -d '{"name":"xyz","id":123,"isbn":xxx}' http://127.0.0.1:8090/api/books/199/update?sort=asc
         // curl -H "Content-Type:application/x-www-form-urlencoded" -X POST -d "name=xyz&id=123&isbn=xxx" http://127.0.0.1:8090/api/books/199/update?sort=asc
-        System.out.println(Context().request().getQueries().get("sort"));
+        System.out.println(Request().getQueries().get("sort"));
         System.out.println(sort);
         System.out.println(book);
         System.out.println(id);
@@ -120,8 +120,8 @@ public class BookController extends APIController {
 
         // curl -F "key=key1" -F "comment=this is an txt file" -F "file1=@/Users/WXQ/Desktop/filetest.txt" http://127.0.0.1:8090/api/books/upload
 
-        Request request = Context().request();
-        Response response = Context().response();
+        Request request = Request();
+        Response response = Response();
 
         Map<String, List<String>> params = request.getFormParams();
         System.out.println(GsonFactory.getGson().toJson(params));

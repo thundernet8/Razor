@@ -239,17 +239,18 @@ public class Ioc implements IContainer {
             Field[] fields = FieldsWalker.cachedInjectFields(clazz);
             Arrays.stream(fields).forEach(field -> {
 
-                boolean accessible = field.isAccessible();
-                field.setAccessible(true);
+                // boolean accessible = field.isAccessible();
                 try {
 
+                    field.setAccessible(true);
                     field.set(ins, resolve(field.getType()));
                 } catch (IllegalAccessException e) {
 
                     log.error("Access field {} of {} with exception: {}", field.getName(), clazz.getName(), e.getMessage());
-                }
+                } finally {
 
-                field.setAccessible(accessible);
+                    // field.setAccessible(accessible);
+                }
             });
 
 

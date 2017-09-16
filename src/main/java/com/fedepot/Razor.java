@@ -49,6 +49,7 @@ import com.fedepot.mvc.template.TemplateEngineFactory;
 import com.fedepot.server.NettyServer;
 import com.fedepot.util.FileKit;
 
+import com.fedepot.util.ReflectKit;
 import lombok.extern.slf4j.Slf4j;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -547,7 +548,9 @@ public class Razor {
      */
     private void initMiddlewares() {
 
-        Set<Class<? extends IController>> controllers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(IController.class);
+        Reflections reflections = ReflectKit.getReflections(appClass);
+
+        Set<Class<? extends IController>> controllers = reflections.getSubTypesOf(IController.class);
         controllers.forEach(controller -> {
 
             try {
@@ -582,15 +585,17 @@ public class Razor {
      */
     private void initImplements() {
 
+        Reflections reflections = ReflectKit.getReflections(appClass);
+
         // Exception handler
-        Set<Class<? extends ExceptionHandler>> exceptionHandlers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(ExceptionHandler.class);
+        Set<Class<? extends ExceptionHandler>> exceptionHandlers = reflections.getSubTypesOf(ExceptionHandler.class);
         if (exceptionHandlers.size() > 0) {
 
             this.exceptionHandler = ioc.resolve(exceptionHandlers.iterator().next());
         }
 
         // Session manager
-        Set<Class<? extends SessionManager>> sessionManagers = new Reflections(appClass.getPackage().getName()).getSubTypesOf(SessionManager.class);
+        Set<Class<? extends SessionManager>> sessionManagers = reflections.getSubTypesOf(SessionManager.class);
         if (sessionManagers.size() > 0) {
 
             this.sessionManager = ioc.resolve(sessionManagers.iterator().next());
@@ -604,7 +609,6 @@ public class Razor {
 
         Optional<String> webRoot = env.get(ENV_KEY_WEB_ROOT_FOLDER);
         boolean useOuterWebRoot = env.getBool(ENV_KEY_USE_OUTER_WEB_ROOT, false);
-
 
         if (!useOuterWebRoot || !webRoot.isPresent()) {
 

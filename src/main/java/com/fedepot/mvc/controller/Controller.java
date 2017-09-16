@@ -27,6 +27,8 @@ import com.fedepot.exception.RazorException;
 import com.fedepot.mvc.annotation.RoutePrefix;
 import com.fedepot.mvc.http.ContentType;
 import com.fedepot.mvc.http.HttpContext;
+import com.fedepot.mvc.http.Request;
+import com.fedepot.mvc.http.Response;
 import com.fedepot.mvc.middleware.Middleware;
 import com.fedepot.mvc.renderer.TemplateRenderer;
 
@@ -54,6 +56,16 @@ public abstract class Controller implements IController {
     protected HttpContext Context() {
 
         return HttpContext.get();
+    }
+
+    protected Request Request() {
+
+        return HttpContext.request();
+    }
+
+    protected Response Response() {
+
+        return HttpContext.response();
     }
 
     /**

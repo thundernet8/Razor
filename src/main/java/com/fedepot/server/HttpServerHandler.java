@@ -36,7 +36,7 @@ import com.fedepot.mvc.route.Router;
 
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -44,6 +44,7 @@ import io.netty.handler.codec.http.HttpVersion;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.*;
 
 import static com.fedepot.mvc.http.HttpHeaderNames.CONTENT_TYPE;
 import static io.netty.buffer.Unpooled.copiedBuffer;
@@ -57,7 +58,7 @@ import static io.netty.buffer.Unpooled.copiedBuffer;
  */
 @Slf4j
 @Sharable
-public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
     private Razor razor;
 
@@ -67,6 +68,22 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
     private ExceptionHandler exceptionHandler;
 
+    private final static ExecutorService workerThreadService = newBlockingExecutorUseCallerRun(Runtime.getRuntime().availableProcessors() * 2);
+
+    private static ExecutorService newBlockingExecutorUseCallerRun(int size) {
+
+        return new ThreadPoolExecutor(size, size, 0l, TimeUnit.MILLISECONDS, new SynchronousQueue<>(), (r, executor) -> {
+
+            try {
+
+                executor.getQueue().put(r);
+            } catch (InterruptedException e) {
+
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
     HttpServerHandler(Razor razor) {
 
         this.razor = razor;
@@ -75,7 +92,50 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         this.exceptionHandler = razor.getExceptionHandler();
     }
 
-    public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) throws Exception {
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+
+        if (msg instanceof FullHttpRequest) {
+
+            final FullHttpRequest fullHttpRequest = (FullHttpRequest) msg;
+            workerThreadService.execute(() -> {
+
+                handleMessage(ctx, fullHttpRequest);
+            });
+        } else {
+
+            super.channelRead(ctx, msg);
+        }
+    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+
+        super.channelReadComplete(ctx);
+        ctx.flush();
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+
+        super.exceptionCaught(ctx, cause);
+
+        ctx.writeAndFlush(new DefaultFullHttpResponse(
+
+                HttpVersion.HTTP_1_1,
+                HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                copiedBuffer(cause.getMessage().getBytes())
+        ));
+
+        // TODO dev usage
+        cause.printStackTrace();
+
+        ctx.close();
+
+        log.error(cause.getMessage());
+    }
+
+    private void handleMessage(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) {
 
         // TODO
         // HEAD request support
@@ -124,7 +184,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                 exceptionHandler.handle(e, razor);
             } else {
 
-                throw e;
+                log.error("Handle inbound message failed", e);
             }
 
         } finally {
@@ -136,33 +196,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
             HttpContext.remove();
         }
-    }
-
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-
-        super.channelReadComplete(ctx);
-        ctx.flush();
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-
-        super.exceptionCaught(ctx, cause);
-
-        ctx.writeAndFlush(new DefaultFullHttpResponse(
-
-                HttpVersion.HTTP_1_1,
-                HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                copiedBuffer(cause.getMessage().getBytes())
-        ));
-
-        // TODO dev usage
-        cause.printStackTrace();
-
-        ctx.close();
-
-        log.error(cause.getMessage());
     }
 
     private void handleRoute(ChannelHandlerContext ctx, RouteSignature signature) throws Exception {
