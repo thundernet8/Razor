@@ -51,31 +51,31 @@ public class CorsMiddleware implements Middleware {
     @Override
     public void apply(Request req, Response res) {
 
-        if (req.method().equals(HttpMethod.OPTIONS)) {
+        String allowOrigin = null;
+        String origin = req.getOrigin();
 
-            String allowOrigin = null;
-            String origin = req.getOrigin();
+        if (whitelist.length > 0 && whitelist[0].equals("*")) {
 
-            if (whitelist.length > 0 && whitelist[0].equals("*")) {
+            allowOrigin = "*";
+        } else if (Arrays.asList(whitelist).contains(origin)) {
 
-                allowOrigin = "*";
-            } else if (Arrays.asList(whitelist).contains(origin)) {
+            allowOrigin = origin;
+        }
 
-                allowOrigin = origin;
-            }
+        if (allowOrigin != null) {
 
-            if (allowOrigin != null) {
+            res.header(VARY, "Origin");
+            res.header(ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+            res.header(ACCESS_CONTROL_ALLOW_ORIGIN, allowOrigin);
+            res.header(ACCESS_CONTROL_ALLOW_METHODS, "GET, POST, PUT, DELETE");
+            res.header(ACCESS_CONTROL_ALLOW_HEADERS, "X-Requested-With, X-CSRF-Token, Authorization, Content-Type, Ajax");
 
-                res.header(VARY, "Origin");
-                res.header(ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
-                res.header(ACCESS_CONTROL_ALLOW_ORIGIN, allowOrigin);
-                res.header(ACCESS_CONTROL_ALLOW_METHODS, "GET, POST, PUT, DELETE");
-                res.header(ACCESS_CONTROL_ALLOW_HEADERS, "X-Requested-With, Content-Type, Ajax");
+            if (req.method().equals(HttpMethod.OPTIONS)) {
                 res.end("ok");
-            } else {
-
-                res.sendStatus(405);
             }
+        } else {
+
+            res.sendStatus(405);
         }
     }
 }

@@ -36,7 +36,7 @@ public interface SessionManager {
     void add(Session session);
 
     void remove(String id);
-
+    
     void persist();
 
     void restore();
