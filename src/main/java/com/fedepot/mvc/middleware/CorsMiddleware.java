@@ -27,7 +27,10 @@ import com.fedepot.mvc.http.HttpMethod;
 import com.fedepot.mvc.http.Request;
 import com.fedepot.mvc.http.Response;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.fedepot.mvc.http.HttpHeaderNames.*;
@@ -37,16 +40,17 @@ import static com.fedepot.mvc.http.HttpHeaderNames.*;
  */
 public class CorsMiddleware implements Middleware {
 
-    private String[] whitelist;
+    private Set<String> whitelist;
 
     public CorsMiddleware() {
 
-        whitelist = new String[]{"*"};
+        whitelist = new HashSet<>();
+        whitelist.add("*");
     }
 
     public CorsMiddleware(String... originWhitelist) {
 
-        whitelist = originWhitelist;
+        whitelist = new HashSet<String>(Arrays.asList(originWhitelist));
     }
 
     @Override
@@ -59,10 +63,10 @@ public class CorsMiddleware implements Middleware {
             return;
         }
 
-        if (Stream.of(whitelist).anyMatch(t -> t.equals(origin))) {
+        if (whitelist.contains(origin)) {
 
             allowOrigin = origin;
-        } else if (Stream.of(whitelist).anyMatch(t -> t.equals("*"))) {
+        } else if (whitelist.contains("*")) {
 
             allowOrigin = "*";
         }
