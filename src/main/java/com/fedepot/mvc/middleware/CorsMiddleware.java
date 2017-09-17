@@ -28,6 +28,7 @@ import com.fedepot.mvc.http.Request;
 import com.fedepot.mvc.http.Response;
 
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import static com.fedepot.mvc.http.HttpHeaderNames.*;
 
@@ -58,12 +59,12 @@ public class CorsMiddleware implements Middleware {
             return;
         }
 
-        if (whitelist.length > 0 && whitelist[0].equals("*")) {
-
-            allowOrigin = "*";
-        } else if (Arrays.asList(whitelist).contains(origin)) {
+        if (Stream.of(whitelist).anyMatch(t -> t.equals(origin))) {
 
             allowOrigin = origin;
+        } else if (Stream.of(whitelist).anyMatch(t -> t.equals("*"))) {
+
+            allowOrigin = "*";
         }
 
         if (allowOrigin != null) {
