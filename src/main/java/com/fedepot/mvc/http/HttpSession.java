@@ -103,6 +103,13 @@ public class HttpSession implements Session {
         this.update();
     }
 
+    @Override
+    public void clearAttributes() {
+
+        this.attributes.clear();
+        this.update();
+    }
+
     private void update() {
 
         HttpContext.app().getSessionManager().add(this);
