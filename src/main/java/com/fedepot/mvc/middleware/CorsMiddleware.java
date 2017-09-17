@@ -75,7 +75,9 @@ public class CorsMiddleware implements Middleware {
             }
         } else {
 
-            res.sendStatus(405);
+            if (req.method().equals(HttpMethod.OPTIONS)) {
+                res.sendStatus(405);
+            }
         }
     }
 }
