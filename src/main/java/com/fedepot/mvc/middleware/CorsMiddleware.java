@@ -54,6 +54,10 @@ public class CorsMiddleware implements Middleware {
         String allowOrigin = null;
         String origin = req.getOrigin();
 
+        if (origin == null || origin.isEmpty()) {
+            return;
+        }
+
         if (whitelist.length > 0 && whitelist[0].equals("*")) {
 
             allowOrigin = "*";
@@ -75,9 +79,7 @@ public class CorsMiddleware implements Middleware {
             }
         } else {
 
-            if (req.method().equals(HttpMethod.OPTIONS)) {
-                res.sendStatus(405);
-            }
+            res.sendStatus(405);
         }
     }
 }
