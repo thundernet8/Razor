@@ -157,7 +157,9 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
             new CookieParserMiddleware().apply(request, response);
 
             // check session
-            request.session();
+            if (!request.method().equals(HttpMethod.OPTIONS)) {
+                request.session();
+            }
 
             // TODO complete RouteSignature
             RouteSignature routeSignature = RouteSignature.builder().request(request).response(response).build();
@@ -207,13 +209,14 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
         // default cors action
         if (request.method().equals(HttpMethod.OPTIONS)) {
+            if (!response.flushed()) {
+                if (request.getOrigin() != null) {
 
-            if (!response.flushed() && request.getOrigin() != null) {
+                    response.sendStatus(405);
+                } else {
 
-                response.sendStatus(405);
-            } else {
-
-                response.sendStatus(200);
+                    response.sendStatus(200);
+                }
             }
 
             return;
@@ -284,8 +287,9 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
         Router router = signature.getRouter();
         router.getMiddlewares().forEach(middleware -> {
-
-            middleware.apply(signature.request(), signature.response());
+            if (signature.response() == null || !signature.response().flushed()) {
+                middleware.apply(signature.request(), signature.response());
+            }
         });
     }
 }

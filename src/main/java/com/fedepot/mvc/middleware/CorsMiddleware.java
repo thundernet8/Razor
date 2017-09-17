@@ -71,7 +71,7 @@ public class CorsMiddleware implements Middleware {
                 res.header(ACCESS_CONTROL_ALLOW_ORIGIN, allowOrigin);
                 res.header(ACCESS_CONTROL_ALLOW_METHODS, "GET, POST, PUT, DELETE");
                 res.header(ACCESS_CONTROL_ALLOW_HEADERS, "X-Requested-With, Content-Type, Ajax");
-                res.end();
+                res.end("ok");
             } else {
 
                 res.sendStatus(405);
