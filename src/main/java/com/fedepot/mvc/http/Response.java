@@ -700,12 +700,7 @@ public class Response {
      */
     public void end() {
 
-        if (httpResponse == null) {
-
-            setHttpResponse(new DefaultFullHttpResponse(HTTP_1_1, getStatus()));
-        }
-
-        writeFlush(!keepAlive);
+        end(Unpooled.EMPTY_BUFFER.toString(CharsetUtil.UTF_8));
     }
 
     /**

@@ -395,7 +395,10 @@ public class Request {
 
             matchRoute = true;
             this.router = router;
-            pathParams = router.getRouteMatcher().getParams(path);
+
+            if (!method.equals(HttpMethod.OPTIONS)) {
+                pathParams = router.getRouteMatcher().getParams(path);
+            }
         }
     }
 

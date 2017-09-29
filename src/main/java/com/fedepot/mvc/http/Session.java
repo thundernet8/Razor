@@ -48,5 +48,7 @@ public interface Session extends Serializable {
 
     void removeAttribute(String name);
 
+    void clearAttributes();
+
     <T> T attribute(String name);
 }

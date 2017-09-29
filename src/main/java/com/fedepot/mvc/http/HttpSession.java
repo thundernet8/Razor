@@ -93,11 +93,25 @@ public class HttpSession implements Session {
     public void addAttribute(String name, Object value) {
 
         this.attributes.put(name, value);
+        this.update();
     }
 
     @Override
     public void removeAttribute(String name) {
 
         this.attributes.remove(name);
+        this.update();
+    }
+
+    @Override
+    public void clearAttributes() {
+
+        this.attributes.clear();
+        this.update();
+    }
+
+    private void update() {
+
+        HttpContext.app().getSessionManager().add(this);
     }
 }

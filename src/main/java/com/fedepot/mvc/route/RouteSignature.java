@@ -28,6 +28,7 @@ import com.fedepot.mvc.annotation.FormFiles;
 import com.fedepot.mvc.annotation.FromBody;
 import com.fedepot.mvc.annotation.QueryParam;
 import com.fedepot.mvc.http.ContentType;
+import com.fedepot.mvc.http.HttpMethod;
 import com.fedepot.mvc.http.Request;
 import com.fedepot.mvc.http.Response;
 import com.fedepot.mvc.json.GsonFactory;
@@ -84,7 +85,7 @@ public class RouteSignature {
         this.router = router;
         this.action = router.getAction();
 
-        if (action != null) {
+        if (action != null && request != null && !request.method().equals(HttpMethod.OPTIONS)) {
 
             this.initParams();
         }
