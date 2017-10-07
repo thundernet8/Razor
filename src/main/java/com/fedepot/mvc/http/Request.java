@@ -170,6 +170,12 @@ public class Request {
     private String ip;
 
     /**
+     * user agent of request
+     */
+    @Getter
+    private String ua;
+
+    /**
      * http or https
      */
     @Getter
@@ -335,6 +341,7 @@ public class Request {
         xhr = StringUtils.equals(requestWith, "XMLHttpRequest");
 
         ip = HttpKit.getIP(headers);
+        ua = headers.get("User-Agent");
 
         method = fullHttpRequest.method().name().toUpperCase();
 
