@@ -391,7 +391,9 @@ public class Request {
 
         // below for non static requests
 
-        if (!method.equals(HttpMethod.GET)) {
+        // for form upload request
+        String contentType = headers.get(CONTENT_TYPE);
+        if (!method.equals(HttpMethod.GET) && (contentType.equals("application/x-www-form-urlencoded") || contentType.equals("multipart/form-data"))) {
 
             HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(HTTP_DATA_FACTORY, fullHttpRequest);
             decoder.getBodyHttpDatas().forEach(this::parseBodyData);
