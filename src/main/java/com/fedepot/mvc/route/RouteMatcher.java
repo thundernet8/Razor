@@ -132,6 +132,9 @@ public class RouteMatcher {
             if (StringUtils.equals(paramTypes[i], "int")) {
 
                 params[i] = new PathParameter(paramNames[i], Integer.parseInt(value));
+            } else if (StringUtils.equals(paramTypes[i], "long")) {
+
+                params[i] = new PathParameter(paramNames[i], Long.parseLong(value));
             } else {
 
                 params[i] = new PathParameter(paramNames[i], value);
@@ -196,8 +199,14 @@ public class RouteMatcher {
                     patternBuilder.append("([0-9a-zA-Z-_]+)");
                 } else {
 
-                    boolean isNumber = StringUtils.equals(currentParamType.toString().toLowerCase(), "int");
-                    types.add(isNumber ? "int" : "String");
+                    boolean isNumber = StringUtils.equals(currentParamType.toString().toLowerCase(), "int") || StringUtils.equals(currentParamType.toString().toLowerCase(), "long");
+                    if (isNumber) {
+
+                        types.add(currentParamType.toString().toLowerCase());
+                    } else {
+
+                        types.add("String");
+                    }
                     names.add(currentParamName.toString());
                     patternBuilder.append(isNumber ? "([0-9]+)" : "([0-9a-zA-Z-_]+)");
                 }
