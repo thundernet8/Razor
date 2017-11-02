@@ -41,6 +41,8 @@ import java.util.regex.Pattern;
 @Getter
 public class Router {
 
+    private static Pattern PATH_PATTERN = Pattern.compile("^(/[0-9a-zA-Z-_./]+)?(/[0-9a-zA-Z-_.]*\\{.+}.*)?((/\\*)(.*))?$");
+
     private RouteMatcher routeMatcher;
 
     private String httpMethod;
@@ -123,10 +125,9 @@ public class Router {
 
         String path = getFullPath();
 
-        if (!path.equals("/*")) {
+        if (!"/*".equals(path)) {
 
-            Pattern pattern = Pattern.compile("^(/[0-9a-zA-Z-_./]+)?(/[0-9a-zA-Z-_.]*\\{.+}.*)?((/\\*)(.*))?$");
-            Matcher matcher = pattern.matcher(path);
+            Matcher matcher = PATH_PATTERN.matcher(path);
 
             if (matcher.matches() && !(matcher.group(1).equals(path))) {
 

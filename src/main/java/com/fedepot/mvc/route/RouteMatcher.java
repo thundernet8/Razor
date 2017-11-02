@@ -39,6 +39,10 @@ import java.util.regex.Pattern;
 @Slf4j
 public class RouteMatcher {
 
+    private static Pattern ROUTE_PREFIX_PATTERN = Pattern.compile("^/([0-9a-zA-Z-_/]+)?$");
+
+    private static Pattern ROUTE_PATTERN = Pattern.compile("^(([^/])([0-9a-zA-Z-_/{}:.]+)([^/]))?$");
+
     /**
      * Route prefix string, applied to a controller, regex is not supported
      */
@@ -155,7 +159,7 @@ public class RouteMatcher {
         // books/{string:category}/{int:id}.html
         this.route = route;
 
-        isUniversal = route.equals("*") || route.contains("/*") || Pattern.compile("\\{([0-9a-zA-Z]+)?:?([0-9a-zA-Z_]+)}").matcher(route).find();
+        isUniversal = "*".equals(route) || route.contains("/*") || Pattern.compile("\\{([0-9a-zA-Z]+)?:?([0-9a-zA-Z_]+)}").matcher(route).find();
 
         if (!this.validateRoutes()) {
             isValid = false;
@@ -224,7 +228,7 @@ public class RouteMatcher {
                 }
             } else {
 
-                patternBuilder.append(ch.equals("*") ? "([0-9a-zA-Z-_./]+)?" : ch);
+                patternBuilder.append("*".equals(ch) ? "([0-9a-zA-Z-_./]+)?" : ch);
             }
 
             start++;
@@ -239,28 +243,24 @@ public class RouteMatcher {
 
     private boolean validateRoutes() {
 
-        Pattern pattern = Pattern.compile("^/([0-9a-zA-Z-_/]+)?$");
-        Matcher matcher = pattern.matcher(routePrefix);
+        Matcher matcher = ROUTE_PREFIX_PATTERN.matcher(routePrefix);
 
         if (!matcher.matches()) {
 
             log.error("Route Prefix {} is illegal, should consist of '0-9 a-z A-Z - _ /'", routePrefix);
-            //throw new RazorException("Router prefix ".concat(routePrefix).concat(" is illegal"));
             return false;
         }
 
-        if (route.equals("*")) {
+        if ("*".equals(route)) {
 
             return true;
         }
 
-        pattern = Pattern.compile("^(([^/])([0-9a-zA-Z-_/{}:.]+)([^/]))?$");
-        matcher = pattern.matcher(route.replace(" ", ""));
+        matcher = ROUTE_PATTERN.matcher(route.replace(" ", ""));
 
         if (!matcher.matches()) {
 
             log.error("Route {} is illegal", route);
-            //throw new RazorException("Router prefix ".concat(routePrefix).concat(" is illegal"));
         }
 
         return true;

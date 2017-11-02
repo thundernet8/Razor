@@ -70,7 +70,7 @@ public class UrlKit {
 
     public static boolean isStaticFile(Set<String> statics, String url) {
 
-        if (url.endsWith("/") && !url.equals("/")) {
+        if (url.endsWith("/") && !"/".equals(url)) {
             // treat as directory
 
             return true;
