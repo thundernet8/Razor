@@ -84,6 +84,7 @@ public class SessionHandler {
                 removeSession(session, response);
             }
 
+            session.setIsFirstTime(false);
             return session;
         }
 
@@ -97,6 +98,7 @@ public class SessionHandler {
         long expires = now + timeout;
 
         Session session = new HttpSession(sessionId, now, expires);
+        session.setIsFirstTime(true);
         sessionManager.add(session);
 
         Cookie cookie = Cookie.builder().name(sessionKey).value(sessionId).httpOnly(true).maxAge(timeout).build();

@@ -43,6 +43,8 @@ public class HttpSession implements Session {
 
     private long expireAt = -1;
 
+    private boolean isFirstTime = false;
+
     private Map<String, Object> attributes = new HashMap<>();
 
     public HttpSession(String id, long createAt, long expireAt) {
@@ -68,6 +70,18 @@ public class HttpSession implements Session {
     public long expireAt() {
 
         return expireAt;
+    }
+
+    @Override
+    public boolean isFirstTime() {
+
+        return isFirstTime;
+    }
+
+    @Override
+    public void setIsFirstTime(boolean status) {
+
+        isFirstTime = status;
     }
 
     @Override

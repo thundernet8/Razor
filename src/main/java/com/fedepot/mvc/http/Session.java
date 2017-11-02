@@ -42,6 +42,10 @@ public interface Session extends Serializable {
 
     long expireAt();
 
+    boolean isFirstTime();
+
+    void setIsFirstTime(boolean status);
+
     Map<String, Object> attributes();
 
     void addAttribute(String name, Object value);
