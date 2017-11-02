@@ -72,17 +72,6 @@ public class HttpSession implements Session {
         return expireAt;
     }
 
-    @Override
-    public boolean isFirstTime() {
-
-        return isFirstTime;
-    }
-
-    @Override
-    public void setIsFirstTime(boolean status) {
-
-        isFirstTime = status;
-    }
 
     @Override
     public Map<String, Object> attributes() {
