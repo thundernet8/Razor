@@ -33,6 +33,15 @@ public interface IContainer {
 
     <T> T resolve(Class<T> t);
 
+    /**
+     * Resolve fields of a instance
+     *
+     * @param t
+     * @param <T>
+     * @return
+     */
+    <T> T resolve(T t);
+
     <T> T resolveNamed(Class<T> t, String name);
 
     <T, E extends Enum<E>> T resolveKeyed(Class<T> t, E enumKey);

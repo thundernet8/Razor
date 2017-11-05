@@ -114,6 +114,30 @@ public class Ioc implements IContainer {
     }
 
     @Override
+    public <T> T resolve(T t) {
+
+        // resolve fields
+        Field[] fields = FieldsWalker.cachedInjectFields(t.getClass());
+        Arrays.stream(fields).forEach(field -> {
+
+            boolean accessible = field.isAccessible();
+            try {
+
+                field.setAccessible(true);
+                field.set(t, resolve(field.getType()));
+            } catch (IllegalAccessException e) {
+
+                log.error("Access field {} of {} with exception: {}", field.getName(), t.getClass().getName(), e.getMessage());
+            } finally {
+
+                 field.setAccessible(accessible);
+            }
+        });
+
+        return t;
+    }
+
+    @Override
     public <T> T resolveNamed(Class<T> t, String name) {
 
         if (t.isInterface()) {

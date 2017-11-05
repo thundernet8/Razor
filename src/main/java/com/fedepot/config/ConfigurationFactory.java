@@ -77,7 +77,7 @@ public class ConfigurationFactory {
                 properties.put(ENV_KEY_SERVER_PORT, Integer.parseInt(element.getElementsByTagName("port").item(0).getTextContent()));
                 properties.put(ENV_KEY_CHARSET, element.getElementsByTagName("charset").item(0).getTextContent());
                 properties.put(ENV_KEY_HTTP_CACHE_SECONDS, Integer.parseInt(element.getElementsByTagName("cache").item(0).getTextContent()));
-                properties.put(ENV_KEY_SSL, element.getElementsByTagName("ssl").item(0).getTextContent().equals("true"));
+                properties.put(ENV_KEY_SSL, "true".equals(element.getElementsByTagName("ssl").item(0).getTextContent()));
             }
         }
 

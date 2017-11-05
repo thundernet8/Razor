@@ -58,7 +58,7 @@ public class HttpKit {
 
         String[] ips = proxyIP(headers);
 
-        if (ips.length > 0 && !ips[0].equals("")) {
+        if (ips.length > 0 && !"".equals(ips[0])) {
 
             return ips[0].split(":")[0];
         }
@@ -69,7 +69,7 @@ public class HttpKit {
 
             String[] realIp = realIpChar.toString().split(":");
 
-            if (realIp.length > 0 && !realIp[0].equals("[")) {
+            if (realIp.length > 0 && !"[".equals(realIp[0])) {
 
                 return realIp[0];
             }

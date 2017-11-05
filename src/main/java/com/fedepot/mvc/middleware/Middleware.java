@@ -60,6 +60,7 @@ public interface Middleware extends Comparable<Middleware> {
 
     public void apply(Request req, Response res);
 
+    @Override
     default public int compareTo(Middleware other) {
 
         return getPriority() - other.getPriority();

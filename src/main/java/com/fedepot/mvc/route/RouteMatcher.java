@@ -39,6 +39,10 @@ import java.util.regex.Pattern;
 @Slf4j
 public class RouteMatcher {
 
+    private static Pattern ROUTE_PREFIX_PATTERN = Pattern.compile("^/([0-9a-zA-Z-_/]+)?$");
+
+    private static Pattern ROUTE_PATTERN = Pattern.compile("^(([^/])([0-9a-zA-Z-_/{}:.]+)([^/]))?$");
+
     /**
      * Route prefix string, applied to a controller, regex is not supported
      */
@@ -132,6 +136,9 @@ public class RouteMatcher {
             if (StringUtils.equals(paramTypes[i], "int")) {
 
                 params[i] = new PathParameter(paramNames[i], Integer.parseInt(value));
+            } else if (StringUtils.equals(paramTypes[i], "long")) {
+
+                params[i] = new PathParameter(paramNames[i], Long.parseLong(value));
             } else {
 
                 params[i] = new PathParameter(paramNames[i], value);
@@ -152,7 +159,7 @@ public class RouteMatcher {
         // books/{string:category}/{int:id}.html
         this.route = route;
 
-        isUniversal = route.equals("*") || route.contains("/*") || Pattern.compile("\\{([0-9a-zA-Z]+)?:?([0-9a-zA-Z_]+)}").matcher(route).find();
+        isUniversal = "*".equals(route) || route.contains("/*") || Pattern.compile("\\{([0-9a-zA-Z]+)?:?([0-9a-zA-Z_]+)}").matcher(route).find();
 
         if (!this.validateRoutes()) {
             isValid = false;
@@ -196,8 +203,14 @@ public class RouteMatcher {
                     patternBuilder.append("([0-9a-zA-Z-_]+)");
                 } else {
 
-                    boolean isNumber = StringUtils.equals(currentParamType.toString().toLowerCase(), "int");
-                    types.add(isNumber ? "int" : "String");
+                    boolean isNumber = StringUtils.equals(currentParamType.toString().toLowerCase(), "int") || StringUtils.equals(currentParamType.toString().toLowerCase(), "long");
+                    if (isNumber) {
+
+                        types.add(currentParamType.toString().toLowerCase());
+                    } else {
+
+                        types.add("String");
+                    }
                     names.add(currentParamName.toString());
                     patternBuilder.append(isNumber ? "([0-9]+)" : "([0-9a-zA-Z-_]+)");
                 }
@@ -215,7 +228,7 @@ public class RouteMatcher {
                 }
             } else {
 
-                patternBuilder.append(ch.equals("*") ? "([0-9a-zA-Z-_./]+)?" : ch);
+                patternBuilder.append("*".equals(ch) ? "([0-9a-zA-Z-_./]+)?" : ch);
             }
 
             start++;
@@ -230,28 +243,24 @@ public class RouteMatcher {
 
     private boolean validateRoutes() {
 
-        Pattern pattern = Pattern.compile("^/([0-9a-zA-Z-_/]+)?$");
-        Matcher matcher = pattern.matcher(routePrefix);
+        Matcher matcher = ROUTE_PREFIX_PATTERN.matcher(routePrefix);
 
         if (!matcher.matches()) {
 
             log.error("Route Prefix {} is illegal, should consist of '0-9 a-z A-Z - _ /'", routePrefix);
-            //throw new RazorException("Router prefix ".concat(routePrefix).concat(" is illegal"));
             return false;
         }
 
-        if (route.equals("*")) {
+        if ("*".equals(route)) {
 
             return true;
         }
 
-        pattern = Pattern.compile("^(([^/])([0-9a-zA-Z-_/{}:.]+)([^/]))?$");
-        matcher = pattern.matcher(route.replace(" ", ""));
+        matcher = ROUTE_PATTERN.matcher(route.replace(" ", ""));
 
         if (!matcher.matches()) {
 
             log.error("Route {} is illegal", route);
-            //throw new RazorException("Router prefix ".concat(routePrefix).concat(" is illegal"));
         }
 
         return true;

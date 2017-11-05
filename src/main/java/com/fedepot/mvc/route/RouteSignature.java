@@ -133,12 +133,25 @@ public class RouteSignature {
                     } else if (annotations[0].annotationType() == QueryParam.class) {
 
                         List<String> queries = request.getQueries().get(((QueryParam)annotations[0]).value());
-                        if (parameter.getType() == String.class) {
 
-                            paramValues[i] = queries.size() > 0 ? queries.get(0) : "";
+                        if (queries == null) {
+
+                            paramValues[i] = null;
                         } else {
 
-                            paramValues[i] = queries;
+                            if (parameter.getType() == String.class) {
+
+                                paramValues[i] = queries.size() > 0 ? queries.get(0) : "";
+                            } else if (parameter.getType() == Integer.class || parameter.getType() == int.class) {
+
+                                paramValues[i] = queries.size() > 0 ? Integer.valueOf(queries.get(0)) : 0;
+                            } else if (parameter.getType() == Long.class || parameter.getType() == long.class) {
+
+                                paramValues[i] = queries.size() > 0 ? Long.valueOf(queries.get(0)) : 0;
+                            } else {
+
+                                paramValues[i] = queries;
+                            }
                         }
                     } else if (annotations[0].annotationType() == FromBody.class) {
 

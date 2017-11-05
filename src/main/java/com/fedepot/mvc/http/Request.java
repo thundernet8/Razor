@@ -170,6 +170,12 @@ public class Request {
     private String ip;
 
     /**
+     * user agent of request
+     */
+    @Getter
+    private String ua;
+
+    /**
      * http or https
      */
     @Getter
@@ -335,6 +341,7 @@ public class Request {
         xhr = StringUtils.equals(requestWith, "XMLHttpRequest");
 
         ip = HttpKit.getIP(headers);
+        ua = headers.get("User-Agent");
 
         method = fullHttpRequest.method().name().toUpperCase();
 
@@ -355,7 +362,7 @@ public class Request {
         origin = headers.get(ORIGIN);
 
         // netty server do not implement https, use nginx forward request and implement https
-        if (headers.get(X_FORWARDED_PROTO) != null && headers.get(X_FORWARDED_PROTO).toLowerCase().equals("https")) {
+        if (headers.get(X_FORWARDED_PROTO) != null && "https".equals(headers.get(X_FORWARDED_PROTO).toLowerCase())) {
 
             protocol = "https";
         } else {
@@ -384,7 +391,9 @@ public class Request {
 
         // below for non static requests
 
-        if (!method.equals(HttpMethod.GET)) {
+        // for form upload request
+        String contentType = headers.get(CONTENT_TYPE);
+        if (!method.equals(HttpMethod.GET) && (contentType != null) && (contentType.startsWith("application/json") || contentType.startsWith("application/x-www-form-urlencoded") || contentType.startsWith("multipart/form-data"))) {
 
             HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(HTTP_DATA_FACTORY, fullHttpRequest);
             decoder.getBodyHttpDatas().forEach(this::parseBodyData);

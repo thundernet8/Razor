@@ -61,7 +61,7 @@ public class Response {
 
     private boolean keepAlive = true;
 
-    private long startAt = 0l;
+    private long startAt = 0L;
 
     /**
      * Indicate the response has been flushed or not(which also means headers has been sent)
@@ -551,7 +551,7 @@ public class Response {
         String html = HttpContext.app().getEnv().get(ENV_RT_KEY_403_HTML).orElse("");
         keepAlive = false;
 
-        if (!html.equals("")) {
+        if (!"".equals(html)) {
 
             header(CONTENT_TYPE, ContentType.HTML.getMimeTypeWithCharset()).status(403).end(html);
         } else {
@@ -568,7 +568,7 @@ public class Response {
         String html = HttpContext.app().getEnv().get(ENV_RT_KEY_404_HTML).orElse("");
         keepAlive = false;
 
-        if (!html.equals("")) {
+        if (!"".equals(html)) {
 
             header(CONTENT_TYPE, ContentType.HTML.getMimeTypeWithCharset()).status(404).end(html);
         } else {
@@ -585,7 +585,7 @@ public class Response {
         String html = HttpContext.app().getEnv().get(ENV_RT_KEY_500_HTML).orElse("");
         keepAlive = false;
 
-        if (!html.equals("")) {
+        if (!"".equals(html)) {
 
             header(CONTENT_TYPE, ContentType.HTML.getMimeTypeWithCharset()).status(500).end(html);
         } else {
@@ -602,7 +602,7 @@ public class Response {
         String html = HttpContext.app().getEnv().get(ENV_RT_KEY_502_HTML).orElse("");
         keepAlive = false;
 
-        if (!html.equals("")) {
+        if (!"".equals(html)) {
 
             header(CONTENT_TYPE, ContentType.HTML.getMimeTypeWithCharset()).status(502).end(html);
         } else {

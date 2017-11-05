@@ -34,6 +34,7 @@ import com.fedepot.mvc.middleware.CookieParserMiddleware;
 import com.fedepot.mvc.route.RouteSignature;
 import com.fedepot.mvc.route.Router;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -72,7 +73,9 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
     private static ExecutorService newBlockingExecutorUseCallerRun(int size) {
 
-        return new ThreadPoolExecutor(size, size, 0l, TimeUnit.MILLISECONDS, new SynchronousQueue<>(), (r, executor) -> {
+        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("Razor-BlockingExecutor-pool-%d").build();
+
+        return new ThreadPoolExecutor(size, size, 0L, TimeUnit.MILLISECONDS, new SynchronousQueue<>(), threadFactory, (r, executor) -> {
 
             try {
 
@@ -286,7 +289,9 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
     private void applyMiddlewares(RouteSignature signature) {
 
         Router router = signature.getRouter();
+        IContainer ioc = razor.getIoc();
         router.getMiddlewares().forEach(middleware -> {
+            middleware = ioc.resolve(middleware);
             if (signature.response() == null || !signature.response().flushed()) {
                 middleware.apply(signature.request(), signature.response());
             }
